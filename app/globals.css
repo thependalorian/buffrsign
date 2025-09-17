@@ -1,0 +1,218 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Core Brand Colors */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    
+    /* Primary Brand Color - BuffrSign Blue */
+    --primary: 220 70% 50%;        /* #3b82f6 - Main brand color */
+    --primary-foreground: 0 0% 98%; /* #fafafa - Text on primary */
+    
+    /* Secondary & Accent Colors */
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    
+    /* UI State Colors */
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 220 70% 50%;           /* Use primary for ring focus */
+    
+    /* Chart Color System - Feature-Specific Colors */
+    --chart-1: 220 70% 50%;        /* #3b82f6 - Digital Signatures (Primary) */
+    --chart-2: 160 60% 45%;        /* #10b981 - Compliance & Success */
+    --chart-3: 30 80% 55%;         /* #f59e0b - Warnings & Notifications */
+    --chart-4: 280 65% 60%;        /* #8b5cf6 - AI Features & Intelligence */
+    --chart-5: 340 75% 55%;        /* #ef4444 - Security & Alerts */
+    
+    /* Utility Colors */
+    --radius: 0.5rem;
+    
+    /* BuffrSign Specific Semantic Colors */
+    --signature-primary: hsl(var(--chart-1));      /* Digital signature actions */
+    --signature-success: hsl(var(--chart-2));      /* Compliance verification */
+    --signature-warning: hsl(var(--chart-3));      /* Document warnings */
+    --signature-info: hsl(var(--chart-4));         /* AI analysis results */
+    --compliance-green: hsl(var(--chart-2));       /* ETA 2019 compliance */
+    --legal-blue: hsl(var(--chart-1));             /* Legal document features */
+    --ai-purple: hsl(var(--chart-4));              /* AI-powered features */
+    --security-red: hsl(var(--chart-5));           /* Security features */
+  }
+  
+  .dark {
+    /* Dark Theme - Maintain brand consistency */
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    
+    /* Primary in dark mode - Light for contrast */
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    
+    /* Secondary & Accent in dark mode */
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    
+    /* UI State Colors in dark mode */
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    
+    /* Chart colors adjusted for dark mode - maintain brand recognition */
+    --chart-1: 220 70% 60%;        /* Brighter blue for dark backgrounds */
+    --chart-2: 160 60% 55%;        /* Brighter green for dark backgrounds */
+    --chart-3: 30 80% 65%;         /* Brighter orange for dark backgrounds */
+    --chart-4: 280 65% 70%;        /* Brighter purple for dark backgrounds */
+    --chart-5: 340 75% 65%;        /* Brighter red for dark backgrounds */
+    
+    /* BuffrSign semantic colors in dark mode */
+    --signature-primary: hsl(var(--chart-1));
+    --signature-success: hsl(var(--chart-2));
+    --signature-warning: hsl(var(--chart-3));
+    --signature-info: hsl(var(--chart-4));
+    --compliance-green: hsl(var(--chart-2));
+    --legal-blue: hsl(var(--chart-1));
+    --ai-purple: hsl(var(--chart-4));
+    --security-red: hsl(var(--chart-5));
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+  }
+  
+  /* Ensure smooth color transitions */
+  * {
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+@layer components {
+  /* BuffrSign Component Styles - Using our color palette */
+  
+  /* Signature-specific buttons */
+  .signature-button {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200;
+  }
+  
+  .signature-button-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-all duration-200;
+  }
+  
+  /* Compliance and status badges */
+  .compliance-badge {
+    @apply bg-chart-2/10 text-chart-2 border-chart-2/20 px-3 py-1 rounded-full text-sm font-semibold;
+  }
+  
+  .warning-badge {
+    @apply bg-chart-3/10 text-chart-3 border-chart-3/20 px-3 py-1 rounded-full text-sm font-semibold;
+  }
+  
+  .ai-badge {
+    @apply bg-chart-4/10 text-chart-4 border-chart-4/20 px-3 py-1 rounded-full text-sm font-semibold;
+  }
+  
+  .security-badge {
+    @apply bg-chart-5/10 text-chart-5 border-chart-5/20 px-3 py-1 rounded-full text-sm font-semibold;
+  }
+  
+  /* Document and card styles */
+  .document-card {
+    @apply bg-card text-card-foreground border border-border rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+  
+  .feature-card {
+    @apply bg-card text-card-foreground border-2 border-border hover:border-primary/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-2;
+  }
+  
+  /* Glass and backdrop effects */
+  .glass-effect {
+    @apply backdrop-blur-md bg-background/80 border border-border/20;
+  }
+  
+  .glass-effect-light {
+    @apply backdrop-blur-sm bg-white/90 border-white/20;
+  }
+  
+  /* Gradient text effects */
+  .gradient-text-primary {
+    @apply bg-gradient-to-r from-primary to-chart-4 bg-clip-text text-transparent;
+  }
+  
+  .gradient-text-brand {
+    @apply bg-gradient-to-r from-chart-1 to-chart-4 bg-clip-text text-transparent;
+  }
+  
+  /* Interactive elements */
+  .interactive-card {
+    @apply cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg;
+  }
+  
+  /* Form elements */
+  .form-input {
+    @apply bg-background border border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20;
+  }
+  
+  .form-button {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-primary/20 transition-all duration-200;
+  }
+}
+
+@layer utilities {
+  /* Custom utility classes for BuffrSign */
+  
+  /* Text colors using our palette */
+  .text-signature { @apply text-chart-1; }
+  .text-compliance { @apply text-chart-2; }
+  .text-warning { @apply text-chart-3; }
+  .text-ai { @apply text-chart-4; }
+  .text-security { @apply text-chart-5; }
+  
+  /* Background colors using our palette */
+  .bg-signature { @apply bg-chart-1; }
+  .bg-compliance { @apply bg-chart-2; }
+  .bg-warning { @apply bg-chart-3; }
+  .bg-ai { @apply bg-chart-4; }
+  .bg-security { @apply bg-chart-5; }
+  
+  /* Border colors using our palette */
+  .border-signature { @apply border-chart-1; }
+  .border-compliance { @apply border-chart-2; }
+  .border-warning { @apply border-chart-3; }
+  .border-ai { @apply border-chart-4; }
+  .border-security { @apply border-chart-5; }
+  
+  /* Hover states */
+  .hover-bg-signature { @apply hover:bg-chart-1/90; }
+  .hover-bg-compliance { @apply hover:bg-chart-2/90; }
+  .hover-bg-warning { @apply hover:bg-chart-3/90; }
+  .hover-bg-ai { @apply hover:bg-chart-4/90; }
+  .hover-bg-security { @apply hover:bg-chart-5/90; }
+}
