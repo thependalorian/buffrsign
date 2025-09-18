@@ -1,0 +1,56 @@
+{
+  "section": "eta_2019_section_17",
+  "title": "Legal Recognition of Data Messages",
+  "requirements": [
+    {
+      "id": "legal_effect_not_denied",
+      "description": "Electronic documents must not be denied legal effect solely due to electronic form",
+      "mandatory": true,
+      "validation_method": "check_legal_effect_clause",
+      "compliance_level": "critical"
+    },
+    {
+      "id": "party_agreement_supported",
+      "description": "Parties must be able to agree on electronic transaction terms",
+      "mandatory": true,
+      "validation_method": "check_agreement_flexibility",
+      "compliance_level": "important"
+    },
+    {
+      "id": "no_compulsory_electronic_interaction",
+      "description": "Public bodies cannot compel electronic interaction",
+      "mandatory": true,
+      "validation_method": "check_optional_government_services",
+      "compliance_level": "critical"
+    }
+  ],
+  "validation_functions": {
+    "check_legal_effect_clause": {
+      "description": "Verify document contains clause acknowledging electronic validity",
+      "implementation": "scan_for_electronic_validity_clause",
+      "pass_criteria": "Contains explicit electronic validity acknowledgment"
+    },
+    "check_agreement_flexibility": {
+      "description": "Verify system allows custom electronic transaction terms",
+      "implementation": "check_custom_terms_capability",
+      "pass_criteria": "System supports custom agreement terms"
+    },
+    "check_optional_government_services": {
+      "description": "Verify government integration is optional",
+      "implementation": "check_government_integration_optional",
+      "pass_criteria": "Government services are opt-in only"
+    }
+  },
+  "remediation_actions": [
+    {
+      "issue": "missing_legal_effect_clause",
+      "action": "Add electronic validity acknowledgment clause",
+      "template": "The parties acknowledge that this agreement may be executed electronically and that electronic signatures shall have the same legal effect as handwritten signatures in accordance with the Electronic Transactions Act 4 of 2019."
+    },
+    {
+      "issue": "inflexible_agreement_terms",
+      "action": "Enable custom electronic transaction terms",
+      "implementation": "Add agreement customization interface"
+    }
+  ]
+}

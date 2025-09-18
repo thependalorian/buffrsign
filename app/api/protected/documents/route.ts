@@ -31,6 +31,7 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
     }
 
     // Build query based on user role and permissions
+    const supabase = await getSupabaseClient();
     let query = supabase
       .from('documents')
       .select(`
@@ -163,6 +164,7 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
     }
 
     // Create document record
+    const supabase = await getSupabaseClient();
     const { data: document, error } = await supabase
       .from('documents')
       .insert({

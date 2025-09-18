@@ -1,0 +1,46 @@
+{
+  "eta_2019_terms": {
+    "advanced_electronic_signature": {
+      "definition": "An electronic signature which is designed so that together with a security procedure it is possible to verify that the signature is unique to the signer, can identify the signer, was created under sole control of the signer, and is linked to detect changes",
+      "legal_reference": "ETA 2019 Section 1",
+      "practical_meaning": "A highly secure digital signature using cryptographic technology",
+      "examples": ["PKI-based signatures", "Biometric signatures", "Smart card signatures"]
+    },
+    "data_message": {
+      "definition": "Data generated, displayed, sent, received or stored by electronic, optical or similar means and which appears to a user as a logical unit",
+      "legal_reference": "ETA 2019 Section 1", 
+      "practical_meaning": "Any electronic document or communication",
+      "examples": ["Email", "PDF document", "SMS", "Web page", "Digital contract"]
+    },
+    "recognized_electronic_signature": {
+      "definition": "An advanced electronic signature complying with the requirements prescribed under section 20(3)",
+      "legal_reference": "ETA 2019 Section 1",
+      "practical_meaning": "The highest level of electronic signature with legal presumption of validity",
+      "requirements": ["Advanced electronic signature", "Prescribed security procedures", "CRAN accreditation"]
+    }
+  },
+  "cran_terms": {
+    "accredited_service_provider": {
+      "definition": "A person accredited by CRAN to provide security services or products",
+      "legal_reference": "ETA 2019 Chapter 5",
+      "requirements": ["CRAN application", "Technical compliance", "Security audit", "Ongoing monitoring"]
+    },
+    "digital_certificate": {
+      "definition": "Data or a device which enables a person to verify that a data message has been sent or created by a specific person",
+      "legal_reference": "ETA 2019 Section 1",
+      "types": ["Personal certificates", "Organizational certificates", "Government certificates"]
+    }
+  },
+  "namibian_legal_terms": {
+    "juristic_person": {
+      "definition": "A legal entity such as a company, close corporation, or trust",
+      "context": "Namibian company law",
+      "examples": ["(Pty) Ltd", "CC", "Trust", "NPO"]
+    },
+    "natural_person": {
+      "definition": "An individual human being with legal rights and obligations",
+      "context": "Namibian law",
+      "identification": ["Namibian ID number", "Passport number", "Birth certificate"]
+    }
+  }
+}

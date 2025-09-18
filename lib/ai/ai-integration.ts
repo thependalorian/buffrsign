@@ -1,17 +1,21 @@
 // BuffrSign Platform - Unified AI Integration Service
 // Combines LlamaIndex, Pydantic AI, LangGraph, and Data Science capabilities
 
-'use client';
-
-// import { Database } from '../database.types';
 import { LlamaIndexDocumentIntelligence } from './llamaindex-integration';
 import { PydanticAIAgents } from './pydantic-ai-agents';
+import { GroqAIIntegration } from './groq-integration';
 import { LangGraphWorkflowOrchestrator } from './langgraph-workflows';
 import { DataScienceEngine } from './data-science-engine';
 import { OCRService } from './ocr-service';
 import { ComputerVisionService } from './computer-vision-service';
+import { AlignedModels } from './aligned-models';
 import type {
   DocumentProcessingResults,
+  UserTier,
+  GroqResponse,
+  GroqAnalysisRequest,
+  GroqComplianceRequest,
+  GroqLegalExplanationRequest,
 } from './ai-types';
 
 // ============================================================================
@@ -21,18 +25,115 @@ import type {
 export class BuffrSignAIIntegration {
   private llamaindex: LlamaIndexDocumentIntelligence;
   private pydanticAI: PydanticAIAgents;
-  private langGraph: LangGraphWorkflowOrchestrator;
+  private groqAI: GroqAIIntegration;
+  public langGraph: LangGraphWorkflowOrchestrator;
   private dataScience: DataScienceEngine;
   private ocr: OCRService;
   private computerVision: ComputerVisionService;
 
-  constructor(apiBaseUrl: string = '/api/ai', apiKey?: string) {
-    this.llamaindex = new LlamaIndexDocumentIntelligence(apiBaseUrl, apiKey);
-    this.pydanticAI = new PydanticAIAgents(apiBaseUrl, apiKey);
-    this.langGraph = new LangGraphWorkflowOrchestrator(apiBaseUrl, apiKey);
-    this.dataScience = new DataScienceEngine(apiBaseUrl, apiKey);
-    this.ocr = new OCRService(apiBaseUrl, apiKey);
-    this.computerVision = new ComputerVisionService(apiBaseUrl, apiKey);
+  constructor(
+    apiBaseUrl: string = '/api/ai', 
+    apiKey?: string,
+    services?: {
+      llamaindex?: LlamaIndexDocumentIntelligence;
+      pydanticAI?: PydanticAIAgents;
+      groqAI?: GroqAIIntegration;
+      langGraph?: LangGraphWorkflowOrchestrator;
+      dataScience?: DataScienceEngine;
+      ocr?: OCRService;
+      computerVision?: ComputerVisionService;
+    }
+  ) {
+    this.llamaindex = services?.llamaindex || new LlamaIndexDocumentIntelligence(apiBaseUrl, apiKey);
+    this.pydanticAI = services?.pydanticAI || new PydanticAIAgents(apiBaseUrl, apiKey);
+    this.groqAI = services?.groqAI || new GroqAIIntegration(apiBaseUrl, apiKey);
+    this.langGraph = services?.langGraph || new LangGraphWorkflowOrchestrator(apiBaseUrl, apiKey);
+    this.dataScience = services?.dataScience || new DataScienceEngine(apiBaseUrl, apiKey);
+    this.ocr = services?.ocr || new OCRService(apiBaseUrl, apiKey);
+    this.computerVision = services?.computerVision || new ComputerVisionService(apiBaseUrl, apiKey);
+  }
+
+  // ============================================================================
+  // GROQ AI METHODS (User Tier-Based)
+  // ============================================================================
+
+  /**
+   * Get BuffrSign AI assistant response with user tier-based model selection
+   */
+  async getBuffrSignAssistantResponse(
+    userMessage: string,
+    userTier: UserTier,
+    context?: {
+      documentType?: string;
+      workflowStage?: string;
+      previousMessages?: any[];
+    }
+  ) {
+    return this.groqAI.getBuffrSignAssistantResponse(userMessage, userTier, context);
+  }
+
+  /**
+   * Analyze document with Groq AI based on user tier
+   */
+  async analyzeDocumentWithGroq(request: GroqAnalysisRequest) {
+    return this.groqAI.analyzeDocument(request);
+  }
+
+  /**
+   * Check compliance with Groq AI based on user tier
+   */
+  async checkComplianceWithGroq(request: GroqComplianceRequest) {
+    return this.groqAI.checkCompliance(request);
+  }
+
+  /**
+   * Explain legal terms with Groq AI based on user tier
+   */
+  async explainLegalTermsWithGroq(request: GroqLegalExplanationRequest) {
+    return this.groqAI.explainLegalTerms(request);
+  }
+
+  /**
+   * Analyze contract for signature requirements with Groq AI
+   */
+  async analyzeContractForSignatures(
+    contractContent: string,
+    userTier: UserTier
+  ) {
+    return this.groqAI.analyzeContractForSignatures(contractContent, userTier);
+  }
+
+  /**
+   * Check ETA 2019 compliance with Groq AI
+   */
+  async checkETA2019ComplianceWithGroq(
+    documentContent: string,
+    userTier: UserTier
+  ) {
+    return this.groqAI.checkETA2019Compliance(documentContent, userTier);
+  }
+
+  /**
+   * Generate streaming response for real-time chat
+   */
+  async generateStreamingResponse(
+    messages: any[],
+    userTier: UserTier,
+    onChunk: (chunk: string) => void,
+    options?: {
+      temperature?: number;
+      maxTokens?: number;
+      topP?: number;
+    }
+  ) {
+    return this.groqAI.generateStreamingResponse(messages, userTier, onChunk, options);
+  }
+
+  /**
+   * Get model information for user tier
+   */
+  getGroqModelInfo(userTier: UserTier) {
+    return this.groqAI.getModelInfo(userTier);
   }
 
   // ============================================================================
@@ -345,177 +446,483 @@ export class BuffrSignAIIntegration {
       return { success: false, error: error instanceof Error ? error.message : 'Complete document analysis failed' };
     }
   }
-}
 
-// ============================================================================
-// REACT HOOKS FOR UNIFIED AI INTEGRATION
-// ============================================================================
+  // ============================================================================
+  // DOCUMENT INTELLIGENCE TOOLS (LlamaIndex)
+  // ============================================================================
 
-import { useState, useEffect, useCallback } from 'react';
-
-export function useBuffrSignAI() {
-  const [aiService] = useState(() => new BuffrSignAIIntegration());
-  return aiService;
-}
-
-export function useDocumentProcessing(documentId: string, options: {
-  enableAnalysis?: boolean;
-  enableCompliance?: boolean;
-  enableRiskAssessment?: boolean;
-  enableWorkflow?: boolean;
-  enableOCR?: boolean;
-  enableComputerVision?: boolean;
-} = {}) {
-  const [results, setResults] = useState<DocumentProcessingResults | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const aiService = useBuffrSignAI();
-
-  const processDocument = useCallback(async () => {
-    if (!documentId) return;
-
-    setLoading(true);
-    setError(null);
-
+  /**
+   * Process document with OCR
+   */
+  async processDocumentWithOCR(documentId: string, base64Data: string): Promise<{
+    text: string;
+    confidence: number;
+    method: string;
+  }> {
     try {
-      const result = await aiService.processDocument(documentId, options);
-      if (result.success && result.results) {
-        setResults(result.results as DocumentProcessingResults);
-      } else {
-        setError(result.error || 'Document processing failed');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Document processing failed');
-    } finally {
-      setLoading(false);
+      const result = await this.llamaindex.processDocumentWithOCR(documentId, base64Data);
+      return result;
+    } catch (error) {
+      console.error('OCR processing error:', error);
+      throw new Error(error instanceof Error ? error.message : 'OCR processing failed');
     }
-  }, [documentId, options, aiService]);
+  }
 
-  useEffect(() => {
-    processDocument();
-  }, [processDocument]);
-
-  return {
-    results,
-    loading,
-    error,
-    refetch: processDocument
-  };
-}
-
-export function useIntelligentAnalysis(documentId: string) {
-  const [analysis, setAnalysis] = useState<Record<string, unknown> | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const aiService = useBuffrSignAI();
-
-  const analyzeDocument = useCallback(async () => {
-    if (!documentId) return;
-
-    setLoading(true);
-    setError(null);
-
+  /**
+   * Extract document fields
+   */
+  async extractDocumentFields(documentId: string): Promise<{
+    fields: Record<string, string>;
+    confidence: number;
+  }> {
     try {
-      const result = await aiService.analyzeDocumentIntelligently(documentId);
-      if (result.success && result.analysis) {
-        setAnalysis(result.analysis);
-      } else {
-        setError(result.error || 'Document analysis failed');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Document analysis failed');
-    } finally {
-      setLoading(false);
+      const result = await this.llamaindex.extractDocumentFields(documentId);
+      return result;
+    } catch (error) {
+      console.error('Field extraction error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Field extraction failed');
     }
-  }, [documentId, aiService]);
+  }
 
-  useEffect(() => {
-    analyzeDocument();
-  }, [analyzeDocument]);
-
-    return {
-    analysis,
-    loading,
-    error,
-    refetch: analyzeDocument
-  };
-}
-
-export function useKYCWorkflow(userId: string, documentId: string, kycType: 'individual' | 'business' | 'enhanced' = 'individual') {
-  const [workflowId, setWorkflowId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const aiService = useBuffrSignAI();
-
-  const startKYCWorkflow = useCallback(async () => {
-    if (!userId || !documentId) return;
-
-    setLoading(true);
-    setError(null);
-
+  /**
+   * Perform semantic document query
+   */
+  async semanticDocumentQuery(documentId: string, query: string): Promise<{
+    answer: string;
+    sources: string[];
+    confidence: number;
+  }> {
     try {
-      const result = await aiService.processKYCWorkflow(userId, documentId, kycType);
-      if (result.success) {
-        setWorkflowId(result.workflowId || null);
-      } else {
-        setError(result.error || 'KYC workflow failed');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'KYC workflow failed');
-    } finally {
-      setLoading(false);
+      const result = await this.llamaindex.semanticDocumentQuery(documentId, query);
+      return result;
+    } catch (error) {
+      console.error('Semantic query error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Semantic query failed');
     }
-  }, [userId, documentId, kycType, aiService]);
+  }
 
-  return {
-    workflowId,
-    loading,
-    error,
-    startWorkflow: startKYCWorkflow
-  };
-}
-
-export function useCompleteDocumentAnalysis(documentId: string) {
-  const [analysis, setAnalysis] = useState<Record<string, unknown> | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const aiService = useBuffrSignAI();
-
-  const performAnalysis = useCallback(async () => {
-    if (!documentId) return;
-
-    setLoading(true);
-    setError(null);
-
+  /**
+   * Analyze document compliance
+   */
+  async analyzeDocumentCompliance(documentId: string): Promise<{
+    complianceScore: number;
+    violations: string[];
+    recommendations: string[];
+  }> {
     try {
-      const result = await aiService.performCompleteDocumentAnalysis(documentId);
-      if (result.success && result.analysis) {
-        setAnalysis(result.analysis);
-      } else {
-        setError(result.error || 'Complete document analysis failed');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Complete document analysis failed');
-    } finally {
-      setLoading(false);
+      const result = await this.llamaindex.analyzeDocumentCompliance(documentId);
+      return result;
+    } catch (error) {
+      console.error('Compliance analysis error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Compliance analysis failed');
     }
-  }, [documentId, aiService]);
+  }
 
-  useEffect(() => {
-    performAnalysis();
-  }, [performAnalysis]);
+  /**
+   * Perform computer vision analysis
+   */
+  async performComputerVisionAnalysis(documentId: string): Promise<{
+    objects: string[];
+    confidence: number;
+  }> {
+    try {
+      const result = await this.llamaindex.performComputerVisionAnalysis(documentId);
+      return result;
+    } catch (error) {
+      console.error('Computer vision analysis error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Computer vision analysis failed');
+    }
+  }
 
-  return {
-    analysis,
-    loading,
-    error,
-    refetch: performAnalysis
-  };
+  /**
+   * Generate document insights
+   */
+  async generateDocumentInsights(documentId: string): Promise<{
+    insights: string[];
+    recommendations: string[];
+  }> {
+    try {
+      const result = await this.llamaindex.generateDocumentInsights(documentId);
+      return result;
+    } catch (error) {
+      console.error('Document insights error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Document insights failed');
+    }
+  }
+
+  // ============================================================================
+  // STRUCTURED AI AGENT TOOLS (Pydantic AI)
+  // ============================================================================
+
+  /**
+   * Validate structured data
+   */
+  async validateStructuredData(documentId: string, data: Record<string, unknown>): Promise<{
+    isValid: boolean;
+    errors: string[];
+    validatedData: Record<string, unknown> | null;
+  }> {
+    try {
+      const result = await this.pydanticAI.validateStructuredData(documentId, data);
+      return {
+        isValid: result.valid,
+        errors: result.errors,
+        validatedData: result.valid ? data : null
+      };
+    } catch (error) {
+      console.error('Structured data validation error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Structured data validation failed');
+    }
+  }
+
+  /**
+   * Extract entities
+   */
+  async extractEntities(documentId: string): Promise<{
+    entities: Array<{
+      type: string;
+      value: string;
+      confidence: number;
+    }>;
+  }> {
+    try {
+      const result = await this.pydanticAI.extractEntities(documentId);
+      return {
+        entities: (result.data || []).map(entity => ({
+          type: entity.type,
+          value: entity.text,
+          confidence: entity.confidence || result.confidence
+        }))
+      };
+    } catch (error) {
+      console.error('Entity extraction error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Entity extraction failed');
+    }
+  }
+
+  /**
+   * Analyze sentiment
+   */
+  async analyzeSentiment(documentId: string): Promise<{
+    sentiment: string;
+    confidence: number;
+    scores: Record<string, number>;
+  }> {
+    try {
+      const result = await this.pydanticAI.analyzeSentiment(documentId);
+      return {
+        sentiment: result.data?.overall_sentiment || 'neutral',
+        confidence: result.data?.confidence || result.confidence,
+        scores: result.data?.sentiment_scores || { positive: 0, negative: 0, neutral: 1 }
+      };
+    } catch (error) {
+      console.error('Sentiment analysis error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Sentiment analysis failed');
+    }
+  }
+
+  /**
+   * Check compliance requirements
+   */
+  async checkComplianceRequirements(documentId: string): Promise<{
+    isCompliant: boolean;
+    requirements: string[];
+    score: number;
+  }> {
+    try {
+      const result = await this.pydanticAI.checkComplianceRequirements(documentId);
+      return {
+        isCompliant: result.complianceScore >= 0.8, // Consider compliant if score >= 80%
+        requirements: result.recommendations || [],
+        score: result.complianceScore
+      };
+    } catch (error) {
+      console.error('Compliance check error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Compliance check failed');
+    }
+  }
+
+  /**
+   * Perform risk assessment
+   */
+  async performRiskAssessment(documentId: string): Promise<{
+    riskLevel: string;
+    score: number;
+    factors: string[];
+    recommendations: string[];
+  }> {
+    try {
+      const result = await this.pydanticAI.performRiskAssessment(documentId);
+      return {
+        riskLevel: result.riskLevel,
+        score: result.riskScore,
+        factors: result.riskFactors || [],
+        recommendations: result.mitigationStrategies || []
+      };
+    } catch (error) {
+      console.error('Risk assessment error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Risk assessment failed');
+    }
+  }
+
+  // ============================================================================
+  // WORKFLOW ORCHESTRATION TOOLS (LangGraph)
+  // ============================================================================
+
+  /**
+   * Execute document processing workflow
+   */
+  async executeDocumentProcessingWorkflow(documentId: string): Promise<{
+    workflowId: string;
+    status: string;
+    steps: string[];
+  }> {
+    try {
+      const result = await this.langGraph.executeDocumentProcessingWorkflow(documentId);
+      return {
+        workflowId: result.workflowId,
+        status: result.status,
+        steps: result.result?.steps || []
+      };
+    } catch (error) {
+      console.error('Document processing workflow error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Document processing workflow failed');
+    }
+  }
+
+  /**
+   * Execute KYC workflow
+   */
+  async executeKYCWorkflow(userId: string, documentId: string): Promise<{
+    workflowId: string;
+    status: string;
+    confidence: number;
+  }> {
+    try {
+      const result = await this.langGraph.executeKYCWorkflow(userId, documentId);
+      return {
+        workflowId: result.workflowId,
+        status: result.status,
+        confidence: 0.8
+      };
+    } catch (error) {
+      console.error('KYC workflow error:', error);
+      throw new Error(error instanceof Error ? error.message : 'KYC workflow failed');
+    }
+  }
+
+  /**
+   * Manage workflow state
+   */
+  async manageWorkflowState(workflowId: string): Promise<{
+    currentState: string;
+    nextSteps: string[];
+    progress?: number;
+    estimatedTimeRemaining?: number;
+  }> {
+    try {
+      const result = await this.langGraph.manageWorkflowState(workflowId);
+      return {
+        currentState: result.state?.current_node || 'unknown',
+        nextSteps: [],
+        progress: result.state?.history?.length || 0,
+        estimatedTimeRemaining: 30 // Default 30 minutes
+      };
+    } catch (error) {
+      console.error('Workflow state management error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Workflow state management failed');
+    }
+  }
+
+  /**
+   * Handle workflow error
+   */
+  async handleWorkflowError(workflowId: string, error: string): Promise<{
+    errorHandled: boolean;
+    retryCount: number;
+    nextAction: string;
+    errorDetails?: string;
+  }> {
+    try {
+      const result = await this.langGraph.handleWorkflowError(workflowId, error);
+      return {
+        errorHandled: result.handled,
+        retryCount: 1,
+        nextAction: result.recoveryAction,
+        errorDetails: error
+      };
+    } catch (error) {
+      console.error('Workflow error handling error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Workflow error handling failed');
+    }
+  }
+
+  /**
+   * Optimize document processing
+   */
+  async optimizeDocumentProcessing(documentId: string): Promise<{
+    optimizations: string[];
+    performanceGain: number;
+    estimatedTimeReduction?: number;
+  }> {
+    try {
+      const result = await this.langGraph.optimizeDocumentProcessing(documentId);
+      return {
+        optimizations: result.optimizations,
+        performanceGain: result.performanceGains,
+        estimatedTimeReduction: 15 // Default 15 minutes reduction
+      };
+    } catch (error) {
+      console.error('Document processing optimization error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Document processing optimization failed');
+    }
+  }
+
+  // ============================================================================
+  // PYTHON AGENT TOOL COMPATIBILITY
+  // ============================================================================
+
+  /**
+   * Hybrid search combining vector similarity and text matching
+   * Matches Python: hybrid_search(query, limit, text_weight)
+   */
+  async hybridSearch(
+    query: string,
+    limit: number = 10,
+    text_weight: number = 0.3
+  ): Promise<unknown[]> {
+    try {
+      const results = await this.llamaindex.hybridSearch(query, limit, text_weight);
+      return results;
+    } catch (error) {
+      console.error('Hybrid search error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Hybrid search failed');
+    }
+  }
+
+  /**
+   * Get a specific document by ID
+   * Matches Python: get_document(document_id)
+   */
+  async getDocument(
+    documentId: string
+  ): Promise<unknown | null> {
+    try {
+      const document = await this.llamaindex.getDocument(documentId);
+      return document;
+    } catch (error) {
+      console.error('Get document error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Get document failed');
+    }
+  }
+
+  /**
+   * List available documents
+   * Matches Python: list_documents(limit, offset)
+   */
+  async listDocuments(
+    limit: number = 20,
+    offset: number = 0
+  ): Promise<{ documents: unknown[]; total: number }> {
+    try {
+      const result = await this.llamaindex.listDocuments(limit, offset);
+      return result;
+    } catch (error) {
+      console.error('List documents error:', error);
+      throw new Error(error instanceof Error ? error.message : 'List documents failed');
+    }
+  }
+
+  /**
+   * Get entity relationships from knowledge graph
+   * Matches Python: get_entity_relationships(entity_name, depth)
+   */
+  async getEntityRelationships(
+    entityName: string,
+    depth: number = 2
+  ): Promise<Record<string, unknown>> {
+    try {
+      const relationships = await this.llamaindex.getEntityRelationships(entityName, depth);
+      return relationships;
+    } catch (error) {
+      console.error('Get entity relationships error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Get entity relationships failed');
+    }
+  }
+
+  /**
+   * Get entity timeline events
+   * Matches Python: get_entity_timeline(entity_name, start_date, end_date)
+   */
+  async getEntityTimeline(
+    entityName: string,
+    startDate?: string,
+    endDate?: string
+  ): Promise<Record<string, unknown>[]> {
+    try {
+      const timeline = await this.llamaindex.getEntityTimeline(entityName, startDate, endDate);
+      return timeline;
+    } catch (error) {
+      console.error('Get entity timeline error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Get entity timeline failed');
+    }
+  }
+
+  /**
+   * Execute service operation
+   * Matches Python: execute_service_operation(service_type, operation, params)
+   */
+  async executeServiceOperation(
+    serviceType: string,
+    operation: string,
+    params: Record<string, unknown>
+  ): Promise<Record<string, unknown>> {
+    try {
+      const result = await this.langGraph.executeServiceOperation(serviceType, operation, params);
+      return result;
+    } catch (error) {
+      console.error('Execute service operation error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Execute service operation failed');
+    }
+  }
+
+  /**
+   * Start signature workflow
+   * Matches Python: start_signature_workflow(document_id, signers, workflow_type)
+   */
+  async startSignatureWorkflow(
+    documentId: string,
+    signers: Array<{ id: string; name: string; email: string; role: string }>,
+    workflowType: 'sequential' | 'parallel' = 'sequential'
+  ): Promise<string> {
+    try {
+      const workflowId = await this.langGraph.startSignatureWorkflow(documentId, signers, workflowType);
+      return workflowId;
+    } catch (error) {
+      console.error('Start signature workflow error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Start signature workflow failed');
+    }
+  }
+
+  /**
+   * Start document workflow
+   * Matches Python: start_document_workflow(document_id, analysis_type, enable_compliance)
+   */
+  async startDocumentWorkflow(
+    documentId: string,
+    analysisType: 'comprehensive' | 'basic' | 'compliance' = 'comprehensive',
+    enableCompliance: boolean = true
+  ): Promise<string> {
+    try {
+      const workflowId = await this.langGraph.startDocumentWorkflow(documentId, analysisType, enableCompliance);
+      return workflowId;
+    } catch (error) {
+      console.error('Start document workflow error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Start document workflow failed');
+    }
+  }
 }
+
 
 // ============================================================================
 // UTILITY FUNCTIONS
@@ -573,6 +980,12 @@ export function getAIProcessingStatus(results: DocumentProcessingResults): {
   else pending.push('Computer Vision');
 
   return { completed, pending, failed };
+}
+
+// Public method to access LangGraph functionality
+export async function getWorkflowState(workflowId: string) {
+  const aiIntegration = new BuffrSignAIIntegration();
+  return await aiIntegration.langGraph.getWorkflowState(workflowId);
 }
 
 // ============================================================================

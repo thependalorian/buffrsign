@@ -24,7 +24,7 @@
     
     /* UI State Colors */
     --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
+    --muted-foreground: 0 0% 38.1%;  /* Improved contrast for better readability */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 89.8%;
@@ -61,9 +61,9 @@
     --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
     
-    /* Primary in dark mode - Light for contrast */
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
+    /* Primary in dark mode - Brighter blue for better contrast */
+    --primary: 220 70% 60%;
+    --primary-foreground: 0 0% 98%;
     
     /* Secondary & Accent in dark mode */
     --secondary: 0 0% 14.9%;
@@ -73,7 +73,7 @@
     
     /* UI State Colors in dark mode */
     --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
+    --muted-foreground: 0 0% 70.9%;  /* Improved contrast for dark mode readability */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 14.9%;
@@ -96,6 +96,27 @@
     --legal-blue: hsl(var(--chart-1));
     --ai-purple: hsl(var(--chart-4));
     --security-red: hsl(var(--chart-5));
+  }
+  
+  /* High Contrast Mode for Accessibility */
+  @media (prefers-contrast: high) {
+    :root {
+      --foreground: 0 0% 0%;
+      --background: 0 0% 100%;
+      --primary: 220 100% 50%;
+      --primary-foreground: 0 0% 100%;
+      --muted-foreground: 0 0% 20%;
+      --border: 0 0% 0%;
+    }
+    
+    .dark {
+      --foreground: 0 0% 100%;
+      --background: 0 0% 0%;
+      --primary: 220 100% 70%;
+      --primary-foreground: 0 0% 0%;
+      --muted-foreground: 0 0% 80%;
+      --border: 0 0% 100%;
+    }
   }
 }
 

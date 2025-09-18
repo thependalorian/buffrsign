@@ -18,9 +18,11 @@ const getSupabaseClient = async () => await createClient();
 /**
  * POST /api/documents/[id]/token - Create document access token
  */
-export const POST = withAuth(async (request: AuthenticatedRequest, { params }: { params: { id: string } }) => {
+export const POST = withAuth(async (request: AuthenticatedRequest) => {
   try {
-    const documentId = params.id;
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const documentId = pathParts[pathParts.length - 2]; // Get the document ID from the URL path
     const user = request.user;
     const { permissions = ['read'], signatureId, workflowId } = await request.json();
 
@@ -32,6 +34,7 @@ export const POST = withAuth(async (request: AuthenticatedRequest, { params }: {
     }
 
     // Check if user has access to the document
+    const supabase = await getSupabaseClient();
     const { data: document, error: documentError } = await supabase
       .from('documents')
       .select('id, owner_id, shared_with, status')
@@ -111,9 +114,11 @@ export const POST = withAuth(async (request: AuthenticatedRequest, { params }: {
 /**
  * GET /api/documents/[id]/token - Validate document access
  */
-export const GET = withAuth(async (request: AuthenticatedRequest, { params }: { params: { id: string } }) => {
+export const GET = withAuth(async (request: AuthenticatedRequest) => {
   try {
-    const documentId = params.id;
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const documentId = pathParts[pathParts.length - 2]; // Get the document ID from the URL path
     const user = request.user;
     const token = request.token;
 
@@ -125,6 +130,7 @@ export const GET = withAuth(async (request: AuthenticatedRequest, { params }: { 
     }
 
     // Get document information
+    const supabase = await getSupabaseClient();
     const { data: document, error: documentError } = await supabase
       .from('documents')
       .select('id, title, owner_id, shared_with, status, created_at')
@@ -203,9 +209,11 @@ export const GET = withAuth(async (request: AuthenticatedRequest, { params }: { 
 /**
  * DELETE /api/documents/[id]/token - Revoke document token
  */
-export const DELETE = withAuth(async (request: AuthenticatedRequest, { params }: { params: { id: string } }) => {
+export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
   try {
-    const documentId = params.id;
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const documentId = pathParts[pathParts.length - 2]; // Get the document ID from the URL path
     const user = request.user;
     const token = request.token;
 

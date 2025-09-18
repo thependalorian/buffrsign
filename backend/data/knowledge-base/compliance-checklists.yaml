@@ -1,0 +1,58 @@
+# backend/data/knowledge-base/compliance-checklists.yaml
+eta_2019_compliance_checklist:
+  section_17_legal_recognition:
+    - item: "Document not denied legal effect solely due to electronic form"
+      required: true
+      validation: "check_legal_effect_clause"
+    - item: "Parties can agree on electronic transaction terms"
+      required: false
+      validation: "check_agreement_clause"
+  
+  section_20_electronic_signatures:
+    - item: "Use of recognized electronic signature"
+      required: true
+      validation: "check_signature_type"
+    - item: "Advanced electronic signature criteria met"
+      required: true
+      validation: "check_aes_criteria"
+    - item: "Security procedure compliance"
+      required: true
+      validation: "check_security_procedure"
+  
+  section_21_original_information:
+    - item: "Information integrity maintained"
+      required: true
+      validation: "check_integrity_measures"
+    - item: "Reliable assurance of completeness"
+      required: true
+      validation: "check_completeness_assurance"
+  
+  chapter_4_consumer_protection:
+    - item: "Information disclosure requirements met"
+      required: true
+      validation: "check_disclosure_requirements"
+      applicable_when: "consumer_transaction"
+    - item: "Cooling-off period provided"
+      required: true
+      validation: "check_cooling_off_period"
+      applicable_when: "consumer_transaction"
+
+cran_accreditation_checklist:
+  service_provider_requirements:
+    - item: "CRAN accreditation certificate valid"
+      required: true
+      validation: "check_cran_certificate"
+    - item: "Security service class appropriate"
+      required: true
+      validation: "check_service_class"
+    - item: "Audit trail database maintained"
+      required: true
+      validation: "check_audit_database"
+  
+  digital_certificate_requirements:
+    - item: "Certificate from accredited authority"
+      required: true
+      validation: "check_certificate_authority"
+    - item: "Certificate not expired or revoked"
+      required: true
+      validation: "check_certificate_status"

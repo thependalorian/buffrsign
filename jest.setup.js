@@ -1,178 +1,113 @@
+// Optional: configure or set up a testing framework before each test.
+// If you delete this file, remove `setupFilesAfterEnv` from `jest.config.js`
+
+// Used for __tests__/testing-library.js
+// Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom'
 
-// Load environment variables from .env file
-require('dotenv').config()
+// Mock environment variables
+process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlc3QiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MDk5NTIwMCwiZXhwIjoxOTU2NTcxMjAwfQ.test-anon-key'
+process.env.SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlc3QiLCJyb2xlIjoic2VydmljZV9yb2xlIiwiaWF0IjoxNjQwOTk1MjAwLCJleHAiOjE5NTY1NzEyMDB9.test-service-role-key'
+process.env.GROQ_API_KEY = 'test-groq-key'
+process.env.OPENAI_API_KEY = 'test-openai-key'
 
-// Set test environment variables if not already set
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
-}
-if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-key'
-}
+// Mock fetch globally
+global.fetch = jest.fn()
 
-// Mock crypto for Node.js environment
-Object.defineProperty(global, 'crypto', {
-  value: {
-    subtle: {
-      digest: jest.fn().mockResolvedValue(new ArrayBuffer(32)),
-    },
-    getRandomValues: jest.fn().mockImplementation((arr) => {
-      for (let i = 0; i < arr.length; i++) {
-        arr[i] = Math.floor(Math.random() * 256)
-      }
-      return arr
-    }),
+// Mock Next.js router
+jest.mock('next/router', () => ({
+  useRouter() {
+    return {
+      route: '/',
+      pathname: '/',
+      query: {},
+      asPath: '/',
+      push: jest.fn(),
+      pop: jest.fn(),
+      reload: jest.fn(),
+      back: jest.fn(),
+      prefetch: jest.fn().mockResolvedValue(undefined),
+      beforePopState: jest.fn(),
+      events: {
+        on: jest.fn(),
+        off: jest.fn(),
+        emit: jest.fn(),
+      },
+      isFallback: false,
+    }
   },
-})
+}))
 
-// Mock File API for Node.js environment
-global.File = class MockFile {
-  constructor(chunks, filename, options = {}) {
-    this.chunks = chunks
-    this.name = filename
-    this.type = options.type || ''
-    this.size = chunks.reduce((acc, chunk) => acc + (typeof chunk === 'string' ? chunk.length : chunk.byteLength || 0), 0)
-    this.lastModified = Date.now()
-  }
-
-  arrayBuffer() {
-    return Promise.resolve(new ArrayBuffer(this.size))
-  }
-
-  text() {
-    return Promise.resolve(this.chunks.join(''))
-  }
-}
-
-// Mock FileReader
-global.FileReader = class MockFileReader {
-  constructor() {
-    this.readyState = 0
-    this.result = null
-    this.error = null
-    this.onload = null
-    this.onerror = null
-  }
-
-  readAsArrayBuffer(file) {
-    setTimeout(() => {
-      this.readyState = 2
-      this.result = new ArrayBuffer(file.size)
-      if (this.onload) this.onload({ target: this })
-    }, 0)
-  }
-
-  readAsText(file) {
-    setTimeout(() => {
-      this.readyState = 2
-      this.result = file.chunks ? file.chunks.join('') : ''
-      if (this.onload) this.onload({ target: this })
-    }, 0)
-  }
-}
-
-// Suppress console warnings in tests
-const originalError = console.error
-const originalWarn = console.warn
-
-beforeAll(() => {
-  console.error = (...args) => {
-    if (
-      typeof args[0] === 'string' &&
-      (args[0].includes('Warning:') || 
-       args[0].includes('act(...)') ||
-       args[0].includes('ReactDOMTestUtils') ||
-       args[0].includes('An update to'))
-    ) {
-      return
+// Mock Next.js navigation
+jest.mock('next/navigation', () => ({
+  useRouter() {
+    return {
+      push: jest.fn(),
+      replace: jest.fn(),
+      prefetch: jest.fn(),
+      back: jest.fn(),
+      forward: jest.fn(),
+      refresh: jest.fn(),
     }
-    originalError.call(console, ...args)
-  }
-  
-  console.warn = (...args) => {
-    if (
-      typeof args[0] === 'string' &&
-      (args[0].includes('Warning:') || 
-       args[0].includes('act(...)'))
-    ) {
-      return
-    }
-    originalWarn.call(console, ...args)
-  }
-})
-
-afterAll(() => {
-  console.error = originalError
-  console.warn = originalWarn
-})
+  },
+  useSearchParams() {
+    return new URLSearchParams()
+  },
+  usePathname() {
+    return '/'
+  },
+}))
 
 // Mock Supabase client
-jest.mock('./lib/supabase', () => ({
-  supabase: {
-    auth: {
-      signInWithPassword: jest.fn().mockResolvedValue({
-        data: { user: null, session: null },
-        error: null
-      }),
-      signUp: jest.fn().mockResolvedValue({
-        data: { user: null, session: null },
-        error: null
-      }),
-      signOut: jest.fn().mockResolvedValue({ error: null }),
-      getSession: jest.fn().mockResolvedValue({
-        data: { session: null },
-        error: null
-      }),
-      getUser: jest.fn().mockResolvedValue({
-        data: { user: null },
-        error: null
-      }),
-    },
-    storage: {
-      from: jest.fn(() => ({
-        upload: jest.fn().mockResolvedValue({ error: null }),
-        remove: jest.fn().mockResolvedValue({ error: null }),
-        getPublicUrl: jest.fn().mockReturnValue({
-          data: { publicUrl: 'https://test.supabase.co/storage/test.pdf' }
-        }),
-      }))
-    },
+jest.mock('@supabase/supabase-js', () => ({
+  createClient: jest.fn(() => ({
     from: jest.fn(() => ({
       select: jest.fn(() => ({
         eq: jest.fn(() => ({
-          single: jest.fn().mockResolvedValue({ data: null, error: null }),
-          order: jest.fn(() => ({
-            limit: jest.fn().mockResolvedValue({ data: [], error: null }),
-          })),
-        })),
-        insert: jest.fn(() => ({
-          select: jest.fn(() => ({
-            single: jest.fn().mockResolvedValue({ data: null, error: null }),
-          })),
-        })),
-        update: jest.fn(() => ({
-          eq: jest.fn(() => ({
-            select: jest.fn(() => ({
-              single: jest.fn().mockResolvedValue({ data: null, error: null }),
-            })),
-          })),
-        })),
-        delete: jest.fn(() => ({
-          eq: jest.fn().mockResolvedValue({ error: null }),
+          single: jest.fn(),
         })),
       })),
+      insert: jest.fn(() => ({
+        select: jest.fn(() => ({
+          single: jest.fn(),
+        })),
+      })),
+      update: jest.fn(() => ({
+        eq: jest.fn(() => ({
+          select: jest.fn(() => ({
+            single: jest.fn(),
+          })),
+        })),
+      })),
+      delete: jest.fn(() => ({
+        eq: jest.fn(),
+      })),
     })),
-  },
-  signIn: jest.fn(),
-  signUp: jest.fn(),
-  signOut: jest.fn(),
-  getCurrentSession: jest.fn().mockResolvedValue({
-    data: { session: null },
-    error: null
-  }),
-  getCurrentUser: jest.fn().mockResolvedValue({
-    data: { user: null },
-    error: null
-  }),
+    auth: {
+      getUser: jest.fn(),
+      signIn: jest.fn(),
+      signOut: jest.fn(),
+    },
+    rpc: jest.fn(),
+  })),
 }))
+
+// Mock console methods to reduce noise in tests
+global.console = {
+  ...console,
+  // Uncomment to ignore a specific log level
+  // log: jest.fn(),
+  // debug: jest.fn(),
+  // info: jest.fn(),
+  // warn: jest.fn(),
+  // error: jest.fn(),
+}
+
+// Mock File.arrayBuffer method globally
+const originalFile = global.File;
+global.File = class extends originalFile {
+  arrayBuffer() {
+    return Promise.resolve(new ArrayBuffer(8));
+  }
+}

@@ -271,7 +271,8 @@ export class JWTMiddleware {
       }
 
       // For regular access tokens, check user permissions and document ownership
-      const { data: document, error } = await this.supabase
+      const supabase = await this.getSupabaseClient();
+      const { data: document, error } = await supabase
         .from('documents')
         .select('id, owner_id, shared_with')
         .eq('id', documentId)
@@ -314,7 +315,8 @@ export class JWTMiddleware {
       }
 
       // For regular access tokens, check signature permissions
-      const { data: signature, error } = await this.supabase
+      const supabase = await this.getSupabaseClient();
+      const { data: signature, error } = await supabase
         .from('signatures')
         .select('id, signer_id, document_id, status')
         .eq('id', signatureId)
@@ -537,4 +539,20 @@ export function withSignatureAccess(
   options?: Omit<JWTMiddlewareOptions, 'requireSignatureAccess'>
 ) {
   return withAuth(handler, { ...options, requireSignatureAccess: true });
+}
+
+// Simple JWT verification function for API routes
+export async function verifyJWT(request: NextRequest): Promise<{ success: boolean; user?: JWTPayloadCustom; error?: string }> {
+  try {
+    const authResponse = await jwtMiddleware.authenticate(request, { rateLimit: false });
+    if (authResponse) {
+      return { success: false, error: 'Authentication failed' };
+    }
+    
+    const authenticatedRequest = request as AuthenticatedRequest;
+    return { success: true, user: authenticatedRequest.user };
+  } catch (error) {
+    console.error('JWT verification error:', error);
+    return { success: false, error: 'Authentication failed' };
+  }
 }

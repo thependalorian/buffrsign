@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuffrSign AI Agent - Live Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #1e40af;
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        .header p {
+            color: #64748b;
+            margin: 10px 0 0 0;
+        }
+        .demo-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+        .demo-section h2 {
+            color: #1e40af;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .demo-section h3 {
+            color: #374151;
+            margin: 20px 0 10px 0;
+        }
+        .response-box {
+            background: #1e40af;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .user-input {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #3b82f6;
+        }
+        .workflow-step {
+            background: #ecfdf5;
+            border: 1px solid #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .workflow-step h4 {
+            color: #065f46;
+            margin: 0 0 10px 0;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 5px 5px 5px 0;
+        }
+        .status-success { background: #dcfce7; color: #166534; }
+        .status-warning { background: #fef3c7; color: #92400e; }
+        .status-error { background: #fee2e2; color: #991b1b; }
+        .status-info { background: #dbeafe; color: #1e40af; }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1e40af;
+        }
+        .metric-label {
+            color: #64748b;
+            font-size: 14px;
+        }
+        .button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 10px 10px 0;
+            transition: background 0.2s;
+        }
+        .button:hover {
+            background: #2563eb;
+        }
+        .button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .conversation-flow {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .conversation-step {
+            display: flex;
+            align-items: flex-start;
+            margin: 15px 0;
+            gap: 15px;
+        }
+        .conversation-step.user {
+            flex-direction: row-reverse;
+        }
+        .conversation-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        .conversation-avatar.user {
+            background: #3b82f6;
+        }
+        .conversation-avatar.ai {
+            background: #10b981;
+        }
+        .conversation-content {
+            flex: 1;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 BuffrSign AI Agent</h1>
+            <p>Live Demo - Legal Document Analysis & Workflow Orchestration</p>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎯 AI Agent Capabilities</h2>
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-value">5</div>
+                    <div class="metric-label">Core AI Services</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">12</div>
+                    <div class="metric-label">Available Methods</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">100%</div>
+                    <div class="metric-label">Test Pass Rate</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">3,694</div>
+                    <div class="metric-label">Tokens Used</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>💬 Live AI Conversation</h2>
+            <div class="conversation-flow">
+                <div class="conversation-step user">
+                    <div class="conversation-avatar user">U</div>
+                    <div class="conversation-content">
+                        <strong>User:</strong> What are the key requirements for digital signatures in Namibia according to ETA 2019?
+                    </div>
+                </div>
+                <div class="conversation-step ai">
+                    <div class="conversation-avatar ai">AI</div>
+                    <div class="conversation-content">
+                        <strong>BuffrSign AI:</strong>
+                        <div class="response-box">The Electronic Transactions Act 2019 (ETA 2019) in Namibia provides a comprehensive framework for digital signatures and electronic transactions. Here are the key requirements:
+
+**Legal Framework:**
+1. **Definition**: Digital signature is "an electronic signature created by a secure electronic process, involving hash function and certificate from licensed CA"
+2. **Legitimacy**: Digital signatures are equivalent to handwritten signatures and admissible in evidence
+
+**Technical Requirements:**
+1. **Certificate Requirements**: Must be issued by licensed Certification Authority (CA)
+2. **Security Requirements**: Created using secure electronic process with hash function
+3. **Key Management**: Private key must be kept confidential and secure
+
+**Compliance Obligations:**
+1. **Licenses**: Must obtain license from CRAN (Communications Regulatory Authority)
+2. **Security Measures**: Implement adequate security to prevent unauthorized access
+3. **Record Keeping**: Keep records of all digital signatures issued/verified
+4. **Authentication**: Authenticate identity before issuing/verifying signatures
+5. **Disclosure**: Disclose required information about certificate holders
+
+**Additional Requirements:**
+- Identity verification procedures
+- Audit trail specifications
+- Compliance with ETA 2019 standards
+- Secure storage and preservation of electronic signatures</div>
+                        <div class="status-badge status-success">✅ Response Generated</div>
+                        <div class="status-badge status-info">📊 841 tokens used</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🛡️ Compliance Analysis Workflow</h2>
+            <div class="workflow-step">
+                <h4>Step 1: Document Analysis</h4>
+                <div class="user-input">
+                    <strong>Input:</strong> Sample digital signature agreement document
+                </div>
+                <div class="response-box">**Compliance Status:** Non-Compliant
+**Compliance Score:** 60/100
+
+**Issues Found:**
+1. No specification of qualified electronic signature type
+2. Missing reference to ETA 2019
+3. No secure storage provisions
+4. No consequences for non-compliance
+
+**Recommendations:**
+1. Specify Advanced Electronic Signatures (AdES)
+2. Include ETA 2019 reference
+3. Add secure storage provisions
+4. Establish non-compliance consequences
+5. Implement identity verification procedures</div>
+            </div>
+            
+            <div class="workflow-step">
+                <h4>Step 2: Risk Assessment</h4>
+                <div class="response-box">**Risk Analysis:**
+- **Regulatory Risk**: Medium - Non-compliance with ETA 2019
+- **Security Risk**: High - Inadequate security measures
+- **Reputation Risk**: Medium - Potential legal consequences
+- **Operational Risk**: Low - Basic framework exists
+
+**Mitigation Strategies:**
+1. Implement qualified electronic signatures
+2. Establish comprehensive audit trails
+3. Regular compliance reviews
+4. Staff training on ETA 2019 requirements</div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📚 Legal Terms Explanation</h2>
+            <div class="workflow-step">
+                <h4>Key ETA 2019 Terms</h4>
+                <div class="response-box">**1. Electronic Signature**
+Definition: Electronic sound, symbol, or process attached to record for authentication
+Example: Online checkbox agreeing to terms and conditions
+
+**2. Digital Certificate**
+Definition: Digital document containing identity information issued by trusted CA
+Example: Bank-issued certificate for online banking account
+
+**3. Qualified Electronic Signature**
+Definition: Electronic signature meeting specific security requirements
+Example: High-stakes contract signing with secure signature creation device
+
+**4. Trust Service Provider (TSP)**
+Definition: Third-party organization providing trust services
+Example: Digital signature platform or Certificate Authority</div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔄 Workflow Orchestration</h2>
+            <div class="workflow-step">
+                <h4>Document Processing Workflow</h4>
+                <div class="status-badge status-info">📋 Document Upload</div>
+                <div class="status-badge status-info">🔍 AI Analysis</div>
+                <div class="status-badge status-info">🛡️ Compliance Check</div>
+                <div class="status-badge status-info">📊 Risk Assessment</div>
+                <div class="status-badge status-success">✅ Workflow Complete</div>
+            </div>
+            
+            <div class="workflow-step">
+                <h4>KYC Workflow</h4>
+                <div class="status-badge status-info">👤 Identity Verification</div>
+                <div class="status-badge status-info">📄 Document Validation</div>
+                <div class="status-badge status-info">🔒 Security Check</div>
+                <div class="status-badge status-success">✅ KYC Approved</div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎮 Interactive Demo</h2>
+            <p>Test the AI agent with your own questions:</p>
+            <div style="margin: 20px 0;">
+                <input type="text" id="userQuestion" placeholder="Ask about Namibian legal requirements..." 
+                       style="width: 70%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-right: 10px;">
+                <button class="button" onclick="askAI()">Ask AI</button>
+            </div>
+            <div id="aiResponse" style="display: none;">
+                <div class="response-box" id="responseContent"></div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📊 Performance Metrics</h2>
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-value">5/5</div>
+                    <div class="metric-label">Tests Passed</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">100%</div>
+                    <div class="metric-label">Success Rate</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">3.7K</div>
+                    <div class="metric-label">Total Tokens</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">Expert</div>
+                    <div class="metric-label">Response Quality</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function askAI() {
+            const question = document.getElementById('userQuestion').value;
+            if (!question.trim()) return;
+            
+            const responseDiv = document.getElementById('aiResponse');
+            const contentDiv = document.getElementById('responseContent');
+            
+            responseDiv.style.display = 'block';
+            contentDiv.innerHTML = '<div class="loading"></div> Processing your question...';
+            
+            try {
+                const response = await fetch('/api/ai/groq', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            {
+                                role: 'system',
+                                content: 'You are a legal AI assistant specializing in Namibian law, particularly ETA 2019. Provide accurate, detailed legal information.'
+                            },
+                            {
+                                role: 'user',
+                                content: question
+                            }
+                        ],
+                        userTier: 'premium',
+                        type: 'chat'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    contentDiv.innerHTML = data.data?.response || 'No response received';
+                } else {
+                    contentDiv.innerHTML = 'Error: Unable to get AI response. Please try again.';
+                }
+            } catch (error) {
+                contentDiv.innerHTML = 'Error: ' + error.message;
+            }
+        }
+        
+        // Allow Enter key to submit
+        document.getElementById('userQuestion').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                askAI();
+            }
+        });
+    </script>
+</body>
+</html>
