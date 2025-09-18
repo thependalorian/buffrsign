@@ -92,7 +92,7 @@ export default {
         },
         "buffrsign-dark": {
           // Dark theme using our color palette
-          "primary": "hsl(var(--chart-1))",           // #3b82f6 - BuffrSign Blue
+          "primary": "hsl(var(--primary))",           // Brighter blue for dark mode
           "primary-content": "hsl(var(--primary-foreground))",
           "secondary": "hsl(var(--chart-4))",         // #8b5cf6 - AI Purple
           "secondary-content": "hsl(var(--primary-foreground))",

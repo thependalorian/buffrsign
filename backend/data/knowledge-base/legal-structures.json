@@ -1,0 +1,84 @@
+{
+  "document_types": {
+    "employment_contract": {
+      "required_clauses": [
+        "parties_identification",
+        "job_description", 
+        "compensation",
+        "termination_conditions",
+        "confidentiality",
+        "governing_law"
+      ],
+      "eta_2019_requirements": {
+        "signature_type": "advanced_electronic",
+        "retention_period": "7_years",
+        "consumer_protection": false
+      },
+      "namibian_law_specifics": {
+        "labour_act_compliance": true,
+        "minimum_wage_reference": true,
+        "termination_notice_periods": "as_per_labour_act"
+      }
+    },
+    "service_agreement": {
+      "required_clauses": [
+        "scope_of_work",
+        "payment_terms",
+        "deliverables",
+        "intellectual_property",
+        "limitation_of_liability"
+      ],
+      "eta_2019_requirements": {
+        "signature_type": "simple_electronic",
+        "retention_period": "5_years",
+        "consumer_protection": true
+      }
+    },
+    "nda": {
+      "required_clauses": [
+        "definition_of_confidential_information",
+        "obligations_of_receiving_party",
+        "duration_of_confidentiality",
+        "exceptions_to_confidentiality",
+        "remedies_for_breach"
+      ],
+      "eta_2019_requirements": {
+        "signature_type": "advanced_electronic",
+        "retention_period": "indefinite",
+        "consumer_protection": false
+      }
+    }
+  },
+  "compliance_frameworks": {
+    "eta_2019": {
+      "sections": {
+        "section_17": {
+          "title": "Legal recognition of data messages",
+          "requirements": [
+            "data_message_legal_effect",
+            "validity_not_denied_solely_on_electronic_form",
+            "agreement_regulation_permitted"
+          ]
+        },
+        "section_20": {
+          "title": "Electronic signature",
+          "requirements": [
+            "recognized_electronic_signature_required",
+            "advanced_electronic_signature_criteria",
+            "security_procedure_compliance"
+          ]
+        }
+      }
+    },
+    "cran_accreditation": {
+      "requirements": {
+        "security_service_provider": {
+          "accreditation_id_required": true,
+          "certificate_authority_capabilities": true,
+          "audit_trail_maintenance": true,
+          "security_incident_reporting": true
+        }
+      }
+    }
+  }
+}

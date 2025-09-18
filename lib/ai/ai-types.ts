@@ -59,6 +59,55 @@ export interface LlamaIndexResults {
 }
 
 // ============================================================================
+// GROQ AI TYPES
+// ============================================================================
+
+export type UserTier = 'standard' | 'pro';
+
+export interface GroqConfig {
+  apiKey: string;
+  baseUrl?: string;
+  standardModel: string;
+  proModel: string;
+}
+
+export interface GroqMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+  timestamp?: string;
+}
+
+export interface GroqResponse {
+  content: string;
+  usage: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+  };
+  model: string;
+  userTier: UserTier;
+}
+
+export interface GroqAnalysisRequest {
+  documentContent: string;
+  userTier: UserTier;
+  analysisType?: 'basic' | 'comprehensive';
+  context?: string;
+}
+
+export interface GroqComplianceRequest {
+  documentContent: string;
+  userTier: UserTier;
+  frameworks?: string[];
+}
+
+export interface GroqLegalExplanationRequest {
+  terms: string[];
+  userTier: UserTier;
+  context?: string;
+}
+
+// ============================================================================
 // PYDANTIC AI TYPES
 // ============================================================================
 
@@ -412,6 +461,13 @@ export interface AIServiceConfig {
     apiKey: string;
     baseURL: string;
     model?: string;
+    temperature?: number;
+  };
+  groq: {
+    apiKey: string;
+    baseURL: string;
+    standardModel: string;
+    proModel: string;
     temperature?: number;
   };
   langGraph: {

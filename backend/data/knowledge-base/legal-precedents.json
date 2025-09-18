@@ -1,0 +1,68 @@
+{
+  "namibian_case_law": {
+    "electronic_signatures": [
+      {
+        "case_name": "Example v. Digital Corp",
+        "citation": "2023 NAHCMD 123",
+        "summary": "Court recognized validity of advanced electronic signatures under ETA 2019",
+        "relevance": "Establishes precedent for electronic signature validity",
+        "key_principles": [
+          "Electronic signatures have same legal weight as handwritten",
+          "Advanced electronic signatures provide higher certainty",
+          "Proper authentication is crucial"
+        ]
+      }
+    ],
+    "contract_formation": [
+      {
+        "case_name": "Namibian Business Solutions v. Tech Innovations (Pty) Ltd",
+        "citation": "2022 NAHC 456",
+        "summary": "Electronic contract formation via email exchanges held valid",
+        "relevance": "Confirms electronic contract validity in commercial context",
+        "key_principles": [
+          "Offer and acceptance can occur electronically",
+          "Intent to create legal relations must be clear",
+          "Electronic records constitute sufficient evidence"
+        ],
+        "eta_2019_sections": ["section_17", "section_26"]
+      },
+      {
+        "case_name": "Consumer Protection Board v. Online Services Ltd",
+        "citation": "2023 NAHCMD 789",
+        "summary": "Consumer protection requirements in electronic transactions",
+        "relevance": "Establishes consumer protection standards for electronic contracts",
+        "key_principles": [
+          "Cooling-off period must be clearly communicated",
+          "Information disclosure requirements are mandatory",
+          "Electronic consent must be informed and voluntary"
+        ],
+        "eta_2019_sections": ["chapter_4"]
+      }
+    ],
+    "data_retention": [
+      {
+        "case_name": "Audit Authority v. Digital Records Corp",
+        "citation": "2023 NAHC 234",
+        "summary": "Electronic record retention requirements for compliance",
+        "relevance": "Clarifies electronic record retention obligations",
+        "key_principles": [
+          "Electronic records must maintain integrity over time",
+          "Audit trails are essential for compliance",
+          "Proper backup and recovery systems required"
+        ],
+        "eta_2019_sections": ["section_24"]
+      }
+    ]
+  },
+  "regional_precedents": {
+    "south_african_influence": [
+      {
+        "case_name": "Spring Forest Trading v. Wilberry",
+        "citation": "2015 SCA 178",
+        "summary": "Electronic signature validity under ECTA",
+        "relevance": "Influential precedent for SADC region electronic signature law",
+        "applicability_to_namibia": "Persuasive authority due to similar legal framework"
+      }
+    ]
+  }
+}

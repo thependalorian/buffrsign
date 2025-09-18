@@ -5,11 +5,11 @@
  * including document and signature token management.
  */
 
-import { JWTService, jwtService } from '@/lib/services/jwt-service';
-import { createClient } from '@/lib/supabase/server';
+import { JWTService, jwtService } from '../../lib/services/jwt-service';
+import { createClient } from '../../lib/supabase/server';
 
 // Mock Supabase client
-jest.mock('@/lib/supabase/server', () => ({
+jest.mock('../../lib/supabase/server', () => ({
   createClient: jest.fn(() => ({
     from: jest.fn(() => ({
       select: jest.fn(() => ({

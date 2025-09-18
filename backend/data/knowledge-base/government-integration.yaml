@@ -1,0 +1,49 @@
+# backend/data/knowledge-base/government-integration.yaml
+namibian_government_systems:
+  ministries:
+    home_affairs:
+      systems:
+        - name: "National Identity Management System"
+          api_endpoint: "https://api.mha.gov.na/identity"
+          authentication: "oauth2"
+          rate_limits: "1000/hour"
+          data_formats: ["json", "xml"]
+          verification_types: ["id_number", "passport", "birth_certificate"]
+        
+        - name: "Civil Registration System"
+          api_endpoint: "https://api.mha.gov.na/civil"
+          authentication: "api_key"
+          services: ["birth_registration", "marriage_registration", "death_registration"]
+    
+    trade_industry:
+      systems:
+        - name: "Business Registration System"
+          api_endpoint: "https://api.mti.gov.na/business"
+          authentication: "oauth2"
+          services: ["company_registration", "business_license", "trade_permits"]
+          document_types: ["incorporation_certificate", "business_license", "tax_clearance"]
+    
+    finance:
+      systems:
+        - name: "Namibia Revenue Agency (NamRA)"
+          api_endpoint: "https://api.namra.gov.na"
+          authentication: "oauth2"
+          services: ["tax_registration", "vat_registration", "tax_clearance"]
+          required_documents: ["tax_returns", "vat_declarations", "paye_submissions"]
+
+integration_requirements:
+  authentication:
+    government_oauth: "OAuth 2.0 with PKCE"
+    certificate_pinning: true
+    mutual_tls: true
+  
+  data_protection:
+    encryption_at_rest: "AES-256"
+    encryption_in_transit: "TLS 1.3"
+    data_residency: "namibia_only"
+    retention_period: "as_per_government_policy"
+  
+  compliance:
+    audit_logging: "comprehensive"
+    data_sovereignty: "namibian_jurisdiction"
+    cross_border_restrictions: "government_approval_required"

@@ -1,0 +1,42 @@
+Category,Variant,Jurisdiction Fit,Source URL,Notes
+Employment Contract,Standard Permanent (SA SME Labour Support),South Africa,https://smelaboursupport.org.za/download/template-permanent-contract-of-employment/,BCEA-aligned; use for full-time hires; add company-specific policies.
+Employment Contract,Plain-English Essentials (Labour Guide Example),South Africa/Namibia (adapt),https://labourguide.co.za/employment-condition/contract-of-employment-example,Good clause structure; update leave/notice to local statutes.
+Employment Contract,Small Business Short-Form (UIF Services),South Africa,https://www.uifservices.co.za/wp-content/uploads/2013/11/Employment_Contract_SmallBusiness.pdf,Compact; ideal for SMEs; verify hours/leave with BCEA.
+Employment Contract (Reference),Namibia Labour General Regulations (2008),Namibia,https://ejustice.moj.na/High%20Court/LegislationAndDirectives/Regulations/Labour%20General%20Regulations%20%20Labour%20Act%202007.pdf,"Use to verify remuneration statements, leave, H&S reps."
+Employment Contract (Reference),Labour Act 11 of 2007 (Profile),Namibia,https://genderlex.fao.org/undefined/country/profiles/NAM/document/LEX-FAOC210939,Primary statute; check minimum terms and protections.
+Employment Contract (Policy Example),Legal Assistance Centre Employment Policy,Namibia,https://www.lac.org.na/about/policy-pdf/employment.pdf,Shows how Namibian NGOs frame terms under Labour Act.
+Non-Disclosure Agreement,Mutual NDA (LegalWise SA),South Africa/SADC (adapt),https://www.legalwise.co.za/help-yourself/contracts,Well-known SA source; ensure jurisdiction & governing law updates.
+Non-Disclosure Agreement,One-way NDA (Law For All SA),South Africa/SADC (adapt),https://lawforall.co.za/legal-articles/free-legal-contract-templates/,Simple one-way form; add duration & exclusions.
+Non-Disclosure Agreement,Comprehensive NDA (DocxTemplates),Botswana/Region (adapt),https://www.docxtemplates.org/legal-forms/non-disclosure-agreement-template/,Use for cross-border work; customize dispute resolution.
+Residential Lease,Plain Lease (LegalWise SA),South Africa,https://www.legalwise.co.za/help-yourself/contracts,Includes deposit/inspection; compliant with Rental Housing Act.
+Residential Lease,Comprehensive Lease (Property24 Sample),South Africa,https://www.property24.com/articles/free-lease-agreement-template/26926,Detailed; add CPA compliance where applicable.
+Residential Lease,Botswana Tenancy Guidance (Minchin & Kelly),Botswana,https://minchinkelly.bw/publications/holdover-or-squatters-and-tenants-rights-in-botswana/,Legal guidance; pair with SA/Namibia template and localize.
+Services Agreement,Consulting Agreement (LegalWise SA),South Africa/SADC (adapt),https://www.legalwise.co.za/help-yourself/contracts,"Scope, payment, IP; add POPIA/GDPR clauses where needed."
+Services Agreement,Service Level Agreement (SLA) Sample,South Africa/SADC (adapt),https://www.tools4dev.org/resources/service-level-agreement-template/,NGO/IT-friendly SLA; define KPIs & remedies.
+Services Agreement,Independent Contractor Agreement (Law For All SA),South Africa/Namibia (adapt),https://lawforall.co.za/legal-articles/free-legal-contract-templates/,Clarifies non-employee status; add tax/withholding language.
+Sale of Goods Agreement,Simple Sale Agreement (LegalWise SA),South Africa/SADC (adapt),https://www.legalwise.co.za/help-yourself/contracts,Use for movable goods; include warranties & risk transfer.
+Sale of Goods Agreement,Purchase Order Ts&Cs (Open Template),SADC (adapt),https://www.vertex42.com/WordTemplates/purchase-order-template.html,Attach to POs; add governing law & limitation of liability.
+Sale of Goods Agreement,Acknowledgement of Debt (AOD) (LegalWise SA),South Africa/Namibia (adapt),https://www.legalwise.co.za/help-yourself/contracts,For repayment plans; pair with surety where needed.
+Loan Agreement,Simple Loan Agreement (Law For All SA),South Africa/SADC (adapt),https://lawforall.co.za/legal-articles/free-legal-contract-templates/,"Covers principal, interest, repayment, default."
+Loan Agreement,Promissory Note (TemplateLab),SADC (adapt),https://templatelab.com/promissory-note/,Short-form loan; add Namibian stamp duty if applicable.
+Loan Agreement,Suretyship Agreement (LegalWise SA),South Africa/Namibia (adapt),https://www.legalwise.co.za/help-yourself/contracts,Add consumer protection and NCA checks (SA).
+Shareholders' Agreement,SME Shareholders Agreement (LegalWise SA),South Africa/SADC (adapt),https://www.legalwise.co.za/help-yourself/contracts,Minority protections; pre-emption; drag/tag.
+Shareholders' Agreement,Founders Agreement (Seed/Startup),SADC (adapt),https://www.ycombinator.com/documents,Use as structure; localize to SA/Namibia/Botswana law.
+Shareholders' Agreement,MOI/MOA Reference (CIPC),South Africa,https://www.cipc.co.za/wp-content/uploads/2022/06/MOI_CoR15_1E.pdf,Official Memorandum of Incorporation; align shareholder terms.
+IP License,Software License Agreement (SaaS) Sample,SADC (adapt),https://www.contractsCounsel.com/b/saas-agreement,Add POPIA/GDPR and data transfer provisions.
+IP License,Content License Agreement (Creative),SADC (adapt),https://www.docracy.com/0xk0z4tqf7/content-license-agreement,"Specify territory, exclusivity, royalties."
+IP License,Trademark Consent/Coexistence (TemplateLab),SADC (adapt),https://templatelab.com/trademark-license-agreement/,"Use with local IP registries (BIPA, CIPC)."
+Data Processing Agreement,POPIA-Aligned DPA (Guidance + Template),South Africa,https://www.justice.gov.za/inforeg/portal.html,Base clauses re operator obligations; add cross-border transfer terms.
+Data Processing Agreement,GDPR DPA (Open Source),SADC (adapt),https://github.com/Standard-Contractual-Clauses/Standard-Contractual-Clauses,Use for EU data flows; bolt on POPIA/NDPR/Namibian rules.
+Data Processing Agreement,Privacy Policy (Law For All SA),South Africa/SADC (adapt),https://lawforall.co.za/legal-articles/free-legal-contract-templates/,Public-facing; ensure plain-language and consent management.
+Partnership Agreement,General Partnership (LegalWise SA),South Africa/SADC (adapt),https://www.legalwise.co.za/help-yourself/contracts,"Profit share, duties, dissolution clauses."
+Joint Venture Agreement,Project-Based JV (Template Archive),SADC (adapt),https://www.templatearchive.com/joint-venture-agreement-templates/,"Define contributions, IP, exit."
+Memorandum of Understanding,MOU (Law For All SA),South Africa/SADC (adapt),https://lawforall.co.za/legal-articles/free-legal-contract-templates/,Non-binding framework; add confidentiality & timelines.
+Distribution Agreement,Exclusive Distribution (TemplateLab),SADC (adapt),https://templatelab.com/distribution-agreement/,"Territory, quotas, branding; competition law check."
+Agency Agreement,Commission Agency (LegalWise SA),South Africa/SADC (adapt),https://www.legalwise.co.za/help-yourself/contracts,"Define authority, commission, termination."
+Franchise Agreement,Franchise Term Sheet + Agreement (Franchise Association SA guidance),South Africa,https://www.fasa.co.za/franchising-advice/,Align to Consumer Protection Act & disclosure regulations.
+Power of Attorney,General POA (LegalWise SA),South Africa/Namibia (adapt),https://www.legalwise.co.za/help-yourself/contracts,Witnessing requirements differ; notarise for cross-border use.
+Board Resolution,Directors' Resolution Template,SADC (adapt),https://www.vertex42.com/WordTemplates/meeting-minutes-template.html,Record approvals for contracts/loans; attach as schedule.
+Resolution / Consent,Shareholder Written Resolution,South Africa,https://www.cipc.co.za/,Use for special resolutions; file with CIPC when required.
+Botswana Employment (Reference),Employment Act (summary/guide),Botswana,https://www.gov.bw/services/employment-act-information,"Check minimum terms, termination, severance; localise contracts."
+Botswana Tenancy (Reference),Tenants' Rights & Holdover (Minchin & Kelly),Botswana,https://minchinkelly.bw/publications/holdover-or-squatters-and-tenants-rights-in-botswana/,Legal contours for lease enforcement & eviction.

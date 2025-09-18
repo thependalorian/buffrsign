@@ -150,6 +150,9 @@ describe('DocumentService', () => {
     const mockUserId = 'user-123';
     const mockFile = new File(['test content'], 'test.pdf', { type: 'application/pdf' });
     Object.defineProperty(mockFile, 'size', { value: 1024 * 1024 });
+    
+    // Add arrayBuffer method to mock File
+    mockFile.arrayBuffer = jest.fn().mockResolvedValue(new ArrayBuffer(8));
 
     it('should handle missing file', async () => {
       const uploadData = {
