@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "../lib/contexts/auth-context";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -110,6 +111,7 @@ export default function RootLayout({
             {children}
           </AuthProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );

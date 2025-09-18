@@ -37,6 +37,7 @@
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
     "@types/jsonwebtoken": "^9.0.10",
+    "@vercel/analytics": "^1.5.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "daisyui": "^5.1.3",
