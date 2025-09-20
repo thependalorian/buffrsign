@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const supabase = createClient();
+    const _supabase = createClient();
     const { searchParams } = new URL(request.url);
     
     const filter = searchParams.get('filter') || 'all';
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    // Check if user is authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    // Check if _user is authenticated
+    const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !_user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
         total: queueItems?.length || 0
       }
     });
-  } catch (error) {
+  } catch {
     console.error('Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -74,12 +74,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const _supabase = createClient();
     const body = await request.json();
 
-    // Check if user is authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    // Check if _user is authenticated
+    const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !_user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
         priority,
         scheduled_at: scheduledAt,
         status: 'pending',
-        created_by: user.id
+        created_by: _user.id
       })
       .select()
       .single();
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       success: true,
       queueItem
     }, { status: 201 });
-  } catch (error) {
+  } catch {
     console.error('Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

@@ -32,24 +32,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Authenticate user with Supabase
-    const supabase = await getSupabaseClient();
     const { data: authData, error: authError } = await (await getSupabaseClient()).auth.signInWithPassword({
       email,
       password,
     });
 
-    if (authError || !authData.user) {
+    if (authError || !authData._user) {
       return NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
 
-    // Get user profile
+    // Get _user profile
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('id, email, role, permissions')
-      .eq('id', authData.user.id)
+      .eq('id', authData._user.id)
       .single();
 
     if (profileError || !profile) {
@@ -75,21 +74,21 @@ export async function POST(request: NextRequest) {
       p_success: true,
       p_metadata: {
         ip_address: request.headers.get('x-forwarded-for') || request.headers.get("x-forwarded-for")?.split(",")[0] || "unknown",
-        user_agent: request.headers.get('user-agent'),
+        user_agent: request.headers.get('_user-agent'),
       },
     });
 
     return NextResponse.json({
       success: true,
       data: tokenPair,
-      user: {
+      _user: {
         id: profile.id,
         email: profile.email,
         role: profile.role,
         permissions: profile.permissions || [],
       },
     });
-  } catch (error) {
+  } catch {
     console.error('Token creation error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -124,7 +123,7 @@ export async function PUT(request: NextRequest) {
       p_success: true,
       p_metadata: {
         ip_address: request.headers.get('x-forwarded-for') || request.headers.get("x-forwarded-for")?.split(",")[0] || "unknown",
-        user_agent: request.headers.get('user-agent'),
+        user_agent: request.headers.get('_user-agent'),
       },
     });
 
@@ -132,7 +131,7 @@ export async function PUT(request: NextRequest) {
       success: true,
       data: newTokenPair,
     });
-  } catch (error) {
+  } catch {
     console.error('Token refresh error:', error);
     
     // Log failed refresh attempt
@@ -146,7 +145,7 @@ export async function PUT(request: NextRequest) {
         p_error_message: error instanceof Error ? error.message : 'Unknown error',
         p_metadata: {
           ip_address: request.headers.get('x-forwarded-for') || request.headers.get("x-forwarded-for")?.split(",")[0] || "unknown",
-          user_agent: request.headers.get('user-agent'),
+          user_agent: request.headers.get('_user-agent'),
         },
       });
     } catch (logError) {
@@ -166,9 +165,9 @@ export async function PUT(request: NextRequest) {
 export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const token = request.token;
-    const user = request.user;
+    const _user = request._user;
 
-    if (!token || !user) {
+    if (!token || !_user) {
       return NextResponse.json(
         { error: 'No token provided' },
         { status: 401 }
@@ -178,22 +177,22 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
     // Blacklist the current token
     await jwtService.blacklistToken(token);
 
-    // Revoke all user tokens (optional - for security)
+    // Revoke all _user tokens (optional - for security)
     const revokeAll = request.nextUrl.searchParams.get('revoke_all') === 'true';
     if (revokeAll) {
-      await jwtService.revokeAllUserTokens(user.sub);
+      await jwtService.revokeAllUserTokens(_user.sub);
     }
 
     // Log successful logout
     await (await getSupabaseClient()).rpc('log_token_action', {
-      p_user_id: user.sub,
+      p_user_id: _user.sub,
       p_action: 'logout',
-      p_token_type: user.tokenType,
+      p_token_type: _user.tokenType,
       p_success: true,
       p_metadata: {
         revoke_all: revokeAll,
         ip_address: request.headers.get('x-forwarded-for') || request.headers.get("x-forwarded-for")?.split(",")[0] || "unknown",
-        user_agent: request.headers.get('user-agent'),
+        user_agent: request.headers.get('_user-agent'),
       },
     });
 
@@ -201,7 +200,7 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
       success: true,
       message: 'Token revoked successfully',
     });
-  } catch (error) {
+  } catch {
     console.error('Token revocation error:', error);
     return NextResponse.json(
       { error: 'Failed to revoke token' },
@@ -215,20 +214,20 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
  */
 export const GET = withAuth(async (request: AuthenticatedRequest) => {
   try {
-    const user = request.user;
+    const _user = request._user;
 
-    if (!user) {
+    if (!_user) {
       return NextResponse.json(
-        { error: 'No user found' },
+        { error: 'No _user found' },
         { status: 401 }
       );
     }
 
-    // Get fresh user profile
+    // Get fresh _user profile
     const { data: profile, error: profileError } = await (await getSupabaseClient())
       .from('profiles')
       .select('id, email, role, permissions, first_name, last_name, company_name')
-      .eq('id', user.sub)
+      .eq('id', _user.sub)
       .single();
 
     if (profileError || !profile) {
@@ -241,7 +240,7 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
     return NextResponse.json({
       success: true,
       data: {
-        user: {
+        _user: {
           id: profile.id,
           email: profile.email,
           role: profile.role,
@@ -251,13 +250,13 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
           company_name: profile.company_name,
         },
         token: {
-          type: user.tokenType,
-          expires_at: new Date(user.exp * 1000).toISOString(),
-          issued_at: new Date(user.iat * 1000).toISOString(),
+          type: _user.tokenType,
+          expires_at: new Date(_user.exp * 1000).toISOString(),
+          issued_at: new Date(_user.iat * 1000).toISOString(),
         },
       },
     });
-  } catch (error) {
+  } catch {
     console.error('Token validation error:', error);
     return NextResponse.json(
       { error: 'Token validation failed' },

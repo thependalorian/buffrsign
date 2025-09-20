@@ -6,12 +6,12 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createClient();
+    const _supabase = createClient();
     const { id } = params;
 
-    // Check if user is authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    // Check if _user is authenticated
+    const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !_user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -42,7 +42,7 @@ export async function DELETE(
       success: true,
       message: 'Email removed from blacklist successfully'
     });
-  } catch (error) {
+  } catch {
     console.error('Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

@@ -4,17 +4,17 @@
  * GET /api/email/status - Get email system status and configuration
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { emailConfig } from '@/lib/config/email-config';
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
+export async function GET(): Promise<NextResponse> {
   try {
     // Get authenticated user
-    const supabase = createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const _supabase = createClient();
+    const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user) {
+    if (authError || !_user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         .limit(1);
       
       dbStatus = dbError ? 'error' : 'connected';
-    } catch (error) {
+    } catch {
       dbStatus = 'error';
     }
 
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       } else {
         queueStatus = 'error';
       }
-    } catch (error) {
+    } catch {
       queueStatus = 'error';
     }
 
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
                        emailConfig.provider === 'ses' ? !!emailConfig.awsAccessKeyId : false;
       
       providerStatus = hasApiKey ? 'configured' : 'not_configured';
-    } catch (error) {
+    } catch {
       providerStatus = 'error';
     }
 
@@ -132,10 +132,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       status: systemStatus
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Email status API error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

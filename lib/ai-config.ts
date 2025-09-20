@@ -254,7 +254,7 @@ export const RISK_ASSESSMENT_CRITERIA = {
   low_risk: {
     score_range: [0, 30],
     characteristics: [
-      'Standard document types',
+      'Standard _document types',
       'Clear compliance requirements',
       'Low financial impact',
       'Standard signature requirements'
@@ -268,7 +268,7 @@ export const RISK_ASSESSMENT_CRITERIA = {
   medium_risk: {
     score_range: [31, 60],
     characteristics: [
-      'Complex document structures',
+      'Complex _document structures',
       'Multiple compliance requirements',
       'Moderate financial impact',
       'Multiple signature parties'

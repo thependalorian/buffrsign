@@ -10,7 +10,7 @@ import { verifyJWT } from '@/lib/middleware/jwt-middleware';
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify JWT token and get user information
+    // Verify JWT token and get _user information
     const authResult = await verifyJWT(request);
     if (!authResult.success) {
       return NextResponse.json(
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { user } = authResult;
+    const { _user } = authResult;
     const body = await request.json();
     
     const {
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
         }
         result = await langGraph.startWorkflow(workflow_id, input_data, {
           workflow_type: workflow_id,
-          user_id: user?.sub || 'unknown',
+          user_id: _user?.sub || 'unknown',
           priority: 'medium'
         });
         break;
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error) {
+  } catch {
     console.error('LangGraph API Error:', error);
     
     return NextResponse.json(

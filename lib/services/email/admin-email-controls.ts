@@ -1,7 +1,7 @@
 /**
  * Admin Email Controls Service for BuffrSign
  * 
- * Manages manual email sending by admins with document-specific conflict prevention
+ * Manages manual email sending by admins with _document-specific conflict prevention
  * Founder: George Nekwaya (george@buffr.ai +12065308433)
  */
 
@@ -23,7 +23,7 @@ export interface ManualEmailRequest {
   id: string;
   adminId: string;
   adminName: string;
-  emailType: 'document_invitation' | 'signature_reminder' | 'document_completed' | 'document_expired' | 'signature_declined' | 'custom';
+  _emailType: 'document_invitation' | 'signature_reminder' | 'document_completed' | 'document_expired' | 'signature_declined' | 'custom';
   recipients: {
     type: 'signer' | 'document_owner' | 'custom';
     ids: string[];
@@ -47,7 +47,7 @@ export interface ManualEmailRequest {
 
 export interface EmailQueueItem {
   id: string;
-  emailType: string;
+  _emailType: string;
   recipientEmail: string;
   subject: string;
   scheduledFor: Date;
@@ -80,11 +80,11 @@ export class BuffrSignAdminEmailControlsService {
       const recentEmails = await this.getRecentEmailsForRecipients(request.recipients.emails, 24);
       
       for (const email of recentEmails) {
-        if (email.emailType === request.emailType) {
+        if (email._emailType === request._emailType) {
           conflicts.push({
             type: 'duplicate',
             severity: 'high',
-            message: `Recent automated ${request.emailType} email sent to ${email.recipientEmail} at ${email.sentAt}`,
+            message: `Recent automated ${request._emailType} email sent to ${email.recipientEmail} at ${email.sentAt}`,
             recommendation: 'Consider delaying manual email or targeting different recipients',
             affectedRecipients: [email.recipientEmail],
             lastAutomatedEmail: email.sentAt,
@@ -93,22 +93,22 @@ export class BuffrSignAdminEmailControlsService {
         }
       }
 
-      // Check for document-specific conflicts
+      // Check for _document-specific conflicts
       if (request.recipients.documentId) {
-        const documentConflicts = await this.checkDocumentConflicts(request.recipients.documentId, request.emailType);
+        const documentConflicts = await this.checkDocumentConflicts(request.recipients.documentId, request._emailType);
         conflicts.push(...documentConflicts);
       }
 
       // Check for signature workflow conflicts
-      const workflowConflicts = await this.checkSignatureWorkflowConflicts(request.recipients.emails, request.emailType);
+      const workflowConflicts = await this.checkSignatureWorkflowConflicts(request.recipients.emails, request._emailType);
       conflicts.push(...workflowConflicts);
 
       // Check for frequency violations
-      const frequencyViolations = await this.checkFrequencyViolations(request.recipients.emails, request.emailType);
+      const frequencyViolations = await this.checkFrequencyViolations(request.recipients.emails, request._emailType);
       conflicts.push(...frequencyViolations);
 
       // Check for timing conflicts with scheduled automation
-      const timingConflicts = await this.checkTimingConflicts(request.scheduledFor, request.emailType);
+      const timingConflicts = await this.checkTimingConflicts(request.scheduledFor, request._emailType);
       conflicts.push(...timingConflicts);
 
       // Check for content conflicts (similar subjects)
@@ -152,7 +152,7 @@ export class BuffrSignAdminEmailControlsService {
           id: manualEmailRequest.id,
           admin_id: manualEmailRequest.adminId,
           admin_name: manualEmailRequest.adminName,
-          email_type: manualEmailRequest.emailType,
+          email_type: manualEmailRequest._emailType,
           recipients: manualEmailRequest.recipients,
           subject: manualEmailRequest.subject,
           content: manualEmailRequest.content,
@@ -173,7 +173,7 @@ export class BuffrSignAdminEmailControlsService {
       // Log admin action
       await this.logAdminAction(manualEmailRequest.adminId, 'manual_email_request_submitted', {
         requestId: manualEmailRequest.id,
-        emailType: manualEmailRequest.emailType,
+        _emailType: manualEmailRequest._emailType,
         recipientCount: manualEmailRequest.recipients.emails.length,
         conflicts: conflicts.length,
         documentId: manualEmailRequest.recipients.documentId
@@ -204,7 +204,7 @@ export class BuffrSignAdminEmailControlsService {
       for (const email of request.recipients.emails) {
         let emailResponse;
         
-        switch (request.emailType) {
+        switch (request._emailType) {
           case 'document_invitation':
             if (request.recipients.documentId) {
               emailResponse = await this.emailService.sendDocumentInvitation({
@@ -273,7 +273,7 @@ export class BuffrSignAdminEmailControlsService {
 
       // Log immediate send action
       await this.logAdminAction(adminId, 'manual_email_sent_immediate', {
-        emailType: request.emailType,
+        _emailType: request._emailType,
         recipientCount: request.recipients.emails.length,
         conflicts: conflicts.length,
         reason: request.reason,
@@ -374,70 +374,70 @@ export class BuffrSignAdminEmailControlsService {
     return data || [];
   }
 
-  private async checkDocumentConflicts(documentId: string, emailType: string): Promise<EmailConflict[]> {
+  private async checkDocumentConflicts(documentId: string, _emailType: string): Promise<EmailConflict[]> {
     const conflicts: EmailConflict[] = [];
 
     try {
-      // Get document status
-      const { data: document } = await this.supabase
+      // Get _document status
+      const { data: _document } = await this.supabase
         .from('documents')
         .select('status, title, created_at')
         .eq('id', documentId)
         .single();
 
-      if (!document) {
+      if (!_document) {
         conflicts.push({
           type: 'document_status',
           severity: 'critical',
           message: 'Document not found',
-          recommendation: 'Verify document ID before sending email',
+          recommendation: 'Verify _document ID before sending email',
           documentId
         });
         return conflicts;
       }
 
-      // Check if document status conflicts with email type
-      if (document.status === 'completed' && emailType === 'document_invitation') {
+      // Check if _document status conflicts with email type
+      if (_document.status === 'completed' && _emailType === 'document_invitation') {
         conflicts.push({
           type: 'document_status',
           severity: 'high',
           message: 'Document is already completed, invitation email may be inappropriate',
           recommendation: 'Consider sending completion notification instead',
           documentId,
-          documentStatus: document.status
+          documentStatus: _document.status
         });
       }
 
-      if (document.status === 'draft' && emailType === 'signature_reminder') {
+      if (_document.status === 'draft' && _emailType === 'signature_reminder') {
         conflicts.push({
           type: 'document_status',
           severity: 'high',
           message: 'Document is still in draft status, reminder email may be premature',
-          recommendation: 'Wait for document to be sent before sending reminders',
+          recommendation: 'Wait for _document to be sent before sending reminders',
           documentId,
-          documentStatus: document.status
+          documentStatus: _document.status
         });
       }
 
-      if (document.status === 'expired' && ['document_invitation', 'signature_reminder'].includes(emailType)) {
+      if (_document.status === 'expired' && ['document_invitation', 'signature_reminder'].includes(_emailType)) {
         conflicts.push({
           type: 'document_status',
           severity: 'critical',
           message: 'Document has expired, sending invitation or reminder emails is inappropriate',
-          recommendation: 'Send document expired notification instead',
+          recommendation: 'Send _document expired notification instead',
           documentId,
-          documentStatus: document.status
+          documentStatus: _document.status
         });
       }
 
     } catch (error) {
-      console.error('Error checking document conflicts:', error);
+      console.error('Error checking _document conflicts:', error);
     }
 
     return conflicts;
   }
 
-  private async checkSignatureWorkflowConflicts(emails: string[], emailType: string): Promise<EmailConflict[]> {
+  private async checkSignatureWorkflowConflicts(emails: string[], _emailType: string): Promise<EmailConflict[]> {
     const conflicts: EmailConflict[] = [];
 
     try {
@@ -448,18 +448,18 @@ export class BuffrSignAdminEmailControlsService {
         .in('signer_email', emails);
 
       signatures?.forEach(signature => {
-        if (signature.status === 'signed' && emailType === 'signature_reminder') {
+        if (signature.status === 'signed' && _emailType === 'signature_reminder') {
           conflicts.push({
             type: 'signature_workflow',
             severity: 'medium',
-            message: `Recipient ${signature.signer_email} has already signed the document`,
+            message: `Recipient ${signature.signer_email} has already signed the _document`,
             recommendation: 'Remove signed recipients from reminder list',
             affectedRecipients: [signature.signer_email],
             documentId: signature.document_id
           });
         }
 
-        if (signature.status === 'declined' && ['document_invitation', 'signature_reminder'].includes(emailType)) {
+        if (signature.status === 'declined' && ['document_invitation', 'signature_reminder'].includes(_emailType)) {
           conflicts.push({
             type: 'signature_workflow',
             severity: 'high',
@@ -478,7 +478,7 @@ export class BuffrSignAdminEmailControlsService {
     return conflicts;
   }
 
-  private async checkFrequencyViolations(emails: string[], emailType: string): Promise<EmailConflict[]> {
+  private async checkFrequencyViolations(emails: string[], _emailType: string): Promise<EmailConflict[]> {
     const conflicts: EmailConflict[] = [];
     
     // Check if any recipient has received more than 3 emails in the last 24 hours
@@ -508,7 +508,7 @@ export class BuffrSignAdminEmailControlsService {
     return conflicts;
   }
 
-  private async checkTimingConflicts(scheduledFor: Date | undefined, emailType: string): Promise<EmailConflict[]> {
+  private async checkTimingConflicts(scheduledFor: Date | undefined, _emailType: string): Promise<EmailConflict[]> {
     const conflicts: EmailConflict[] = [];
 
     if (!scheduledFor) return conflicts;
@@ -517,7 +517,7 @@ export class BuffrSignAdminEmailControlsService {
     const { data: scheduledAutomation } = await this.supabase
       .from('scheduled_reminders')
       .select('*')
-      .eq('reminder_type', emailType)
+      .eq('reminder_type', _emailType)
       .gte('scheduled_for', new Date(scheduledFor.getTime() - 30 * 60 * 1000).toISOString())
       .lte('scheduled_for', new Date(scheduledFor.getTime() + 30 * 60 * 1000).toISOString());
 
@@ -525,7 +525,7 @@ export class BuffrSignAdminEmailControlsService {
       conflicts.push({
         type: 'timing',
         severity: 'medium',
-        message: `Scheduled automation for ${emailType} is planned around the same time`,
+        message: `Scheduled automation for ${_emailType} is planned around the same time`,
         recommendation: 'Consider adjusting the timing to avoid conflicts'
       });
     }
@@ -589,7 +589,7 @@ export class BuffrSignAdminEmailControlsService {
     return matrix[str2.length][str1.length];
   }
 
-  private async logAdminAction(adminId: string, action: string, details: any): Promise<void> {
+  private async logAdminAction(adminId: string, action: string, details: unknown): Promise<void> {
     try {
       await this.supabase
         .from('admin_email_activity')
@@ -604,12 +604,12 @@ export class BuffrSignAdminEmailControlsService {
     }
   }
 
-  private mapDbToManualEmailRequest(data: any): ManualEmailRequest {
+  private mapDbToManualEmailRequest(data: unknown): ManualEmailRequest {
     return {
       id: data.id,
       adminId: data.admin_id,
       adminName: data.admin_name,
-      emailType: data.email_type,
+      _emailType: data.email_type,
       recipients: data.recipients,
       subject: data.subject,
       content: data.content,

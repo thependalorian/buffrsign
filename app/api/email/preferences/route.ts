@@ -1,7 +1,7 @@
 /**
  * Email Preferences API Route
  * 
- * Handles user email preferences operations.
+ * Handles _user email preferences operations.
  * GET, POST, PUT /api/email/preferences
  */
 
@@ -9,24 +9,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { EmailPreferencesRequest } from '@/lib/types/email';
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
+export async function GET(): Promise<NextResponse> {
   try {
     // Get authenticated user
-    const supabase = createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const _supabase = createClient();
+    const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user) {
+    if (authError || !_user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    // Get user preferences
+    // Get _user preferences
     const { data: preferences, error: preferencesError } = await supabase
       .from('user_email_preferences')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', _user.id)
       .single();
 
     if (preferencesError && preferencesError.code !== 'PGRST116') {
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     if (!preferences) {
       const defaultPreferences = {
         id: '',
-        user_id: user.id,
+        user_id: _user.id,
         receive_invitations: true,
         receive_reminders: true,
         receive_status_updates: true,
@@ -54,10 +54,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     return NextResponse.json(preferences);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Get email preferences API error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
@@ -66,10 +67,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     // Get authenticated user
-    const supabase = createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const _supabase = createClient();
+    const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user) {
+    if (authError || !_user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { data: preferences, error: preferencesError } = await supabase
       .from('user_email_preferences')
       .upsert({
-        user_id: user.id,
+        user_id: _user.id,
         ...body,
         updated_at: new Date().toISOString(),
       })
@@ -111,10 +112,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     return NextResponse.json(preferences);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Create/update email preferences API error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
@@ -123,10 +125,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 export async function PUT(request: NextRequest): Promise<NextResponse> {
   try {
     // Get authenticated user
-    const supabase = createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const _supabase = createClient();
+    const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user) {
+    if (authError || !_user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -159,7 +161,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
         ...body,
         updated_at: new Date().toISOString(),
       })
-      .eq('user_id', user.id)
+      .eq('user_id', _user.id)
       .select()
       .single();
 
@@ -175,10 +177,11 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
     }
 
     return NextResponse.json(preferences);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Update email preferences API error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

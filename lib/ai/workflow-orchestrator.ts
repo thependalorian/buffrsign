@@ -552,11 +552,11 @@ export class WorkflowOrchestrator {
   }
 
   private async executeDocumentAnalysis(workflow: WorkflowState): Promise<Record<string, unknown>> {
-    // Simulate document analysis
+    // Simulate _document analysis
     await this.delay(1000);
     
     return {
-      documentSummary: 'AI-generated document summary',
+      documentSummary: 'AI-generated _document summary',
       keyClauses: [
         { type: 'payment', content: 'Payment terms clause', confidence: 0.95 },
         { type: 'liability', content: 'Liability limitation clause', confidence: 0.88 }
@@ -869,9 +869,9 @@ export class WorkflowOrchestrator {
 
   removeEventListener(eventType: string, listener: WorkflowEventListener): void {
     const listeners = this.eventListeners.get(eventType) || [];
-    const index = listeners.indexOf(listener);
-    if (index > -1) {
-      listeners.splice(index, 1);
+    const _index = listeners.indexOf(listener);
+    if (_index > -1) {
+      listeners.splice(_index, 1);
     }
   }
 

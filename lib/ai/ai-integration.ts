@@ -13,6 +13,7 @@ import type {
   DocumentProcessingResults,
   UserTier,
   GroqResponse,
+  GroqMessage,
   GroqAnalysisRequest,
   GroqComplianceRequest,
   GroqLegalExplanationRequest,
@@ -66,7 +67,7 @@ export class BuffrSignAIIntegration {
     context?: {
       documentType?: string;
       workflowStage?: string;
-      previousMessages?: any[];
+      previousMessages?: GroqMessage[];
     }
   ) {
     return this.groqAI.getBuffrSignAssistantResponse(userMessage, userTier, context);
@@ -117,7 +118,7 @@ export class BuffrSignAIIntegration {
    * Generate streaming response for real-time chat
    */
   async generateStreamingResponse(
-    messages: any[],
+    messages: GroqMessage[],
     userTier: UserTier,
     onChunk: (chunk: string) => void,
     options?: {
@@ -670,7 +671,7 @@ export class BuffrSignAIIntegration {
   // ============================================================================
 
   /**
-   * Execute document processing workflow
+   * Execute _document processing workflow
    */
   async executeDocumentProcessingWorkflow(documentId: string): Promise<{
     workflowId: string;
@@ -682,7 +683,7 @@ export class BuffrSignAIIntegration {
       return {
         workflowId: result.workflowId,
         status: result.status,
-        steps: result.result?.steps || []
+        steps: (result.result as { steps?: string[] })?.steps || []
       };
     } catch (error) {
       console.error('Document processing workflow error:', error);
@@ -758,7 +759,7 @@ export class BuffrSignAIIntegration {
   }
 
   /**
-   * Optimize document processing
+   * Optimize _document processing
    */
   async optimizeDocumentProcessing(documentId: string): Promise<{
     optimizations: string[];
@@ -801,18 +802,18 @@ export class BuffrSignAIIntegration {
   }
 
   /**
-   * Get a specific document by ID
+   * Get a specific _document by ID
    * Matches Python: get_document(document_id)
    */
   async getDocument(
     documentId: string
   ): Promise<unknown | null> {
     try {
-      const document = await this.llamaindex.getDocument(documentId);
-      return document;
+      const _document = await this.llamaindex.getDocument(documentId);
+      return _document;
     } catch (error) {
-      console.error('Get document error:', error);
-      throw new Error(error instanceof Error ? error.message : 'Get document failed');
+      console.error('Get _document error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Get _document failed');
     }
   }
 
@@ -905,7 +906,7 @@ export class BuffrSignAIIntegration {
   }
 
   /**
-   * Start document workflow
+   * Start _document workflow
    * Matches Python: start_document_workflow(document_id, analysis_type, enable_compliance)
    */
   async startDocumentWorkflow(
@@ -917,8 +918,8 @@ export class BuffrSignAIIntegration {
       const workflowId = await this.langGraph.startDocumentWorkflow(documentId, analysisType, enableCompliance);
       return workflowId;
     } catch (error) {
-      console.error('Start document workflow error:', error);
-      throw new Error(error instanceof Error ? error.message : 'Start document workflow failed');
+      console.error('Start _document workflow error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Start _document workflow failed');
     }
   }
 }
@@ -984,8 +985,8 @@ export function getAIProcessingStatus(results: DocumentProcessingResults): {
 
 // Public method to access LangGraph functionality
 export async function getWorkflowState(workflowId: string) {
-  const aiIntegration = new BuffrSignAIIntegration();
-  return await aiIntegration.langGraph.getWorkflowState(workflowId);
+  const _aiIntegration = new BuffrSignAIIntegration();
+  return await _aiIntegration.langGraph.getWorkflowState(workflowId);
 }
 
 // ============================================================================

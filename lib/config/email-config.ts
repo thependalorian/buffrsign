@@ -111,4 +111,5 @@ export const isEmailSystemEnabled = (): boolean => {
   return errors.length === 0;
 };
 
+export { getEmailConfig as emailConfig };
 export default getEmailConfig;

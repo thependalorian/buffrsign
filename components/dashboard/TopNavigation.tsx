@@ -1,5 +1,5 @@
 // BuffrSign Platform - Top Navigation Component
-// Provides top navigation bar with user menu, notifications, and mobile controls
+// Provides top navigation bar with _user menu, notifications, and mobile controls
 
 'use client';
 
@@ -12,7 +12,7 @@ import { UserProfile } from '../../lib/types/auth';
 // ============================================================================
 
 interface TopNavigationProps {
-  user: UserProfile;
+  _user: UserProfile;
   onMenuClick: () => void;
   showMobileMenu: boolean;
 }
@@ -21,7 +21,7 @@ interface TopNavigationProps {
 // TOP NAVIGATION COMPONENT
 // ============================================================================
 
-export default function TopNavigation({ user, onMenuClick, showMobileMenu }: TopNavigationProps) {
+export default function TopNavigation({ _user, onMenuClick, showMobileMenu }: TopNavigationProps) {
   const { signOut } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -161,12 +161,12 @@ export default function TopNavigation({ user, onMenuClick, showMobileMenu }: Top
               <div className="avatar placeholder">
                 <div className="bg-primary text-primary-content rounded-full w-8">
                   <span className="text-sm font-medium">
-                    {user.first_name?.[0]}{user.last_name?.[0]}
+                    {_user.first_name?.[0]}{_user.last_name?.[0]}
                   </span>
                 </div>
               </div>
               <span className="hidden md:block text-sm font-medium">
-                {user.first_name} {user.last_name}
+                {_user.first_name} {_user.last_name}
               </span>
               <svg
                 className={`w-4 h-4 transition-transform ${
@@ -188,18 +188,18 @@ export default function TopNavigation({ user, onMenuClick, showMobileMenu }: Top
                     <div className="avatar placeholder">
                       <div className="bg-primary text-primary-content rounded-full w-10">
                         <span className="text-sm font-medium">
-                          {user.first_name?.[0]}{user.last_name?.[0]}
+                          {_user.first_name?.[0]}{_user.last_name?.[0]}
                         </span>
                       </div>
                     </div>
                     <div>
                       <p className="text-sm font-medium">
-                        {user.first_name} {user.last_name}
+                        {_user.first_name} {_user.last_name}
                       </p>
-                      <p className="text-xs text-base-content/70">{user.email}</p>
+                      <p className="text-xs text-base-content/70">{_user.email}</p>
                       <div className="flex items-center mt-1 space-x-2">
                         <span className="badge badge-sm badge-outline">
-                          {user.role}
+                          {_user.role}
                         </span>
                       </div>
                     </div>

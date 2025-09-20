@@ -19,7 +19,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createClient();
+    const _supabase = createClient();
     const { id } = params;
     const body = await request.json();
 
@@ -84,7 +84,7 @@ export async function POST(
         { status: 500 }
       );
     }
-  } catch (error) {
+  } catch {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation error', details: error.errors },

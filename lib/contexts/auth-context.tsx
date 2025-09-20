@@ -21,13 +21,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AuthState>({
-    user: null,
+    _user: null,
     session: null,
     loading: true,
     error: null,
   });
 
-  const supabase = useMemo(() => createClient(), []);
+  const _supabase = useMemo(() => createClient(), []);
 
   const fetchUserProfile = useCallback(async (userId: string) => {
     try {
@@ -38,22 +38,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (error) {
-        console.error('Error fetching user profile:', error);
-        setState(prev => ({ ...prev, error: 'Failed to fetch user profile' }));
+        console.error('Error fetching _user profile:', error);
+        setState(prev => ({ ...prev, error: 'Failed to fetch _user profile' }));
         return;
       }
 
       if (profile) {
         setState(prev => ({
           ...prev,
-          user: profile,
+          _user: profile,
           loading: false,
           error: null,
         }));
       }
     } catch (error) {
-      console.error('Error fetching user profile:', error);
-      setState(prev => ({ ...prev, error: 'Failed to fetch user profile' }));
+      console.error('Error fetching _user profile:', error);
+      setState(prev => ({ ...prev, error: 'Failed to fetch _user profile' }));
     }
   }, [supabase]);
 
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
-          await fetchUserProfile(session.user.id);
+          await fetchUserProfile(session._user.id);
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
@@ -81,10 +81,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN' && session) {
-          await fetchUserProfile(session.user.id);
+          await fetchUserProfile(session._user.id);
         } else if (event === 'SIGNED_OUT') {
           setState({
-            user: null,
+            _user: null,
             session: null,
             loading: false,
             error: null,
@@ -131,7 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             last_name: credentials.last_name,
             company_name: credentials.company_name,
             phone: credentials.phone,
-            role: credentials.role || 'user',
+            role: credentials.role || '_user',
           },
           emailRedirectTo: `${window.location.origin}/auth/confirm?next=/protected`,
         },
@@ -161,16 +161,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateProfile = async (updates: Partial<UserProfile>) => {
     try {
-      if (!state.user) throw new Error('No user logged in');
+      if (!state._user) throw new Error('No _user logged in');
 
       const { error } = await supabase
         .from('profiles')
         .update(updates)
-        .eq('id', state.user.id);
+        .eq('id', state._user.id);
 
       if (error) throw error;
 
-      // Refresh user profile
+      // Refresh _user profile
       await refreshUser();
 
       return { error: null };
@@ -204,16 +204,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const hasPermission = useCallback((permission: keyof UserProfile['permissions']) => {
-    return state.user?.permissions?.[permission] || false;
-  }, [state.user]);
+    return state._user?.permissions?.[permission] || false;
+  }, [state._user]);
 
   const isRole = useCallback((role: UserRole) => {
-    return state.user?.role === role;
-  }, [state.user]);
+    return state._user?.role === role;
+  }, [state._user]);
 
   const refreshUser = async () => {
-    if (state.user) {
-      await fetchUserProfile(state.user.id);
+    if (state._user) {
+      await fetchUserProfile(state._user.id);
     }
   };
 

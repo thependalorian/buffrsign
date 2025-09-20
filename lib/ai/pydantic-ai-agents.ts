@@ -1,5 +1,5 @@
 // BuffrSign Platform - Pydantic AI Agents Integration
-// Structured AI agents for document analysis and workflow automation
+// Structured AI agents for _document analysis and workflow automation
 
 'use client';
 
@@ -152,17 +152,17 @@ export class PydanticAIAgents {
   // ============================================================================
 
   /**
-   * Analyze document with structured AI agent
+   * Analyze _document with structured AI agent
    */
   async analyzeDocumentWithAgent(
     documentId: string,
-    agentId: string = 'document-analysis-agent',
+    agentId: string = '_document-analysis-agent',
     analysisType: 'comprehensive' | 'compliance' | 'entities' | 'sentiment' = 'comprehensive'
   ): Promise<AgentResponse<DocumentAnalysisAgentResponse>> {
     try {
       const startTime = Date.now();
       
-      const response = await fetch(`${this.apiBaseUrl}/pydantic-agents/analyze-document`, {
+      const response = await fetch(`${this.apiBaseUrl}/pydantic-agents/analyze-_document`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -562,7 +562,7 @@ export class PydanticAIAgents {
   /**
    * Validate structured data
    */
-  async validateStructuredData(documentId: string, data: any): Promise<{
+  async validateStructuredData(documentId: string, data: unknown): Promise<{
     valid: boolean;
     errors: string[];
     confidence: number;
@@ -711,10 +711,10 @@ export class PydanticAIAgents {
   /**
    * Save validation results
    */
-  async saveValidationResults(documentId: string, validation: any): Promise<void> {
+  async saveValidationResults(documentId: string, validation: unknown): Promise<void> {
     try {
       // This would typically save to the database
-      console.log('Saving validation results for document:', documentId, validation);
+      console.log('Saving validation results for _document:', documentId, validation);
     } catch (error) {
       console.error('Save validation results error:', error);
       throw new Error(error instanceof Error ? error.message : 'Save validation results failed');
@@ -722,15 +722,15 @@ export class PydanticAIAgents {
   }
 
   /**
-   * Get document metadata
+   * Get _document metadata
    */
   async getDocumentMetadata(documentId: string): Promise<any> {
     try {
-      const document = await getDocument(documentId);
-      return document;
+      const _document = await getDocument(documentId);
+      return _document;
     } catch (error) {
-      console.error('Get document metadata error:', error);
-      throw new Error(error instanceof Error ? error.message : 'Get document metadata failed');
+      console.error('Get _document metadata error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Get _document metadata failed');
     }
   }
 }
@@ -780,7 +780,7 @@ export function usePydanticAIAgent(agentId: string) {
   };
 }
 
-export function useDocumentAnalysis(documentId: string, agentId: string = 'document-analysis-agent') {
+export function useDocumentAnalysis(documentId: string, agentId: string = '_document-analysis-agent') {
   const [analysis, setAnalysis] = useState<DocumentAnalysisAgentResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

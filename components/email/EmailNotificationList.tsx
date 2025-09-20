@@ -11,9 +11,9 @@ import { useState } from 'react';
 import { useEmailNotifications } from '@/lib/hooks/useEmailNotifications';
 import { EmailNotificationListProps, EmailType, EmailStatus } from '@/lib/types/email';
 
-export default function EmailNotificationList({
+function EmailNotificationList({
   documentId,
-  emailType,
+  _emailType,
   limit = 50,
   showFilters = true,
 }: EmailNotificationListProps) {
@@ -31,7 +31,7 @@ export default function EmailNotificationList({
     getClickRate,
   } = useEmailNotifications({
     documentId,
-    emailType,
+    _emailType,
     limit,
   });
 
@@ -196,10 +196,10 @@ export default function EmailNotificationList({
 
         {filteredNotifications.length === 0 ? (
           <div className="text-center py-8">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="mx-auto h-12 w-12 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            <p className="mt-2 text-sm text-gray-500">No email notifications found</p>
+            <p className="mt-2 text-sm text-muted-foreground">No email notifications found</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -276,3 +276,6 @@ export default function EmailNotificationList({
     </div>
   );
 }
+
+export { EmailNotificationList };
+export default EmailNotificationList;

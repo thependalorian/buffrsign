@@ -16,14 +16,14 @@ import { UserProfile } from '../../lib/types/auth';
 interface MobileSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  user: UserProfile;
+  _user: UserProfile;
 }
 
 // ============================================================================
 // MOBILE SIDEBAR COMPONENT
 // ============================================================================
 
-export default function MobileSidebar({ isOpen, onClose, user }: MobileSidebarProps) {
+export default function MobileSidebar({ isOpen, onClose, _user }: MobileSidebarProps) {
   const pathname = usePathname();
 
   // ============================================================================
@@ -78,7 +78,7 @@ export default function MobileSidebar({ isOpen, onClose, user }: MobileSidebarPr
       )
     },
     // Admin section for admin users
-    ...(user.role === 'admin' || user.role === 'super_admin' ? [{
+    ...(_user.role === 'admin' || _user.role === 'super_admin' ? [{
       label: 'Admin',
       href: '/admin',
       icon: (
@@ -143,20 +143,20 @@ export default function MobileSidebar({ isOpen, onClose, user }: MobileSidebarPr
             <div className="avatar placeholder">
               <div className="bg-primary text-primary-content rounded-full w-12">
                 <span className="text-sm font-medium">
-                  {user.first_name?.[0]}{user.last_name?.[0]}
+                  {_user.first_name?.[0]}{_user.last_name?.[0]}
                 </span>
               </div>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-base-content truncate">
-                {user.first_name} {user.last_name}
+                {_user.first_name} {_user.last_name}
               </p>
               <p className="text-xs text-base-content/70 truncate">
-                {user.email}
+                {_user.email}
               </p>
               <div className="flex items-center mt-1">
                 <span className="badge badge-sm badge-outline">
-                  {user.role}
+                  {_user.role}
                 </span>
               </div>
             </div>

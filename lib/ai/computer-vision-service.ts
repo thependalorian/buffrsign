@@ -1,5 +1,5 @@
 // BuffrSign Platform - Computer Vision Service
-// Computer Vision for signature detection, document security, and image analysis
+// Computer Vision for signature detection, _document security, and image analysis
 
 'use client';
 
@@ -214,7 +214,7 @@ export class ComputerVisionService {
   // ============================================================================
 
   /**
-   * Analyze document security
+   * Analyze _document security
    */
   async analyzeDocumentSecurity(
     documentId: string
@@ -244,7 +244,7 @@ export class ComputerVisionService {
   }
 
   /**
-   * Detect document tampering
+   * Detect _document tampering
    */
   async detectTampering(
     documentId: string

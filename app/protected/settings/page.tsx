@@ -10,8 +10,8 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 
 export default function SettingsPage() {
-  const supabase = createClient()
-  const [user, setUser] = useState<User | null>(null)
+  const _supabase = createClient()
+  const [_user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
@@ -27,14 +27,14 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const initialize = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        setUser(user)
+      const { data: { _user } } = await supabase.auth.getUser()
+      if (_user) {
+        setUser(_user)
         // Fetch notification settings from profile
         const { data: profile } = await supabase
           .from('profiles')
           .select('workflow_updates, security_alerts')
-          .eq('id', user.id)
+          .eq('id', _user.id)
           .single()
         if (profile) {
           setNotificationSettings({
@@ -71,10 +71,10 @@ export default function SettingsPage() {
   }
 
   const handleNotificationsUpdate = async () => {
-    if (!user) return
+    if (!_user) return
 
     setLoading(true)
-    const { error } = await supabase.from('profiles').update(notificationSettings).eq('id', user.id)
+    const { error } = await supabase.from('profiles').update(notificationSettings).eq('id', _user.id)
     if (error) {
       setFeedback({ type: 'error', message: 'Failed to update notifications.' })
     } else {
@@ -131,7 +131,7 @@ export default function SettingsPage() {
                 <div>
                     <Label htmlFor="workflow_updates">Workflow Updates</Label>
                     <p className="text-xs text-muted-foreground">
-                        Receive emails about the status of your document workflows.
+                        Receive emails about the status of your _document workflows.
                     </p>
                 </div>
                 <Switch

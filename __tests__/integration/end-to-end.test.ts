@@ -1,10 +1,10 @@
 /**
  * End-to-End Integration Tests
- * Tests complete user journeys and system workflows
+ * Tests complete _user journeys and system workflows
  */
 
-import { DocumentService } from '../../lib/services/document-service';
-import { DocumentAnalyzer } from '../../lib/services/document-analyzer';
+import { DocumentService } from '../../lib/services/_document-service';
+import { DocumentAnalyzer } from '../../lib/services/_document-analyzer';
 import { WorkflowEngine } from '../../lib/services/workflow-engine';
 import { WorkflowOrchestrator, WorkflowStepType } from '../../lib/ai/workflow-orchestrator';
 import { kycService } from '../../lib/services/kyc';
@@ -17,7 +17,7 @@ jest.mock('../../lib/supabase', () => ({
       from: () => ({
         upload: jest.fn().mockResolvedValue({ error: null }),
         createSignedUrl: jest.fn().mockResolvedValue({ 
-          data: { signedUrl: 'https://test.com/document.pdf' }, 
+          data: { signedUrl: 'https://test.com/_document.pdf' }, 
           error: null 
         })
       })
@@ -35,7 +35,7 @@ jest.mock('../../lib/supabase', () => ({
                 status: 'uploaded',
                 created_at: timestamp,
                 updated_at: timestamp,
-                created_by: 'user-123',
+                created_by: '_user-123',
                 ai_analysis_enabled: true,
                 ai_analysis_status: 'pending'
               },
@@ -81,7 +81,7 @@ describe('End-to-End Integration Tests', () => {
   });
 
   describe('Complete Document Processing Journey', () => {
-    it('should handle full document lifecycle from upload to completion', async () => {
+    it('should handle full _document lifecycle from upload to completion', async () => {
       // Step 1: User uploads a contract document
       const contractFile = new File(
         ['This is a comprehensive employment contract with signature requirements and compliance clauses.'],
@@ -94,8 +94,8 @@ describe('End-to-End Integration Tests', () => {
       const validation = documentService.validateFile(contractFile);
       expect(validation.isValid).toBe(true);
 
-      // Upload document (Real service logic with mocked storage)
-      const uploadResult = await documentService.uploadDocument('user-123', {
+      // Upload _document (Real service logic with mocked storage)
+      const uploadResult = await documentService.uploadDocument('_user-123', {
         file: contractFile,
         title: 'Employment Contract - John Doe',
         documentType: 'employment_contract',
@@ -104,8 +104,8 @@ describe('End-to-End Integration Tests', () => {
       });
 
       expect(uploadResult.success).toBe(true);
-      expect(uploadResult.document).toBeDefined();
-      const documentId = uploadResult.document!.id;
+      expect(uploadResult._document).toBeDefined();
+      const documentId = uploadResult._document!.id;
 
       // Step 2: System automatically triggers AI analysis
       const analysisResult = await documentAnalyzer.analyzeDocument(
@@ -197,7 +197,7 @@ describe('End-to-End Integration Tests', () => {
       expect(executionResult).toBeDefined();
       expect(executionResult.workflow_id).toBe(workflowId);
 
-      // Step 5: Verify final document status
+      // Step 5: Verify final _document status
       const finalStatus = workflowEngine.getWorkflowStatus(workflowId);
       expect(finalStatus).toBeDefined();
       expect(['active', 'completed', 'failed'].includes(finalStatus!.status)).toBe(true);
@@ -215,7 +215,7 @@ describe('End-to-End Integration Tests', () => {
       Object.defineProperty(idDocument, 'size', { value: 1.5 * 1024 * 1024 }); // 1.5MB
 
       // Upload KYC document
-      const uploadResult = await documentService.uploadDocument('user-123', {
+      const uploadResult = await documentService.uploadDocument('_user-123', {
         file: idDocument,
         title: 'Namibian National ID',
         documentType: 'kyc_document',
@@ -224,11 +224,11 @@ describe('End-to-End Integration Tests', () => {
       });
 
       expect(uploadResult.success).toBe(true);
-      expect(uploadResult.document).toBeDefined();
+      expect(uploadResult._document).toBeDefined();
 
       // Step 2: Start KYC workflow using KYC service
-      const kycWorkflowResult = await kycService.startKYCWorkflow('user-123', {
-        documentIds: [uploadResult.document!.id],
+      const kycWorkflowResult = await kycService.startKYCWorkflow('_user-123', {
+        documentIds: [uploadResult._document!.id],
         kycLevel: 'full',
         jurisdiction: 'namibia'
       });
@@ -239,7 +239,7 @@ describe('End-to-End Integration Tests', () => {
       // Step 3: Analyze KYC document
       const kycAnalysis = await documentAnalyzer.analyzeDocument(
         'Namibian ID Card - John Doe, ID: 12345678901, DOB: 1990-01-01, Address: 123 Main St, Windhoek',
-        uploadResult.document!.id,
+        uploadResult._document!.id,
         { 
           documentType: 'kyc_document',
           kycDocumentType: 'namibian_id',
@@ -252,14 +252,14 @@ describe('End-to-End Integration Tests', () => {
       expect(kycAnalysis.compliance_status).toBeDefined();
 
       // Step 4: Get KYC data and verify extraction
-      const kycDataResult = await kycService.getUserKYCData('user-123');
+      const kycDataResult = await kycService.getUserKYCData('_user-123');
       expect(kycDataResult.success).toBe(true);
       expect(kycDataResult.kycData).toBeDefined();
     });
   });
 
   describe('Multi-Document Workflow Journey', () => {
-    it('should handle complex multi-document processing', async () => {
+    it('should handle complex multi-_document processing', async () => {
       const documents = [
         {
           file: new File(['Contract content'], 'contract.pdf', { type: 'application/pdf' }),
@@ -281,7 +281,7 @@ describe('End-to-End Integration Tests', () => {
       // Upload all documents
       const uploadPromises = documents.map(doc => {
         Object.defineProperty(doc.file, 'size', { value: 1024 * 1024 });
-        return documentService.uploadDocument('user-123', {
+        return documentService.uploadDocument('_user-123', {
           file: doc.file,
           title: doc.title,
           documentType: doc.type
@@ -293,10 +293,10 @@ describe('End-to-End Integration Tests', () => {
       // Verify all uploads succeeded
       uploadResults.forEach(result => {
         expect(result.success).toBe(true);
-        expect(result.document).toBeDefined();
+        expect(result._document).toBeDefined();
       });
 
-      const documentIds = uploadResults.map(result => result.document!.id);
+      const documentIds = uploadResults.map(result => result._document!.id);
 
       // Create orchestrated workflow for all documents
       const multiDocWorkflowId = await workflowOrchestrator.createWorkflow({
@@ -341,12 +341,12 @@ describe('End-to-End Integration Tests', () => {
       expect(workflow).toBeDefined();
       expect(workflow?.status).toBe('running');
 
-      // Analyze each document individually
-      const analysisPromises = uploadResults.map((result, index) => 
+      // Analyze each _document individually
+      const analysisPromises = uploadResults.map((result, _index) => 
         documentAnalyzer.analyzeDocument(
-          `${documents[index].type} content with relevant clauses and requirements`,
-          result.document!.id,
-          { documentType: documents[index].type }
+          `${documents[_index].type} content with relevant clauses and requirements`,
+          result._document!.id,
+          { documentType: documents[_index].type }
         )
       );
 
@@ -368,7 +368,7 @@ describe('End-to-End Integration Tests', () => {
   describe('Error Recovery and Resilience', () => {
     it('should handle and recover from various failure scenarios', async () => {
       // Test 1: Invalid file upload recovery
-      const invalidUpload = await documentService.uploadDocument('user-123', {
+      const invalidUpload = await documentService.uploadDocument('_user-123', {
         file: null,
         title: 'Invalid Document'
       });
@@ -439,7 +439,7 @@ describe('End-to-End Integration Tests', () => {
               id: 'start',
               type: WorkflowStepType.DOCUMENT_ANALYSIS,
               name: `Concurrent Workflow ${i}`,
-              config: { index: i }
+              config: { _index: i }
             }
           ]
         })
@@ -466,9 +466,9 @@ describe('End-to-End Integration Tests', () => {
       expect(activeWorkflows.length).toBeGreaterThanOrEqual(concurrentOperations);
     });
 
-    it('should handle large document processing efficiently', async () => {
-      // Create a large document (simulate 100KB text)
-      const largeContent = 'This is a large document with extensive content. '.repeat(2000);
+    it('should handle large _document processing efficiently', async () => {
+      // Create a large _document (simulate 100KB text)
+      const largeContent = 'This is a large _document with extensive content. '.repeat(2000);
       
       const startTime = Date.now();
       

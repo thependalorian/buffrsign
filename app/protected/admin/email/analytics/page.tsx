@@ -12,7 +12,7 @@ export default function AdminEmailAnalyticsPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-base-content">Email Analytics</h1>
         <p className="text-base-content/70 mt-2">
-          Monitor email performance, delivery rates, and user engagement
+          Monitor email performance, delivery rates, and _user engagement
         </p>
       </div>
 

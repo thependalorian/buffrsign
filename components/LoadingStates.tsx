@@ -74,14 +74,14 @@ export const AI_PROCESSING_STAGES: LoadingState[] = [
   {
     stage: 'Computer Vision',
     progress: 40,
-    message: 'Analyzing signatures and document security...',
+    message: 'Analyzing signatures and _document security...',
     icon: Eye,
     color: 'purple'
   },
   {
     stage: 'Document Classification',
     progress: 55,
-    message: 'Classifying document type and structure...',
+    message: 'Classifying _document type and structure...',
     icon: Brain,
     color: 'blue'
   },
@@ -130,23 +130,23 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
   return (
     <div className={`progress-indicator ${className}`}>
       {/* Progress Bar */}
-      <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+      <div className="w-full bg-muted rounded-full h-2 mb-4">
         <div
-          className="bg-blue-600 h-2 rounded-full transition-all duration-500 ease-out"
+          className="bg-primary h-2 rounded-full transition-all duration-500 ease-out"
           style={{ width: `${progressPercentage}%` }}
         />
       </div>
 
       {/* Stage Indicators */}
       <div className="flex justify-between items-center">
-        {stages.map((stage, index) => {
-          const isActive = index <= currentStage;
-          const isCurrent = index === currentStage;
+        {stages.map((stage, _index) => {
+          const isActive = _index <= currentStage;
+          const isCurrent = _index === currentStage;
           const Icon = stage.icon || CheckCircle;
           
           return (
             <div
-              key={index}
+              key={_index}
               className={`flex flex-col items-center space-y-2 ${
                 isActive ? 'opacity-100' : 'opacity-40'
               }`}
@@ -157,22 +157,22 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
                     ? `bg-${stage.color}-600 border-${stage.color}-600 text-white`
                     : isActive
                     ? `bg-${stage.color}-100 border-${stage.color}-600 text-${stage.color}-600`
-                    : 'bg-gray-100 border-gray-300 text-gray-400'
+                    : 'bg-muted border-border text-muted-foreground'
                 }`}
               >
                 {isActive ? (
                   <Icon className="h-4 w-4" />
                 ) : (
-                  <div className="w-2 h-2 bg-gray-400 rounded-full" />
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full" />
                 )}
               </div>
               <div className="text-center">
                 <p className={`text-xs font-medium ${
-                  isCurrent ? `text-${stage.color}-600` : 'text-gray-500'
+                  isCurrent ? `text-${stage.color}-600` : 'text-muted-foreground'
                 }`}>
                   {stage.stage}
                 </p>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-muted-foreground">
                   {stage.progress}%
                 </p>
               </div>
@@ -207,18 +207,18 @@ export const AILoading: React.FC<AILoadingProps> = ({
       <div className="flex items-center space-x-3 mb-6">
         <div className="flex-shrink-0">
           <div className="relative">
-            <Brain className="h-8 w-8 text-blue-600" />
+            <Brain className="h-8 w-8 text-primary" />
             <div className="absolute -top-1 -right-1">
-              <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />
+              <Loader2 className="h-4 w-4 text-primary animate-spin" />
             </div>
           </div>
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-foreground">
             AI Document Analysis
           </h3>
-          <p className="text-sm text-gray-600">
-            Processing your document with advanced AI capabilities
+          <p className="text-sm text-muted-foreground">
+            Processing your _document with advanced AI capabilities
           </p>
         </div>
       </div>
@@ -233,16 +233,16 @@ export const AILoading: React.FC<AILoadingProps> = ({
             )}
           </div>
           <div className="flex-1">
-            <p className="font-medium text-gray-900">{currentStage}</p>
-            <p className="text-sm text-gray-600">{message}</p>
+            <p className="font-medium text-foreground">{currentStage}</p>
+            <p className="text-sm text-muted-foreground">{message}</p>
           </div>
-          <div className="text-sm font-medium text-gray-500">
+          <div className="text-sm font-medium text-muted-foreground">
             {progress}%
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="w-full bg-gray-200 rounded-full h-3">
+        <div className="w-full bg-muted rounded-full h-3">
           <div
             className={`bg-${currentStageData.color}-600 h-3 rounded-full transition-all duration-500 ease-out`}
             style={{ width: `${progress}%` }}
@@ -258,8 +258,8 @@ export const AILoading: React.FC<AILoadingProps> = ({
       </div>
 
       {/* Estimated Time */}
-      <div className="mt-6 p-3 bg-blue-50 rounded-lg">
-        <div className="flex items-center space-x-2 text-sm text-blue-700">
+      <div className="mt-6 p-3 bg-primary/5 rounded-lg">
+        <div className="flex items-center space-x-2 text-sm text-primary">
           <Clock className="h-4 w-4" />
           <span>Estimated time remaining: 2-3 minutes</span>
         </div>
@@ -285,7 +285,7 @@ export const DocumentProcessing: React.FC<DocumentProcessingProps> = ({
         return {
           icon: FileText,
           color: 'blue',
-          message: 'Uploading document to secure storage...'
+          message: 'Uploading _document to secure storage...'
         };
       case 'ocr':
         return {
@@ -297,7 +297,7 @@ export const DocumentProcessing: React.FC<DocumentProcessingProps> = ({
         return {
           icon: Brain,
           color: 'purple',
-          message: 'Analyzing document with AI intelligence...'
+          message: 'Analyzing _document with AI intelligence...'
         };
       case 'compliance':
         return {
@@ -315,7 +315,7 @@ export const DocumentProcessing: React.FC<DocumentProcessingProps> = ({
         return {
           icon: FileText,
           color: 'blue',
-          message: 'Processing document...'
+          message: 'Processing _document...'
         };
     }
   };
@@ -324,17 +324,17 @@ export const DocumentProcessing: React.FC<DocumentProcessingProps> = ({
   const Icon = stageInfo.icon;
 
   return (
-    <div className={`document-processing bg-white rounded-lg border p-6 ${className}`}>
+    <div className={`_document-processing bg-white rounded-lg border p-6 ${className}`}>
       {/* Header */}
       <div className="flex items-center space-x-3 mb-4">
         <div className="flex-shrink-0">
           <Icon className={`h-6 w-6 text-${stageInfo.color}-600`} />
         </div>
         <div>
-          <h3 className="font-semibold text-gray-900">
+          <h3 className="font-semibold text-foreground">
             Processing Document
           </h3>
-          <p className="text-sm text-gray-600 truncate max-w-xs">
+          <p className="text-sm text-muted-foreground truncate max-w-xs">
             {documentName}
           </p>
         </div>
@@ -343,15 +343,15 @@ export const DocumentProcessing: React.FC<DocumentProcessingProps> = ({
       {/* Progress */}
       <div className="space-y-3">
         <div className="flex justify-between items-center">
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-foreground">
             {stageInfo.message}
           </span>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-muted-foreground">
             {progress}%
           </span>
         </div>
 
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="w-full bg-muted rounded-full h-2">
           <div
             className={`bg-${stageInfo.color}-600 h-2 rounded-full transition-all duration-300`}
             style={{ width: `${progress}%` }}
@@ -359,7 +359,7 @@ export const DocumentProcessing: React.FC<DocumentProcessingProps> = ({
         </div>
 
         {estimatedTime && processingStage !== 'complete' && (
-          <div className="flex items-center space-x-2 text-xs text-gray-500">
+          <div className="flex items-center space-x-2 text-xs text-muted-foreground">
             <Clock className="h-3 w-3" />
             <span>Estimated time: {estimatedTime}s</span>
           </div>
@@ -368,8 +368,8 @@ export const DocumentProcessing: React.FC<DocumentProcessingProps> = ({
 
       {/* Success State */}
       {processingStage === 'complete' && (
-        <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-center space-x-2 text-green-700">
+        <div className="mt-4 p-3 bg-chart-2/5 border border-chart-2/20 rounded-lg">
+          <div className="flex items-center space-x-2 text-chart-2">
             <CheckCircle className="h-4 w-4" />
             <span className="text-sm font-medium">
               Document processed successfully!
@@ -397,10 +397,10 @@ export const LoadingSpinner: React.FC<{
   };
 
   const colorClasses = {
-    blue: 'text-blue-600',
-    green: 'text-green-600',
+    blue: 'text-primary',
+    green: 'text-chart-2',
     yellow: 'text-yellow-600',
-    red: 'text-red-600',
+    red: 'text-chart-5',
     purple: 'text-purple-600'
   };
 
@@ -428,7 +428,7 @@ export const LoadingOverlay: React.FC<{
       <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
         <div className="flex flex-col items-center space-y-4">
           <LoadingSpinner size="lg" />
-          <p className="text-gray-700 font-medium">{message}</p>
+          <p className="text-foreground font-medium">{message}</p>
           {children}
         </div>
       </div>
@@ -446,11 +446,11 @@ export const SkeletonLoader: React.FC<{
 }> = ({ lines = 3, className = '' }) => {
   return (
     <div className={`animate-pulse space-y-3 ${className}`}>
-      {Array.from({ length: lines }).map((_, index) => (
+      {Array.from({ length: lines }).map((_, _index) => (
         <div
-          key={index}
-          className={`h-4 bg-gray-200 rounded ${
-            index === lines - 1 ? 'w-3/4' : 'w-full'
+          key={_index}
+          className={`h-4 bg-muted rounded ${
+            _index === lines - 1 ? 'w-3/4' : 'w-full'
           }`}
         />
       ))}

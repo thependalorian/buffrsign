@@ -1,5 +1,5 @@
 // BuffrSign Platform - OCR Service
-// Optical Character Recognition for document text extraction and field detection
+// Optical Character Recognition for _document text extraction and field detection
 
 'use client';
 
@@ -131,7 +131,7 @@ export class OCRService {
   // ============================================================================
 
   /**
-   * Extract text from document using OCR
+   * Extract text from _document using OCR
    */
   async extractText(
     documentId: string,
@@ -308,7 +308,7 @@ export class OCRService {
   // ============================================================================
 
   /**
-   * Analyze document structure
+   * Analyze _document structure
    */
   async analyzeDocumentStructure(
     documentId: string
@@ -338,13 +338,13 @@ export class OCRService {
   }
 
   /**
-   * Detect document type
+   * Detect _document type
    */
   async detectDocumentType(
     documentId: string
   ): Promise<{ success: boolean; documentType?: string; confidence?: number; error?: string }> {
     try {
-      const response = await fetch(`${this.apiBaseUrl}/ocr/detect-document-type`, {
+      const response = await fetch(`${this.apiBaseUrl}/ocr/detect-_document-type`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

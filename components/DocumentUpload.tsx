@@ -1,5 +1,5 @@
 // BuffrSign Platform - Document Upload Component
-// Handles document upload with AI analysis and KYC workflow integration
+// Handles _document upload with AI analysis and KYC workflow integration
 
 'use client';
 
@@ -77,13 +77,13 @@ export default function DocumentUpload({
       'image/png',
       'image/tiff',
       'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      'application/vnd.openxmlformats-officedocument.wordprocessingml._document'
     ];
 
     if (!allowedTypes.includes(file.type)) {
       setUploadState(prev => ({
         ...prev,
-        error: 'Please select a valid document file (PDF, JPG, PNG, TIFF, DOC, DOCX)'
+        error: 'Please select a valid _document file (PDF, JPG, PNG, TIFF, DOC, DOCX)'
       }));
       return;
     }
@@ -169,13 +169,13 @@ export default function DocumentUpload({
 
       clearInterval(progressInterval);
 
-      if (result.success && result.document) {
+      if (result.success && result._document) {
         setUploadState(prev => ({
           ...prev,
           isUploading: false,
           progress: 100,
           success: true,
-          documentId: result.document!.id
+          documentId: result._document!.id
         }));
 
         // Start AI processing
@@ -185,16 +185,16 @@ export default function DocumentUpload({
         }));
 
         // Start KYC workflow if it's a KYC document
-        if (uploadData.isKycDocument && result.document.id) {
+        if (uploadData.isKycDocument && result._document.id) {
           await kycService.startKYCWorkflow({
             userId,
-            documentId: result.document.id,
+            documentId: result._document.id,
             documentType: uploadData.kycDocumentType || 'identity',
             country: uploadData.jurisdiction
           });
         }
 
-        onUploadSuccess?.(result.document.id);
+        onUploadSuccess?.(result._document.id);
       } else {
         setUploadState(prev => ({
           ...prev,
@@ -243,19 +243,19 @@ export default function DocumentUpload({
 
   return (
     <div className={`w-full max-w-2xl mx-auto ${className}`}>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-background rounded-lg shadow-sm border border-border p-6">
         <h2 className="text-xl font-semibold mb-4">Upload Document</h2>
 
         {/* File Upload Area */}
         <div
           className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
             uploadState.isUploading
-              ? 'border-blue-300 bg-blue-50'
+              ? 'border-primary/30 bg-primary/5'
               : uploadState.error
-              ? 'border-red-300 bg-red-50'
+              ? 'border-chart-5/30 bg-chart-5/5'
               : uploadState.success
-              ? 'border-green-300 bg-green-50'
-              : 'border-gray-300 hover:border-gray-400'
+              ? 'border-chart-2/30 bg-chart-2/5'
+              : 'border-border hover:border-border'
           }`}
           onDragOver={handleDragOver}
           onDragEnter={handleDragEnter}
@@ -272,25 +272,25 @@ export default function DocumentUpload({
 
           {uploadState.isUploading ? (
             <div className="space-y-4">
-              <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto" />
+              <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
               <div>
-                <p className="text-lg font-medium text-blue-900">Uploading...</p>
-                <p className="text-sm text-blue-700">Processing your document</p>
+                <p className="text-lg font-medium text-primary">Uploading...</p>
+                <p className="text-sm text-primary">Processing your _document</p>
               </div>
-              <div className="w-full bg-blue-200 rounded-full h-2">
+              <div className="w-full bg-primary/20 rounded-full h-2">
                 <div
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  className="bg-primary h-2 rounded-full transition-all duration-300"
                   style={{ width: `${uploadState.progress}%` }}
                 ></div>
               </div>
-              <p className="text-sm text-blue-600">{uploadState.progress}%</p>
+              <p className="text-sm text-primary">{uploadState.progress}%</p>
             </div>
           ) : uploadState.success ? (
             <div className="space-y-4">
-              <CheckCircle className="w-12 h-12 text-green-600 mx-auto" />
+              <CheckCircle className="w-12 h-12 text-chart-2 mx-auto" />
               <div>
-                <p className="text-lg font-medium text-green-900">Upload Successful!</p>
-                <p className="text-sm text-green-700">
+                <p className="text-lg font-medium text-chart-2">Upload Successful!</p>
+                <p className="text-sm text-chart-2">
                   {uploadState.aiProcessing 
                     ? 'AI analysis in progress...' 
                     : 'Document uploaded and processed'}
@@ -298,7 +298,7 @@ export default function DocumentUpload({
               </div>
               
               {uploadState.aiProcessing && (
-                <div className="flex items-center justify-center space-x-2 text-blue-600">
+                <div className="flex items-center justify-center space-x-2 text-primary">
                   <Brain className="w-4 h-4 animate-pulse" />
                   <span className="text-sm">AI Analysis</span>
                 </div>
@@ -313,10 +313,10 @@ export default function DocumentUpload({
             </div>
           ) : uploadState.error ? (
             <div className="space-y-4">
-              <AlertCircle className="w-12 h-12 text-red-600 mx-auto" />
+              <AlertCircle className="w-12 h-12 text-chart-5 mx-auto" />
               <div>
-                <p className="text-lg font-medium text-red-900">Upload Failed</p>
-                <p className="text-sm text-red-700">{uploadState.error}</p>
+                <p className="text-lg font-medium text-chart-5">Upload Failed</p>
+                <p className="text-sm text-chart-5">{uploadState.error}</p>
               </div>
               <button
                 onClick={resetUpload}
@@ -327,12 +327,12 @@ export default function DocumentUpload({
             </div>
           ) : (
             <div className="space-y-4">
-              <Upload className="w-12 h-12 text-gray-400 mx-auto" />
+              <Upload className="w-12 h-12 text-muted-foreground mx-auto" />
               <div>
-                <p className="text-lg font-medium text-gray-900">
-                  {uploadData.file ? 'File Selected' : 'Drop your document here'}
+                <p className="text-lg font-medium text-foreground">
+                  {uploadData.file ? 'File Selected' : 'Drop your _document here'}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   {uploadData.file
                     ? uploadData.file.name
                     : 'or click to browse files'}
@@ -353,7 +353,7 @@ export default function DocumentUpload({
         {uploadData.file && !uploadState.isUploading && !uploadState.success && (
           <div className="mt-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Document Title
               </label>
               <input
@@ -361,13 +361,13 @@ export default function DocumentUpload({
                 value={uploadData.title}
                 onChange={(e) => setUploadData(prev => ({ ...prev, title: e.target.value }))}
                 className="input input-bordered w-full"
-                placeholder="Enter document title"
+                placeholder="Enter _document title"
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Document Type
                 </label>
                 <select
@@ -387,7 +387,7 @@ export default function DocumentUpload({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Industry
                 </label>
                 <input
@@ -401,7 +401,7 @@ export default function DocumentUpload({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Jurisdiction
               </label>
               <input
@@ -417,7 +417,7 @@ export default function DocumentUpload({
             <div className="border-t pt-4">
               <div className="form-control">
                 <label className="label cursor-pointer">
-                  <span className="label-text">This is a KYC document</span>
+                  <span className="label-text">This is a KYC _document</span>
                   <input
                     type="checkbox"
                     checked={uploadData.isKycDocument}
@@ -429,7 +429,7 @@ export default function DocumentUpload({
 
               {uploadData.isKycDocument && (
                 <div className="mt-3">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     KYC Document Type
                   </label>
                   <select
@@ -437,7 +437,7 @@ export default function DocumentUpload({
                     onChange={(e) => setUploadData(prev => ({ ...prev, kycDocumentType: e.target.value }))}
                     className="select select-bordered w-full"
                   >
-                    <option value="">Select KYC document type</option>
+                    <option value="">Select KYC _document type</option>
                     <option value="national_id">National ID</option>
                     <option value="passport">Passport</option>
                     <option value="drivers_license">Driver&apos;s License</option>

@@ -1,7 +1,7 @@
 /**
  * Admin User Management Page
  * 
- * Purpose: Comprehensive user management for BuffrSign administrators
+ * Purpose: Comprehensive _user management for BuffrSign administrators
  * Location: /app/protected/admin/users/page.tsx
  * Features: User CRUD, role management, KYC oversight, bulk operations
  */
@@ -13,7 +13,7 @@ export default function ProtectedAdminUsersPage() {
         {/* Header */}
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-600">Manage BuffrSign user accounts, roles, and verification status</p>
+          <p className="text-gray-600">Manage BuffrSign _user accounts, roles, and verification status</p>
         </div>
 
         {/* User Statistics */}
@@ -48,7 +48,7 @@ export default function ProtectedAdminUsersPage() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-lg font-semibold">User Management</h2>
-              <p className="text-sm text-gray-600">Add, edit, and manage user accounts</p>
+              <p className="text-sm text-gray-600">Add, edit, and manage _user accounts</p>
             </div>
             <div className="flex space-x-3">
               <button className="bg-blue-600 text-white px-4 py-2 rounded-lg" disabled>
@@ -516,7 +516,7 @@ export default function ProtectedAdminUsersPage() {
               <div className="border border-gray-200 rounded-lg p-6">
                 <h3 className="font-medium text-lg mb-4">Automated Risk Assessment</h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  AI analyzes user behavior and documents to identify potential risks and compliance issues.
+                  AI analyzes _user behavior and documents to identify potential risks and compliance issues.
                 </p>
                 <button className="bg-blue-600 text-white px-4 py-2 rounded-lg" disabled>
                   Run Assessment
@@ -526,7 +526,7 @@ export default function ProtectedAdminUsersPage() {
               <div className="border border-gray-200 rounded-lg p-6">
                 <h3 className="font-medium text-lg mb-4">User Behavior Analytics</h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  Get insights into user patterns, preferences, and potential fraud indicators.
+                  Get insights into _user patterns, preferences, and potential fraud indicators.
                 </p>
                 <button className="bg-green-600 text-white px-4 py-2 rounded-lg" disabled>
                   View Analytics
@@ -539,9 +539,9 @@ export default function ProtectedAdminUsersPage() {
         {/* Placeholder Note */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
           <p className="text-blue-800 text-sm">
-            <strong>Note:</strong> This is a placeholder page for the admin user management system. 
-            The actual implementation will include comprehensive user CRUD operations, 
-            KYC verification workflows, and AI-powered user analytics for managing individual and SME users.
+            <strong>Note:</strong> This is a placeholder page for the admin _user management system. 
+            The actual implementation will include comprehensive _user CRUD operations, 
+            KYC verification workflows, and AI-powered _user analytics for managing individual and SME users.
           </p>
         </div>
       </div>

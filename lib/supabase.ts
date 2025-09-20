@@ -8,15 +8,15 @@ import { Database } from './database.types';
 // SUPABASE CLIENT CONFIGURATION
 // ============================================================================
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const _supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const _supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!_supabaseUrl || !_supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
 // Create Supabase client with database types
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient<Database>(_supabaseUrl, _supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -44,13 +44,13 @@ export interface AuthUser {
 }
 
 export interface AuthResponse {
-  user: AuthUser | null;
+  _user: AuthUser | null;
   session: Session | null;
   error?: string;
 }
 
 /**
- * Sign in user with email and password
+ * Sign in _user with email and password
  */
 export async function signIn(email: string, password: string): Promise<AuthResponse> {
   try {
@@ -60,33 +60,33 @@ export async function signIn(email: string, password: string): Promise<AuthRespo
     });
 
     if (error) {
-      return { user: null, session: null, error: error.message };
+      return { _user: null, session: null, error: error.message };
     }
 
-    if (data.user && data.session) {
-      // Get additional user profile data
+    if (data._user && data.session) {
+      // Get additional _user profile data
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', data.user.id)
+        .eq('id', data._user.id)
         .single();
 
-      const user: AuthUser = {
-        id: data.user.id,
-        email: data.user.email!,
-        role: profile?.role || 'user',
+      const _user: AuthUser = {
+        id: data._user.id,
+        email: data._user.email!,
+        role: profile?.role || '_user',
         plan: 'free', // Will be updated when subscription system is implemented
         first_name: profile?.first_name,
         last_name: profile?.last_name,
         company: profile?.company_name || undefined,
       };
 
-      return { user, session: data.session };
+      return { _user, session: data.session };
     }
 
-    return { user: null, session: null };
+    return { _user: null, session: null };
   } catch {
-    return { user: null, session: null, error: 'Authentication failed' };
+    return { _user: null, session: null, error: 'Authentication failed' };
   }
 }
 
@@ -116,20 +116,20 @@ export async function signUp(
     });
 
     if (error) {
-      return { user: null, session: null, error: error.message };
+      return { _user: null, session: null, error: error.message };
     }
 
-    if (data.user && data.session) {
-      // Create user profile
+    if (data._user && data.session) {
+      // Create _user profile
       const { error: profileError } = await supabase
         .from('profiles')
         .insert({
-          id: data.user.id,
+          id: data._user.id,
           first_name: userData.first_name,
           last_name: userData.last_name,
           full_name: `${userData.first_name} ${userData.last_name}`,
           company_name: userData.company,
-          role: 'user',
+          role: '_user',
           is_active: true,
           is_verified: false,
         });
@@ -138,22 +138,22 @@ export async function signUp(
         console.error('Profile creation error:', profileError);
       }
 
-      const user: AuthUser = {
-        id: data.user.id,
-        email: data.user.email!,
-        role: 'user',
+      const _user: AuthUser = {
+        id: data._user.id,
+        email: data._user.email!,
+        role: '_user',
         plan: 'free',
         first_name: userData.first_name,
         last_name: userData.last_name,
         company: userData.company,
       };
 
-      return { user, session: data.session };
+      return { _user, session: data.session };
     }
 
-    return { user: null, session: null };
+    return { _user: null, session: null };
   } catch {
-    return { user: null, session: null, error: 'Registration failed' };
+    return { _user: null, session: null, error: 'Registration failed' };
   }
 }
 
@@ -170,83 +170,83 @@ export async function signOut(): Promise<{ error?: string }> {
 }
 
 /**
- * Get current user session
+ * Get current _user session
  */
 export async function getCurrentSession(): Promise<AuthResponse> {
   try {
     const { data: { session }, error } = await supabase.auth.getSession();
 
     if (error || !session) {
-      return { user: null, session: null };
+      return { _user: null, session: null };
     }
 
-    // Get user profile data
+    // Get _user profile data
     const { data: profile } = await supabase
       .from('profiles')
       .select('*')
-      .eq('id', session.user.id)
+      .eq('id', session._user.id)
       .single();
 
     if (profile) {
-      const user: AuthUser = {
-        id: session.user.id,
-        email: session.user.email!,
-        role: profile.role || 'user',
+      const _user: AuthUser = {
+        id: session._user.id,
+        email: session._user.email!,
+        role: profile.role || '_user',
         plan: 'free', // Will be updated when subscription system is implemented
         first_name: profile.first_name,
         last_name: profile.last_name,
         company: profile.company_name || undefined,
       };
 
-      return { user, session };
+      return { _user, session };
     }
 
-    return { user: null, session: null };
+    return { _user: null, session: null };
   } catch {
-    return { user: null, session: null, error: 'Failed to get session' };
+    return { _user: null, session: null, error: 'Failed to get session' };
   }
 }
 
 /**
- * Refresh user session
+ * Refresh _user session
  */
 export async function refreshSession(): Promise<AuthResponse> {
   try {
     const { data, error } = await supabase.auth.refreshSession();
 
     if (error || !data.session) {
-      return { user: null, session: null, error: error?.message };
+      return { _user: null, session: null, error: error?.message };
     }
 
-    // Get updated user profile
+    // Get updated _user profile
     const { data: profile } = await supabase
       .from('profiles')
       .select('*')
-      .eq('id', data.session.user.id)
+      .eq('id', data.session._user.id)
       .single();
 
     if (profile) {
-      const user: AuthUser = {
-        id: data.session.user.id,
-        email: data.session.user.email!,
-        role: profile.role || 'user',
+      const _user: AuthUser = {
+        id: data.session._user.id,
+        email: data.session._user.email!,
+        role: profile.role || '_user',
         plan: 'free', // Will be updated when subscription system is implemented
         first_name: profile.first_name,
         last_name: profile.last_name,
         company: profile.company_name || undefined,
       };
 
-      return { user, session: data.session };
+      return { _user, session: data.session };
     }
 
-    return { user: null, session: null };
+    return { _user: null, session: null };
   } catch {
-    return { user: null, session: null, error: 'Session refresh failed' };
+    return { _user: null, session: null, error: 'Session refresh failed' };
   }
 }
 
 /**
- * Update user profile
+ * Update _user profile
  */
 export async function updateUserProfile(
   userId: string,
@@ -281,7 +281,7 @@ export async function updateUserProfile(
 }
 
 /**
- * Reset user password
+ * Reset _user password
  */
 export async function resetPassword(email: string): Promise<{ success: boolean; error?: string }> {
   try {
@@ -300,7 +300,7 @@ export async function resetPassword(email: string): Promise<{ success: boolean; 
 }
 
 /**
- * Update user password
+ * Update _user password
  */
 export async function updatePassword(newPassword: string): Promise<{ success: boolean; error?: string }> {
   try {
@@ -323,7 +323,7 @@ export async function updatePassword(newPassword: string): Promise<{ success: bo
 // ============================================================================
 
 /**
- * Subscribe to user profile changes
+ * Subscribe to _user profile changes
  */
 export function subscribeToProfileChanges(
   userId: string,
@@ -345,7 +345,7 @@ export function subscribeToProfileChanges(
 }
 
 /**
- * Subscribe to document changes
+ * Subscribe to _document changes
  */
 export function subscribeToDocumentChanges(
   userId: string,

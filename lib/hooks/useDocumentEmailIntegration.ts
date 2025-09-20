@@ -1,7 +1,7 @@
 /**
  * Document Email Integration Hook
  * 
- * React hook for managing email notifications in document workflows
+ * React hook for managing email notifications in _document workflows
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -58,7 +58,7 @@ export function useDocumentEmailIntegration(documentId: string): UseDocumentEmai
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const supabase = createClient();
+  const _supabase = createClient();
 
   // Fetch email notifications for the document
   const fetchNotifications = useCallback(async () => {
@@ -90,7 +90,7 @@ export function useDocumentEmailIntegration(documentId: string): UseDocumentEmai
     }
   }, [documentId, supabase]);
 
-  // Fetch document recipients
+  // Fetch _document recipients
   const fetchRecipients = useCallback(async () => {
     try {
       const { data, error } = await supabase
@@ -108,7 +108,7 @@ export function useDocumentEmailIntegration(documentId: string): UseDocumentEmai
   }, [documentId, supabase]);
 
   // Send email action
-  const sendEmailAction = useCallback(async (action: string, data?: any) => {
+  const sendEmailAction = useCallback(async (action: string, data?: unknown) => {
     setLoading(true);
     setError(null);
 

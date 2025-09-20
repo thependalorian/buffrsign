@@ -72,7 +72,7 @@ export interface GroqConfig {
 }
 
 export interface GroqMessage {
-  role: 'system' | 'user' | 'assistant';
+  role: 'system' | '_user' | 'assistant';
   content: string;
   timestamp?: string;
 }

@@ -1,5 +1,5 @@
 // BuffrSign Platform - Document Analyzer Service
-// AI-powered document analysis with ETA 2019 compliance checking
+// AI-powered _document analysis with ETA 2019 compliance checking
 
 import {
   DocumentAnalysisResult,
@@ -52,7 +52,7 @@ export class DocumentAnalyzer {
       const textContent = documentText;
       const metadata = documentMetadata || {};
 
-      // Classify document type
+      // Classify _document type
       const docType = await this.classifyDocument(textContent);
 
       // Detect signature fields
@@ -102,7 +102,7 @@ export class DocumentAnalyzer {
     text: string
   ): Promise<string> {
     try {
-      // Use AI for document classification
+      // Use AI for _document classification
       if (this.openaiApiKey) {
         return await this.classifyDocumentWithAI(text);
       }
@@ -119,7 +119,7 @@ export class DocumentAnalyzer {
     text: string
   ): Promise<string> {
     const prompt = `
-      Analyze the following document text and classify it into one of these categories:
+      Analyze the following _document text and classify it into one of these categories:
       - employment_contract
       - service_agreement
       - nda_agreement
@@ -194,7 +194,7 @@ export class DocumentAnalyzer {
     text: string
   ): Promise<SignatureField[]> {
     const prompt = `
-      Analyze the following document and identify signature fields. Return a JSON array with:
+      Analyze the following _document and identify signature fields. Return a JSON array with:
       - x, y coordinates (0-100 scale)
       - width, height (0-100 scale)
       - page_number (1-based)
@@ -314,7 +314,7 @@ export class DocumentAnalyzer {
         compliance_score: 0,
         compliance_details: [],
         validation_errors: [`Compliance check failed: ${error}`],
-        recommendations: ['Review document manually for compliance']
+        recommendations: ['Review _document manually for compliance']
       };
     }
   }
@@ -365,16 +365,16 @@ export class DocumentAnalyzer {
 
     // Generate recommendations
     if (!compliance.section_17_compliant) {
-      compliance.recommendations.push('Ensure document format is accessible and readable');
+      compliance.recommendations.push('Ensure _document format is accessible and readable');
     }
     if (!compliance.section_20_compliant) {
       compliance.recommendations.push('Implement proper electronic signature mechanisms');
     }
     if (!compliance.section_21_compliant) {
-      compliance.recommendations.push('Maintain document integrity and authenticity');
+      compliance.recommendations.push('Maintain _document integrity and authenticity');
     }
     if (!compliance.section_24_compliant) {
-      compliance.recommendations.push('Establish proper document retention policies');
+      compliance.recommendations.push('Establish proper _document retention policies');
     }
 
     return compliance;
@@ -474,7 +474,7 @@ export class DocumentAnalyzer {
       recommendations: []
     };
 
-    // Check document type specific compliance
+    // Check _document type specific compliance
     if (documentType === 'employment_contract') {
       compliance.labour_act_compliance = this.checkLabourActCompliance(text);
     } else if (documentType === 'service_agreement') {
@@ -557,7 +557,7 @@ export class DocumentAnalyzer {
     documentType: string
   ): Promise<Record<string, unknown>> {
     const prompt = `
-      Extract structured data from this ${documentType} document. Return a JSON object with relevant fields.
+      Extract structured data from this ${documentType} _document. Return a JSON object with relevant fields.
       
       Document text: ${text.substring(0, 1000)}...
       
@@ -651,7 +651,7 @@ export class DocumentAnalyzer {
       riskScore += 40;
     }
 
-    // Assess document type specific risks
+    // Assess _document type specific risks
     const typeRisks = this.assessDocumentTypeRisks(documentType, text);
     riskFactors.push(...typeRisks);
     riskScore += typeRisks.reduce((sum, risk) => sum + this.getRiskScore(risk.severity), 0);
@@ -774,16 +774,16 @@ export class DocumentAnalyzer {
 
     // Compliance recommendations
     if (!complianceStatus.eta_2019_compliant) {
-      recommendations.push('Ensure document meets all ETA 2019 requirements');
+      recommendations.push('Ensure _document meets all ETA 2019 requirements');
       recommendations.push('Implement electronic signature mechanisms');
-      recommendations.push('Establish document retention policies');
+      recommendations.push('Establish _document retention policies');
     }
 
     // Risk-based recommendations
     if (riskAssessment.overall_risk === RiskLevel.CRITICAL) {
       recommendations.push('Immediate legal review required');
       recommendations.push('Implement enhanced security measures');
-      recommendations.push('Consider document redesign');
+      recommendations.push('Consider _document redesign');
     } else if (riskAssessment.overall_risk === RiskLevel.HIGH) {
       recommendations.push('Expert legal review recommended');
       recommendations.push('Implement multi-level validation');
@@ -827,7 +827,7 @@ export class DocumentAnalyzer {
         
       default:
         return [
-          'Review document for legal compliance',
+          'Review _document for legal compliance',
           'Ensure proper signature mechanisms',
           'Implement audit trail requirements'
         ];
@@ -855,10 +855,10 @@ export class DocumentAnalyzer {
           messages: [
             {
               role: 'system',
-              content: 'You are a legal document analysis assistant. Provide accurate, helpful responses.'
+              content: 'You are a legal _document analysis assistant. Provide accurate, helpful responses.'
             },
             {
-              role: 'user',
+              role: '_user',
               content: prompt
             }
           ],
@@ -903,7 +903,7 @@ export class DocumentAnalyzer {
       });
     }
 
-    // Assess based on document type
+    // Assess based on _document type
     if (documentData.document_type === 'unknown') {
       riskScore += 25;
       riskFactors.push({
@@ -916,7 +916,7 @@ export class DocumentAnalyzer {
       });
     }
 
-    // Assess based on document type complexity
+    // Assess based on _document type complexity
     if (documentData.document_type === 'unknown' || documentData.document_type === 'other') {
       riskScore += 20;
       riskFactors.push({
@@ -925,7 +925,7 @@ export class DocumentAnalyzer {
         description: 'Document type could not be determined',
         impact: 'Reduced processing accuracy',
         probability: 0.3,
-        mitigation: 'Manual document type classification required'
+        mitigation: 'Manual _document type classification required'
       });
     }
 
@@ -963,7 +963,7 @@ export class DocumentAnalyzer {
         if (!isCompliant) {
           result.validation_errors.push('Document does not meet ETA 2019 electronic signature requirements');
           result.recommendations.push('Implement electronic signature mechanism');
-          result.recommendations.push('Ensure document format compliance');
+          result.recommendations.push('Ensure _document format compliance');
         }
       }
     }
@@ -986,7 +986,7 @@ export class DocumentAnalyzer {
       const titleLine = lines.find(line => 
         line.toLowerCase().includes('agreement') || 
         line.toLowerCase().includes('contract') ||
-        line.toLowerCase().includes('document')
+        line.toLowerCase().includes('_document')
       ) || lines[0];
       metadata.title = titleLine.trim();
     }

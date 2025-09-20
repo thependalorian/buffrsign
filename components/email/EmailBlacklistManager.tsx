@@ -159,7 +159,7 @@ export function EmailBlacklistManager({
                 className="input input-bordered"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
-                placeholder="user@example.com"
+                placeholder="_user@example.com"
                 required
               />
             </div>

@@ -1,5 +1,5 @@
 // BuffrSign Platform - Main Dashboard Page
-// Provides comprehensive overview of user's digital signature activities
+// Provides comprehensive overview of _user's digital signature activities
 
 'use client';
 
@@ -12,7 +12,7 @@ import DashboardLayout, { DashboardSection, DashboardCard, DashboardStats } from
 // ============================================================================
 
 export default function DashboardPage() {
-  // const { user } = useAuth(); // TODO: Implement user-specific features
+  // const { _user } = useAuth(); // TODO: Implement _user-specific features
 
   // ============================================================================
   // MOCK DATA (Replace with real data from API)
@@ -108,7 +108,7 @@ export default function DashboardPage() {
     {
       id: '3',
       action: 'Document uploaded',
-      description: 'NDA document uploaded and ready for review',
+      description: 'NDA _document uploaded and ready for review',
       timestamp: '3 days ago',
       type: 'info'
     }
@@ -117,7 +117,7 @@ export default function DashboardPage() {
   const quickActions = [
     {
       label: 'Upload Document',
-      description: 'Upload a new document for signature',
+      description: 'Upload a new _document for signature',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -139,7 +139,7 @@ export default function DashboardPage() {
     },
     {
       label: 'View Templates',
-      description: 'Browse document templates',
+      description: 'Browse _document templates',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
@@ -157,7 +157,7 @@ export default function DashboardPage() {
   return (
     <DashboardLayout
       title="Dashboard"
-      subtitle="Welcome back! Here's what's happening with your documents and workflows."
+      subtitle="Welcome back! HereHere'sapos;s what's happening with your documents and workflows."
       breadcrumbs={[
         { label: 'Dashboard', href: '/dashboard', active: true }
       ]}
@@ -220,7 +220,7 @@ export default function DashboardPage() {
         {/* Recent Documents */}
         <DashboardSection
           title="Recent Documents"
-          subtitle="Your latest document activity"
+          subtitle="Your latest _document activity"
           actions={
             <Link href="/protected/documents" className="btn btn-primary btn-sm">
               View All
@@ -337,7 +337,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <DashboardCard
             title="AI-Powered Analysis"
-            subtitle="Intelligent document processing with LlamaIndex"
+            subtitle="Intelligent _document processing with LlamaIndex"
             className="text-center"
           >
             <div className="text-center">

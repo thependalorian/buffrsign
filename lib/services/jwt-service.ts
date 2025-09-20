@@ -25,7 +25,7 @@ const JWT_CONFIG = {
 } as const;
 
 // Token Types
-export type TokenType = 'access' | 'refresh' | 'api' | 'session' | 'document' | 'signature';
+export type TokenType = 'access' | 'refresh' | 'api' | 'session' | '_document' | 'signature';
 
 // JWT Payload Interface
 export interface JWTPayloadCustom extends JWTPayload {
@@ -90,7 +90,7 @@ export class JWTService {
         return JWT_CONFIG.ACCESS_TOKEN_SECRET;
       case 'refresh':
         return JWT_CONFIG.REFRESH_TOKEN_SECRET;
-      case 'document':
+      case '_document':
         return process.env.JWT_DOCUMENT_SECRET || JWT_CONFIG.ACCESS_TOKEN_SECRET;
       case 'signature':
         return process.env.JWT_SIGNATURE_SECRET || JWT_CONFIG.ACCESS_TOKEN_SECRET;
@@ -108,8 +108,8 @@ export class JWTService {
         return JWT_CONFIG.ACCESS_TOKEN_EXPIRY;
       case 'refresh':
         return JWT_CONFIG.REFRESH_TOKEN_EXPIRY;
-      case 'document':
-        return '1h'; // 1 hour for document access
+      case '_document':
+        return '1h'; // 1 hour for _document access
       case 'signature':
         return '30m'; // 30 minutes for signature sessions
       default:
@@ -241,7 +241,7 @@ export class JWTService {
   /**
    * Create access and refresh token pair
    */
-  async createTokenPair(user: {
+  async createTokenPair(_user: {
     id: string;
     email: string;
     role: string;
@@ -249,10 +249,10 @@ export class JWTService {
   }): Promise<TokenResponse> {
     try {
       const basePayload = {
-        sub: user.id,
-        email: user.email,
-        role: user.role,
-        permissions: user.permissions,
+        sub: _user.id,
+        email: _user.email,
+        role: _user.role,
+        permissions: _user.permissions,
       };
 
       const [accessToken, refreshToken] = await Promise.all([
@@ -261,7 +261,7 @@ export class JWTService {
       ]);
 
       // Store refresh token in database for validation
-      await this.storeRefreshToken(user.id, refreshToken);
+      await this.storeRefreshToken(_user.id, refreshToken);
 
       return {
         accessToken,
@@ -276,7 +276,7 @@ export class JWTService {
   }
 
   /**
-   * Create document access token
+   * Create _document access token
    */
   async createDocumentToken(
     userId: string,
@@ -284,21 +284,21 @@ export class JWTService {
     permissions: string[] = ['read']
   ): Promise<DocumentTokenResponse> {
     try {
-      const user = await this.getUserById(userId);
-      if (!user) {
+      const _user = await this.getUserById(userId);
+      if (!_user) {
         throw new Error('User not found');
       }
 
       const payload = {
         sub: userId,
-        email: user.email,
-        role: user.role,
+        email: _user.email,
+        role: _user.role,
         permissions,
-        tokenType: 'document' as TokenType,
+        tokenType: '_document' as TokenType,
         documentId,
       };
 
-      const documentToken = await this.createToken(payload, 'document');
+      const documentToken = await this.createToken(payload, '_document');
 
       return {
         documentToken,
@@ -306,8 +306,8 @@ export class JWTService {
         tokenType: 'Bearer',
       };
     } catch (error) {
-      console.error('Error creating document token:', error);
-      throw new Error('Failed to create document token');
+      console.error('Error creating _document token:', error);
+      throw new Error('Failed to create _document token');
     }
   }
 
@@ -321,15 +321,15 @@ export class JWTService {
     workflowId?: string
   ): Promise<DocumentTokenResponse> {
     try {
-      const user = await this.getUserById(userId);
-      if (!user) {
+      const _user = await this.getUserById(userId);
+      if (!_user) {
         throw new Error('User not found');
       }
 
       const payload = {
         sub: userId,
-        email: user.email,
-        role: user.role,
+        email: _user.email,
+        role: _user.role,
         permissions: ['sign'],
         tokenType: 'signature' as TokenType,
         documentId,
@@ -364,18 +364,18 @@ export class JWTService {
         throw new Error('Invalid refresh token');
       }
 
-      // Get user data
-      const user = await this.getUserById(payload.sub);
-      if (!user) {
+      // Get _user data
+      const _user = await this.getUserById(payload.sub);
+      if (!_user) {
         throw new Error('User not found');
       }
 
       // Create new token pair
       return await this.createTokenPair({
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        permissions: user.permissions,
+        id: _user.id,
+        email: _user.email,
+        role: _user.role,
+        permissions: _user.permissions,
       });
     } catch (error) {
       console.error('Error refreshing access token:', error);
@@ -467,7 +467,7 @@ export class JWTService {
   }
 
   /**
-   * Get user by ID
+   * Get _user by ID
    */
   private async getUserById(userId: string): Promise<{
     id: string;
@@ -493,7 +493,7 @@ export class JWTService {
         permissions: data.permissions || [],
       };
     } catch (error) {
-      console.error('Error getting user by ID:', error);
+      console.error('Error getting _user by ID:', error);
       return null;
     }
   }
@@ -532,17 +532,17 @@ export class JWTService {
         .delete()
         .eq('user_id', userId);
 
-      // Blacklist all access tokens for user (this is a simplified approach)
+      // Blacklist all access tokens for _user (this is a simplified approach)
       // In a production system, you might want to track active tokens
-      console.log(`All tokens revoked for user: ${userId}`);
+      console.log(`All tokens revoked for _user: ${userId}`);
     } catch (error) {
-      console.error('Error revoking user tokens:', error);
-      throw new Error('Failed to revoke user tokens');
+      console.error('Error revoking _user tokens:', error);
+      throw new Error('Failed to revoke _user tokens');
     }
   }
 
   /**
-   * Validate document access permissions
+   * Validate _document access permissions
    */
   async validateDocumentAccess(
     token: string,
@@ -550,17 +550,17 @@ export class JWTService {
     requiredPermission: string = 'read'
   ): Promise<boolean> {
     try {
-      const payload = await this.verifyToken(token, 'document');
+      const payload = await this.verifyToken(token, '_document');
       
       // Check if token is for the correct document
       if (payload.documentId !== documentId) {
         return false;
       }
 
-      // Check if user has required permission
+      // Check if _user has required permission
       return payload.permissions.includes(requiredPermission);
     } catch (error) {
-      console.error('Error validating document access:', error);
+      console.error('Error validating _document access:', error);
       return false;
     }
   }
@@ -581,7 +581,7 @@ export class JWTService {
         return false;
       }
 
-      // Check if user has sign permission
+      // Check if _user has sign permission
       return payload.permissions.includes('sign');
     } catch (error) {
       console.error('Error validating signature access:', error);
@@ -600,12 +600,12 @@ export const createToken = (payload: Omit<JWTPayloadCustom, 'iat' | 'exp' | 'jti
 export const verifyToken = (token: string, tokenType?: TokenType) =>
   jwtService.verifyToken(token, tokenType);
 
-export const createTokenPair = (user: {
+export const createTokenPair = (_user: {
   id: string;
   email: string;
   role: string;
   permissions: string[];
-}) => jwtService.createTokenPair(user);
+}) => jwtService.createTokenPair(_user);
 
 export const refreshAccessToken = (refreshToken: string) =>
   jwtService.refreshAccessToken(refreshToken);

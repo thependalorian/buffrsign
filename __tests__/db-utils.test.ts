@@ -10,7 +10,7 @@ import { Database } from '../types/supabase';
 jest.mock('@supabase/supabase-js');
 
 describe('Database Utilities', () => {
-  let mockSupabase: any;
+  let mockSupabase: unknown;
 
   beforeEach(() => {
     // Create individual mock functions
@@ -52,15 +52,15 @@ describe('Database Utilities', () => {
   });
 
   describe('Document Operations', () => {
-    test('should create document successfully', async () => {
+    test('should create _document successfully', async () => {
       const mockDocument = {
         id: 'doc123',
         title: 'Test Document',
-        file_path: '/path/to/document.pdf',
+        file_path: '/path/to/_document.pdf',
         mime_type: 'application/pdf',
         file_size: 1024,
         file_hash: 'abc123',
-        created_by: 'user123'
+        created_by: '_user123'
       };
 
       mockSupabase.insert.mockResolvedValue({ data: mockDocument, error: null });
@@ -73,11 +73,11 @@ describe('Database Utilities', () => {
       expect(mockSupabase.insert).toHaveBeenCalledWith(mockDocument);
     });
 
-    test('should retrieve document by ID', async () => {
+    test('should retrieve _document by ID', async () => {
       const mockDocument = {
         id: 'doc123',
         title: 'Test Document',
-        file_path: '/path/to/document.pdf',
+        file_path: '/path/to/_document.pdf',
         mime_type: 'application/pdf'
       };
 
@@ -92,7 +92,7 @@ describe('Database Utilities', () => {
       expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'doc123');
     });
 
-    test('should update document status', async () => {
+    test('should update _document status', async () => {
       const mockUpdate = {
         status: 'processed',
         updated_at: new Date().toISOString()
@@ -131,7 +131,7 @@ describe('Database Utilities', () => {
       expect(mockSupabase.insert).toHaveBeenCalledWith(mockAnalysis);
     });
 
-    test('should retrieve AI analysis by document ID', async () => {
+    test('should retrieve AI analysis by _document ID', async () => {
       const mockAnalysis = {
         id: 'analysis123',
         document_id: 'doc123',
@@ -155,7 +155,7 @@ describe('Database Utilities', () => {
     test('should create KYC workflow', async () => {
       const mockWorkflow = {
         id: 'kyc123',
-        user_id: 'user123',
+        user_id: '_user123',
         document_id: 'doc123',
         workflow_state: 'initialized',
         created_at: new Date().toISOString()
@@ -188,34 +188,34 @@ describe('Database Utilities', () => {
       expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'kyc123');
     });
 
-    test('should retrieve KYC workflow by user ID', async () => {
+    test('should retrieve KYC workflow by _user ID', async () => {
       const mockWorkflow = {
         id: 'kyc123',
-        user_id: 'user123',
+        user_id: '_user123',
         workflow_state: 'completed',
         final_decision: 'approved'
       };
 
       mockSupabase.single.mockResolvedValue({ data: mockWorkflow, error: null });
 
-      const result = await mockSupabase.from('kyc_workflows').select('*').eq('user_id', 'user123').single();
+      const result = await mockSupabase.from('kyc_workflows').select('*').eq('user_id', '_user123').single();
 
       expect(result.data).toEqual(mockWorkflow);
       expect(result.error).toBeNull();
       expect(mockSupabase.from).toHaveBeenCalledWith('kyc_workflows');
       expect(mockSupabase.select).toHaveBeenCalledWith('*');
-      expect(mockSupabase.eq).toHaveBeenCalledWith('user_id', 'user123');
+      expect(mockSupabase.eq).toHaveBeenCalledWith('user_id', '_user123');
     });
   });
 
   describe('User Operations', () => {
-    test('should create user profile', async () => {
+    test('should create _user profile', async () => {
       const mockProfile = {
-        id: 'user123',
+        id: '_user123',
         first_name: 'John',
         last_name: 'Doe',
         email: 'john.doe@example.com',
-        role: 'user',
+        role: '_user',
         is_active: true
       };
 
@@ -229,7 +229,7 @@ describe('Database Utilities', () => {
       expect(mockSupabase.insert).toHaveBeenCalledWith(mockProfile);
     });
 
-    test('should update user profile', async () => {
+    test('should update _user profile', async () => {
       const mockUpdate = {
         first_name: 'Jane',
         last_name: 'Smith',
@@ -238,13 +238,13 @@ describe('Database Utilities', () => {
 
       mockSupabase.eq.mockResolvedValue({ data: mockUpdate, error: null });
 
-      const result = await mockSupabase.from('profiles').update(mockUpdate).eq('id', 'user123');
+      const result = await mockSupabase.from('profiles').update(mockUpdate).eq('id', '_user123');
 
       expect(result.data).toEqual(mockUpdate);
       expect(result.error).toBeNull();
       expect(mockSupabase.from).toHaveBeenCalledWith('profiles');
       expect(mockSupabase.update).toHaveBeenCalledWith(mockUpdate);
-      expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'user123');
+      expect(mockSupabase.eq).toHaveBeenCalledWith('id', '_user123');
     });
   });
 
@@ -253,7 +253,7 @@ describe('Database Utilities', () => {
       const mockAuditEvent = {
         id: 'audit123',
         action: 'document_uploaded',
-        user_id: 'user123',
+        user_id: '_user123',
         document_id: 'doc123',
         details: { file_size: 1024, mime_type: 'application/pdf' },
         created_at: new Date().toISOString()
@@ -269,19 +269,19 @@ describe('Database Utilities', () => {
       expect(mockSupabase.insert).toHaveBeenCalledWith(mockAuditEvent);
     });
 
-    test('should retrieve audit trail for document', async () => {
+    test('should retrieve audit trail for _document', async () => {
       const mockAuditEvents = [
         {
           id: 'audit123',
           action: 'document_uploaded',
-          user_id: 'user123',
+          user_id: '_user123',
           document_id: 'doc123',
           created_at: '2024-01-01T00:00:00Z'
         },
         {
           id: 'audit124',
           action: 'document_processed',
-          user_id: 'user123',
+          user_id: '_user123',
           document_id: 'doc123',
           created_at: '2024-01-01T00:01:00Z'
         }

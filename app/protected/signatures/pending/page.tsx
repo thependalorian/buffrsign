@@ -3,7 +3,7 @@
  * Location: /app/protected/signatures/pending/page.tsx
  * Purpose: Display documents awaiting signatures from the user
  * Features:
- * - List of documents pending user signature
+ * - List of documents pending _user signature
  * - Signature status tracking
  * - Quick signature actions
  * - Document preview and details
@@ -38,7 +38,7 @@ interface PendingSignature {
 }
 
 export default function PendingSignaturesPage() {
-  const { user, getSupabaseClient } = useAuth();
+  const { _user, getSupabaseClient } = useAuth();
   const [pendingSignatures, setPendingSignatures] = useState<PendingSignature[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +48,7 @@ export default function PendingSignaturesPage() {
       setLoading(true);
       setError(null);
 
-      const supabase = getSupabaseClient();
+      const _supabase = getSupabaseClient();
       const { data: documents, error: documentsError } = await supabase
         .from('documents')
         .select(`
@@ -86,10 +86,10 @@ export default function PendingSignaturesPage() {
   }, [getSupabaseClient]);
 
   useEffect(() => {
-    if (user) {
+    if (_user) {
       fetchPendingSignatures();
     }
-  }, [user, fetchPendingSignatures]);
+  }, [_user, fetchPendingSignatures]);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {

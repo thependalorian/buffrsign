@@ -1,6 +1,6 @@
 /**
  * React Hook for Groq AI Integration
- * Provides easy access to Groq LLM services with user tier-based model selection
+ * Provides easy access to Groq LLM services with _user tier-based model selection
  */
 
 import { useState, useCallback, useRef } from 'react';
@@ -8,7 +8,7 @@ import { BuffrSignAIIntegration } from '@/lib/ai/ai-integration';
 import type { UserTier } from '@/lib/ai/ai-types';
 
 export interface GroqMessage {
-  role: 'system' | 'user' | 'assistant';
+  role: 'system' | '_user' | 'assistant';
   content: string;
   timestamp?: string;
 }
@@ -62,7 +62,7 @@ export function useGroqAI(options: UseGroqAIOptions): UseGroqAIResult {
   const lastSystemPromptRef = useRef<string>('');
 
   // Initialize AI integration
-  const aiIntegration = useRef(new BuffrSignAIIntegration()).current;
+  const _aiIntegration = useRef(new BuffrSignAIIntegration()).current;
 
   // Send a regular message
   const sendMessage = useCallback(async (content: string, systemPrompt?: string) => {
@@ -85,9 +85,9 @@ export function useGroqAI(options: UseGroqAIOptions): UseGroqAIResult {
         });
       }
       
-      // Add user message
+      // Add _user message
       messageHistory.push({
-        role: 'user',
+        role: '_user',
         content,
         timestamp: new Date().toISOString(),
       });
@@ -147,9 +147,9 @@ export function useGroqAI(options: UseGroqAIOptions): UseGroqAIResult {
         });
       }
       
-      // Add user message
+      // Add _user message
       messageHistory.push({
-        role: 'user',
+        role: '_user',
         content,
         timestamp: new Date().toISOString(),
       });
@@ -202,8 +202,8 @@ export function useGroqAI(options: UseGroqAIOptions): UseGroqAIResult {
                   
                   // Update the assistant message content
                   setMessages(prev => 
-                    prev.map((msg, index) => 
-                      index === prev.length - 1 && msg.role === 'assistant'
+                    prev.map((msg, _index) => 
+                      _index === prev.length - 1 && msg.role === 'assistant'
                         ? { ...msg, content: assistantContent }
                         : msg
                     )

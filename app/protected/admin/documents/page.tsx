@@ -1,7 +1,7 @@
 /**
  * Admin Document Management Page
  * 
- * Purpose: Comprehensive document oversight and management for BuffrSign administrators
+ * Purpose: Comprehensive _document oversight and management for BuffrSign administrators
  * Location: /app/protected/admin/documents/page.tsx
  * Features: Document monitoring, signature verification, compliance oversight, analytics
  */
@@ -48,7 +48,7 @@ export default function ProtectedAdminDocumentsPage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold">Quick Actions</h2>
-              <p className="text-sm text-gray-600">Common document management tasks</p>
+              <p className="text-sm text-gray-600">Common _document management tasks</p>
             </div>
             <div className="flex space-x-3">
               <button className="bg-blue-600 text-white px-4 py-2 rounded-lg" disabled>
@@ -519,7 +519,7 @@ export default function ProtectedAdminDocumentsPage() {
               <div className="border border-gray-200 rounded-lg p-6">
                 <h3 className="font-medium text-lg mb-4">Document Analytics</h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  Get insights into document patterns, user behavior, and platform usage trends.
+                  Get insights into _document patterns, _user behavior, and platform usage trends.
                 </p>
                 <button className="bg-green-600 text-white px-4 py-2 rounded-lg" disabled>
                   View Analytics
@@ -532,9 +532,9 @@ export default function ProtectedAdminDocumentsPage() {
         {/* Placeholder Note */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
           <p className="text-blue-800 text-sm">
-            <strong>Note:</strong> This is a placeholder page for the admin document management system. 
-            The actual implementation will include comprehensive document oversight, 
-            compliance monitoring, and AI-powered document analytics for managing all platform documents.
+            <strong>Note:</strong> This is a placeholder page for the admin _document management system. 
+            The actual implementation will include comprehensive _document oversight, 
+            compliance monitoring, and AI-powered _document analytics for managing all platform documents.
           </p>
         </div>
       </div>

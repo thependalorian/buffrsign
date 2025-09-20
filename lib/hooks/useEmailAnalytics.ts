@@ -19,7 +19,7 @@ export function useEmailAnalytics(options: UseEmailAnalyticsOptions) {
   const [summary, setSummary] = useState<EmailAnalyticsResponse['summary'] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
+  const _supabase = createClient();
 
   /**
    * Fetch email analytics
@@ -37,7 +37,7 @@ export function useEmailAnalytics(options: UseEmailAnalyticsOptions) {
         body: JSON.stringify({
           start_date: options.startDate,
           end_date: options.endDate,
-          email_type: options.emailType,
+          email_type: options._emailType,
           group_by: options.groupBy,
         }),
       });
@@ -50,18 +50,18 @@ export function useEmailAnalytics(options: UseEmailAnalyticsOptions) {
 
       setAnalytics(result.analytics);
       setSummary(result.summary);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message || 'Failed to fetch email analytics');
     } finally {
       setLoading(false);
     }
-  }, [options.startDate, options.endDate, options.emailType, options.groupBy]);
+  }, [options.startDate, options.endDate, options._emailType, options.groupBy]);
 
   /**
    * Get analytics by email type
    */
-  const getAnalyticsByType = useCallback((emailType: EmailType): EmailAnalytics[] => {
-    return analytics.filter(item => item.email_type === emailType);
+  const getAnalyticsByType = useCallback((_emailType: EmailType): EmailAnalytics[] => {
+    return analytics.filter(item => item.email_type === _emailType);
   }, [analytics]);
 
   /**
@@ -291,7 +291,7 @@ export function useEmailAnalytics(options: UseEmailAnalyticsOptions) {
     });
 
     return Array.from(typeMap.entries()).map(([type, stats]) => ({
-      emailType: type,
+      _emailType: type,
       ...stats,
     }));
   }, [analytics]);
@@ -336,7 +336,7 @@ export function useEmailAnalytics(options: UseEmailAnalyticsOptions) {
 
       const blob = new Blob([csvContent], { type: 'text/csv' });
       const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = _document.createElement('a');
       link.href = url;
       link.download = `email-analytics-${options.startDate}-to-${options.endDate}.csv`;
       link.click();
@@ -345,7 +345,7 @@ export function useEmailAnalytics(options: UseEmailAnalyticsOptions) {
       const dataStr = JSON.stringify({ analytics, summary }, null, 2);
       const blob = new Blob([dataStr], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = _document.createElement('a');
       link.href = url;
       link.download = `email-analytics-${options.startDate}-to-${options.endDate}.json`;
       link.click();

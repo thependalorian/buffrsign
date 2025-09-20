@@ -106,7 +106,7 @@ export class EmailService {
         };
       }
 
-      // Get user preferences
+      // Get _user preferences
       const preferences = await this.getUserEmailPreferences(request.to);
       if (!preferences) {
         return {
@@ -115,7 +115,7 @@ export class EmailService {
         };
       }
 
-      // Check if user wants to receive this type of email
+      // Check if _user wants to receive this type of email
       if (!this.shouldSendEmail(request.email_type, preferences)) {
         return {
           success: true,
@@ -160,7 +160,7 @@ export class EmailService {
       } else {
         return await this.sendEmailImmediate(emailData);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Send email error:', error);
       return {
         success: false,
@@ -189,7 +189,7 @@ export class EmailService {
         messageId: result.messageId,
         error: result.error,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Immediate email send error:', error);
       return {
         success: false,
@@ -226,7 +226,7 @@ export class EmailService {
         success: true,
         messageId: data.id,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Schedule email error:', error);
       return {
         success: false,
@@ -270,7 +270,7 @@ export class EmailService {
           if (result.success) {
             await this.recordEmailNotification(item.email_data, result);
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error(`Failed to process queue item ${item.id}:`, error);
           
           // Mark as failed if max attempts reached
@@ -328,9 +328,9 @@ export class EmailService {
   private async buildTemplateContext(request: SendEmailRequest): Promise<TemplateContext> {
     const context: TemplateContext = {};
 
-    // Load document context if document_id provided
+    // Load _document context if document_id provided
     if (request.document_id) {
-      const { data: document } = await this.supabase
+      const { data: _document } = await this.supabase
         .from('documents')
         .select(`
           id,
@@ -344,15 +344,15 @@ export class EmailService {
         .eq('id', request.document_id)
         .single();
 
-      if (document) {
-        context.document = {
-          id: document.id,
-          title: document.title,
-          status: document.status,
-          created_at: document.created_at,
-          expires_at: document.expires_at,
-          sender_name: document.profiles?.full_name || '',
-          sender_email: document.profiles?.email || '',
+      if (_document) {
+        context._document = {
+          id: _document.id,
+          title: _document.title,
+          status: _document.status,
+          created_at: _document.created_at,
+          expires_at: _document.expires_at,
+          sender_name: _document.profiles?.full_name || '',
+          sender_email: _document.profiles?.email || '',
         };
       }
     }
@@ -413,19 +413,19 @@ export class EmailService {
   }
 
   /**
-   * Get user email preferences
+   * Get _user email preferences
    */
   private async getUserEmailPreferences(email: string): Promise<UserEmailPreferences | null> {
     try {
       // First try to get by email
-      const { data: user } = await this.supabase
+      const { data: _user } = await this.supabase
         .from('users')
         .select('id')
         .eq('email', email)
         .single();
 
-      if (!user) {
-        // Return default preferences if user not found
+      if (!_user) {
+        // Return default preferences if _user not found
         return {
           id: '',
           user_id: '',
@@ -438,27 +438,27 @@ export class EmailService {
       const { data: preferences } = await this.supabase
         .from('user_email_preferences')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', _user.id)
         .single();
 
       return preferences || {
         id: '',
-        user_id: user.id,
+        user_id: _user.id,
         ...DEFAULT_EMAIL_PREFERENCES,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
     } catch (error) {
-      console.error('Get user preferences error:', error);
+      console.error('Get _user preferences error:', error);
       return null;
     }
   }
 
   /**
-   * Check if email should be sent based on user preferences
+   * Check if email should be sent based on _user preferences
    */
-  private shouldSendEmail(emailType: EmailType, preferences: UserEmailPreferences): boolean {
-    switch (emailType) {
+  private shouldSendEmail(_emailType: EmailType, preferences: UserEmailPreferences): boolean {
+    switch (_emailType) {
       case 'document_invitation':
         return preferences.receive_invitations;
       case 'signature_reminder':
@@ -578,7 +578,7 @@ export class EmailService {
   async getEmailAnalytics(
     startDate: string,
     endDate: string,
-    emailType?: EmailType
+    _emailType?: EmailType
   ): Promise<EmailAnalytics[]> {
     try {
       let query = this.supabase
@@ -588,8 +588,8 @@ export class EmailService {
         .lte('date', endDate)
         .order('date', { ascending: true });
 
-      if (emailType) {
-        query = query.eq('email_type', emailType);
+      if (_emailType) {
+        query = query.eq('email_type', _emailType);
       }
 
       const { data, error } = await query;
@@ -653,7 +653,7 @@ export class EmailService {
   }
 
   /**
-   * Send document expired notification
+   * Send _document expired notification
    */
   async sendDocumentExpired(data: {
     documentId: string;
@@ -684,7 +684,7 @@ export class EmailService {
 
       return await this.sendEmail(emailData);
     } catch (error) {
-      console.error('Error sending document expired notification:', error);
+      console.error('Error sending _document expired notification:', error);
       throw error;
     }
   }

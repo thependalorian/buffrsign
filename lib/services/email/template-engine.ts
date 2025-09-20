@@ -82,16 +82,16 @@ export class EmailTemplateEngine {
   private processString(template: string, context: TemplateContext): string {
     let processed = template;
 
-    // Process document variables
-    if (context.document) {
+    // Process _document variables
+    if (context._document) {
       processed = this.replaceVariables(processed, {
-        'document.title': context.document.title,
-        'document.id': context.document.id,
-        'document.status': context.document.status,
-        'document.created_at': this.formatDate(context.document.created_at),
-        'document.expires_at': context.document.expires_at ? this.formatDate(context.document.expires_at) : 'N/A',
-        'document.sender_name': context.document.sender_name,
-        'document.sender_email': context.document.sender_email,
+        '_document.title': context._document.title,
+        '_document.id': context._document.id,
+        '_document.status': context._document.status,
+        '_document.created_at': this.formatDate(context._document.created_at),
+        '_document.expires_at': context._document.expires_at ? this.formatDate(context._document.expires_at) : 'N/A',
+        '_document.sender_name': context._document.sender_name,
+        '_document.sender_email': context._document.sender_email,
       });
     }
 
@@ -104,11 +104,11 @@ export class EmailTemplateEngine {
       });
     }
 
-    // Process user variables
-    if (context.user) {
+    // Process _user variables
+    if (context._user) {
       processed = this.replaceVariables(processed, {
-        'user.name': context.user.name,
-        'user.email': context.user.email,
+        '_user.name': context._user.name,
+        '_user.email': context._user.email,
       });
     }
 
@@ -196,14 +196,14 @@ export class EmailTemplateEngine {
         return '';
       }
 
-      return array.map((item, index) => {
+      return array.map((item, _index) => {
         let itemContent = content;
         
         // Replace {{this}} with current item
         itemContent = itemContent.replace(/\{\{this\}\}/g, this.sanitizeValue(item));
         
-        // Replace {{@index}} with current index
-        itemContent = itemContent.replace(/\{\{@index\}\}/g, index.toString());
+        // Replace {{@_index}} with current index
+        itemContent = itemContent.replace(/\{\{@_index\}\}/g, _index.toString());
         
         // Replace item properties
         if (typeof item === 'object' && item !== null) {
@@ -221,11 +221,11 @@ export class EmailTemplateEngine {
   }
 
   /**
-   * Get value from context by path (e.g., 'document.title')
+   * Get value from context by path (e.g., '_document.title')
    */
-  private getContextValue(path: string, context: TemplateContext): any {
+  private getContextValue(path: string, context: TemplateContext): unknown {
     const parts = path.split('.');
-    let value: any = context;
+    let value: unknown = context;
 
     for (const part of parts) {
       if (value && typeof value === 'object' && part in value) {
@@ -241,7 +241,7 @@ export class EmailTemplateEngine {
   /**
    * Evaluate condition for conditional blocks
    */
-  private evaluateCondition(value: any): boolean {
+  private evaluateCondition(value: unknown): boolean {
     if (value === null || value === undefined) {
       return false;
     }
@@ -295,7 +295,7 @@ export class EmailTemplateEngine {
   /**
    * Sanitize value for safe output
    */
-  private sanitizeValue(value: any): string {
+  private sanitizeValue(value: unknown): string {
     if (value === null || value === undefined) {
       return '';
     }

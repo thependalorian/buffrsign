@@ -19,8 +19,8 @@ type Profile = {
 }
 
 export default function TeamPage() {
-  const supabase = createClient()
-  const [user, setUser] = useState<User | null>(null)
+  const _supabase = createClient()
+  const [_user, setUser] = useState<User | null>(null)
   const [teamMembers, setTeamMembers] = useState<Profile[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -28,8 +28,8 @@ export default function TeamPage() {
   const [feedback, setFeedback] = useState<string | null>(null)
 
   const fetchTeamMembers = useCallback(async (userId: string) => {
-    // 1. Get current user's team_id
-    const { data: profile, error: profileError } = await supabase
+    // 1. Get current _user's team_id
+    const { data: profile, error: profileError } = await _supabase
       .from('profiles')
       .select('team_id')
       .eq('id', userId)
@@ -42,7 +42,7 @@ export default function TeamPage() {
     }
 
     // 2. Fetch all members with that team_id
-    const { data: members, error: membersError } = await supabase
+    const { data: members, error: membersError } = await _supabase
       .from('profiles')
       .select('id, full_name, email, role')
       .eq('team_id', profile.team_id)
@@ -53,21 +53,21 @@ export default function TeamPage() {
       setTeamMembers(members as Profile[])
     }
     setLoading(false)
-  }, [supabase])
+  }, [_supabase])
 
   useEffect(() => {
     const initialize = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        setUser(user)
-        await fetchTeamMembers(user.id)
+      const { data: { _user } } = await _supabase.auth.getUser()
+      if (_user) {
+        setUser(_user)
+        await fetchTeamMembers(_user.id)
       } else {
         setLoading(false)
         setError('You must be logged in to manage a team.')
       }
     }
     initialize()
-  }, [supabase, fetchTeamMembers])
+  }, [_supabase, fetchTeamMembers])
 
   const handleInvite = async () => {
     if (!inviteEmail) {
@@ -106,7 +106,7 @@ export default function TeamPage() {
               disabled={loading}
             />
           </div>
-          <Button onClick={handleInvite} disabled={loading} className="whitespace-nowrap">
+          <Button variant="primary" size="md" onClick={handleInvite} state={loading ? 'loading' : 'default'} className="whitespace-nowrap">
             {loading ? 'Sending...' : 'Send Invite'}
           </Button>
         </CardContent>
@@ -141,7 +141,7 @@ export default function TeamPage() {
                       <TableCell>{member.email}</TableCell>
                       <TableCell><Badge variant="outline">{member.role || 'Member'}</Badge></TableCell>
                       <TableCell className="text-right">
-                        <Button variant="outline" size="sm">Remove</Button>
+                        <Button variant="outline" size="sm" state="default">Remove</Button>
                       </TableCell>
                     </TableRow>
                   ))

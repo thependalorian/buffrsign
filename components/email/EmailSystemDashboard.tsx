@@ -89,7 +89,7 @@ export const EmailSystemDashboard: React.FC<EmailSystemDashboardProps> = ({
     <div className="container mx-auto p-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Email System Dashboard</h1>
-        <p className="text-gray-600">Monitor and manage your email notification system</p>
+        <p className="text-muted-foreground">Monitor and manage your email notification system</p>
       </div>
 
       {/* Tab Navigation */}
@@ -182,21 +182,21 @@ export const EmailSystemDashboard: React.FC<EmailSystemDashboardProps> = ({
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {analytics.recent_activity?.slice(0, 5).map((activity: any, index: number) => (
-                    <div key={index} className="flex justify-between items-center p-3 bg-base-200 rounded-lg">
+                  {analytics.recent_activity?.slice(0, 5).map((activity: unknown, _index: number) => (
+                    <div key={_index} className="flex justify-between items-center p-3 bg-base-200 rounded-lg">
                       <div>
                         <div className="font-medium">{activity.type}</div>
-                        <div className="text-sm text-gray-600">{activity.description}</div>
+                        <div className="text-sm text-muted-foreground">{activity.description}</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-muted-foreground">
                           {new Date(activity.timestamp).toLocaleString()}
                         </div>
                         <div className="badge badge-outline">{activity.status}</div>
                       </div>
                     </div>
                   )) || (
-                    <p className="text-gray-500">No recent activity</p>
+                    <p className="text-muted-foreground">No recent activity</p>
                   )}
                 </div>
               )}

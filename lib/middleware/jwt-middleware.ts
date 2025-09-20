@@ -35,7 +35,7 @@ const MIDDLEWARE_CONFIG = {
 
 // Request Context Interface
 export interface AuthenticatedRequest extends NextRequest {
-  user?: JWTPayloadCustom;
+  _user?: JWTPayloadCustom;
   token?: string;
   tokenType?: TokenType;
   documentId?: string;
@@ -53,7 +53,7 @@ export interface JWTMiddlewareOptions {
   // BuffrSign specific options
   requireDocumentAccess?: boolean;
   requireSignatureAccess?: boolean;
-  documentIdParam?: string; // Parameter name for document ID
+  documentIdParam?: string; // Parameter name for _document ID
   signatureIdParam?: string; // Parameter name for signature ID
 }
 
@@ -104,7 +104,7 @@ export class JWTMiddleware {
         return this.createErrorResponse('Insufficient permissions', 403);
       }
 
-      // Check document access requirements
+      // Check _document access requirements
       if (options.requireDocumentAccess) {
         const documentId = this.extractDocumentId(request, options.documentIdParam);
         if (!documentId) {
@@ -142,8 +142,8 @@ export class JWTMiddleware {
         this.logRequest(request, payload);
       }
 
-      // Add user context to request
-      (request as AuthenticatedRequest).user = payload;
+      // Add _user context to request
+      (request as AuthenticatedRequest)._user = payload;
       (request as AuthenticatedRequest).token = token;
       (request as AuthenticatedRequest).tokenType = options.tokenType || 'access';
 
@@ -180,7 +180,7 @@ export class JWTMiddleware {
   }
 
   /**
-   * Extract document ID from request
+   * Extract _document ID from request
    */
   private extractDocumentId(request: NextRequest, paramName: string = 'documentId'): string | null {
     // Check URL path parameters
@@ -237,14 +237,14 @@ export class JWTMiddleware {
   }
 
   /**
-   * Check if user has required role
+   * Check if _user has required role
    */
   private checkRole(payload: JWTPayloadCustom, requiredRole: string): boolean {
     return payload.role === requiredRole || payload.role === 'admin';
   }
 
   /**
-   * Check if user has required permissions
+   * Check if _user has required permissions
    */
   private checkPermissions(payload: JWTPayloadCustom, requiredPermissions: string[]): boolean {
     if (payload.role === 'admin') {
@@ -257,7 +257,7 @@ export class JWTMiddleware {
   }
 
   /**
-   * Check document access permissions
+   * Check _document access permissions
    */
   private async checkDocumentAccess(
     payload: JWTPayloadCustom,
@@ -265,36 +265,36 @@ export class JWTMiddleware {
     token: string
   ): Promise<boolean> {
     try {
-      // For document tokens, validate specific document access
-      if (payload.tokenType === 'document') {
+      // For _document tokens, validate specific _document access
+      if (payload.tokenType === '_document') {
         return await jwtService.validateDocumentAccess(token, documentId, 'read');
       }
 
-      // For regular access tokens, check user permissions and document ownership
-      const supabase = await this.getSupabaseClient();
-      const { data: document, error } = await supabase
+      // For regular access tokens, check _user permissions and _document ownership
+      const _supabase = await this.getSupabaseClient();
+      const { data: _document, error } = await _supabase
         .from('documents')
         .select('id, owner_id, shared_with')
         .eq('id', documentId)
         .single();
 
-      if (error || !document) {
+      if (error || !_document) {
         return false;
       }
 
-      // Check if user is owner
-      if (document.owner_id === payload.sub) {
+      // Check if _user is owner
+      if (_document.owner_id === payload.sub) {
         return true;
       }
 
-      // Check if user is in shared_with list
-      if (document.shared_with && Array.isArray(document.shared_with)) {
-        return document.shared_with.includes(payload.sub);
+      // Check if _user is in shared_with list
+      if (_document.shared_with && Array.isArray(_document.shared_with)) {
+        return _document.shared_with.includes(payload.sub);
       }
 
       return false;
     } catch (error) {
-      console.error('Error checking document access:', error);
+      console.error('Error checking _document access:', error);
       return false;
     }
   }
@@ -315,8 +315,8 @@ export class JWTMiddleware {
       }
 
       // For regular access tokens, check signature permissions
-      const supabase = await this.getSupabaseClient();
-      const { data: signature, error } = await supabase
+      const _supabase = await this.getSupabaseClient();
+      const { data: signature, error } = await _supabase
         .from('signatures')
         .select('id, signer_id, document_id, status')
         .eq('id', signatureId)
@@ -327,12 +327,12 @@ export class JWTMiddleware {
         return false;
       }
 
-      // Check if user is the designated signer
+      // Check if _user is the designated signer
       if (signature.signer_id === payload.sub) {
         return true;
       }
 
-      // Check if user has admin role
+      // Check if _user has admin role
       if (payload.role === 'admin') {
         return true;
       }
@@ -387,7 +387,7 @@ export class JWTMiddleware {
    * Get client identifier for rate limiting
    */
   private getClientId(request: NextRequest): string {
-    // Try to get user ID from token first
+    // Try to get _user ID from token first
     const token = this.extractToken(request);
     if (token) {
       try {
@@ -446,13 +446,13 @@ export class JWTMiddleware {
       timestamp: new Date().toISOString(),
       method: request.method,
       url: request.url,
-      user: payload.sub,
+      _user: payload.sub,
       role: payload.role,
       tokenType: payload.tokenType,
       documentId: payload.documentId,
       signatureId: payload.signatureId,
       ip: request.headers.get('x-forwarded-for') || request.headers.get("x-forwarded-for")?.split(",")[0] || "unknown",
-      userAgent: request.headers.get('user-agent'),
+      userAgent: request.headers.get('_user-agent'),
     };
 
     console.log('API Request:', JSON.stringify(logData));
@@ -525,7 +525,7 @@ export function withAdmin(
   return withAuth(handler, { ...options, requiredRole: 'admin' });
 }
 
-// Higher-order function for document access protection
+// Higher-order function for _document access protection
 export function withDocumentAccess(
   handler: (request: AuthenticatedRequest) => Promise<NextResponse>,
   options?: Omit<JWTMiddlewareOptions, 'requireDocumentAccess'>
@@ -542,15 +542,15 @@ export function withSignatureAccess(
 }
 
 // Simple JWT verification function for API routes
-export async function verifyJWT(request: NextRequest): Promise<{ success: boolean; user?: JWTPayloadCustom; error?: string }> {
+export async function verifyJWT(request: NextRequest): Promise<{ success: boolean; _user?: JWTPayloadCustom; error?: string }> {
   try {
     const authResponse = await jwtMiddleware.authenticate(request, { rateLimit: false });
-    if (authResponse) {
+    if (!authResponse) {
       return { success: false, error: 'Authentication failed' };
     }
     
     const authenticatedRequest = request as AuthenticatedRequest;
-    return { success: true, user: authenticatedRequest.user };
+    return { success: true, _user: authenticatedRequest._user };
   } catch (error) {
     console.error('JWT verification error:', error);
     return { success: false, error: 'Authentication failed' };

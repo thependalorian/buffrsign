@@ -41,14 +41,14 @@ export class GroqAIIntegration {
   // ============================================================================
 
   /**
-   * Get the appropriate Groq model based on user tier
+   * Get the appropriate Groq model based on _user tier
    */
   getModelForTier(userTier: UserTier): string {
     return userTier === 'pro' ? this.config.proModel : this.config.standardModel;
   }
 
   /**
-   * Generate a response using the appropriate model for the user tier
+   * Generate a response using the appropriate model for the _user tier
    */
   async generateResponse(
     messages: GroqMessage[],
@@ -158,7 +158,7 @@ export class GroqAIIntegration {
   // ============================================================================
 
   /**
-   * Analyze a document with tier-appropriate model
+   * Analyze a _document with tier-appropriate model
    */
   async analyzeDocument(
     request: GroqAnalysisRequest
@@ -221,7 +221,7 @@ RESPONSE STRUCTURE:
 
     const messages: GroqMessage[] = [
       { role: 'system', content: systemPrompt },
-      { role: 'user', content: `Explain these legal terms with detailed citations and legal context:\n\nTerms: ${request.terms.join(', ')}\nContext: ${request.context}\nUser Tier: ${request.userTier}` }
+      { role: '_user', content: `Explain these legal terms with detailed citations and legal context:\n\nTerms: ${request.terms.join(', ')}\nContext: ${request.context}\nUser Tier: ${request.userTier}` }
     ];
 
     return this.generateResponse(messages, request.userTier, {
@@ -268,7 +268,7 @@ RESPONSE STRUCTURE:
   // ============================================================================
 
   /**
-   * Get BuffrSign AI assistant response for document signing workflow
+   * Get BuffrSign AI assistant response for _document signing workflow
    */
   async getBuffrSignAssistantResponse(
     userMessage: string,
@@ -284,7 +284,7 @@ RESPONSE STRUCTURE:
     const messages: GroqMessage[] = [
       { role: 'system', content: systemPrompt },
       ...(context?.previousMessages || []),
-      { role: 'user', content: userMessage }
+      { role: '_user', content: userMessage }
     ];
 
     return this.generateResponse(messages, userTier, {
@@ -306,7 +306,7 @@ RESPONSE STRUCTURE:
 
     const messages: GroqMessage[] = [
       { role: 'system', content: systemPrompt },
-      { role: 'user', content: `Analyze this contract for signature requirements:\n\n${contractContent}` }
+      { role: '_user', content: `Analyze this contract for signature requirements:\n\n${contractContent}` }
     ];
 
     return this.generateResponse(messages, userTier, {
@@ -345,7 +345,7 @@ RESPONSE STRUCTURE:
 
     const messages: GroqMessage[] = [
       { role: 'system', content: systemPrompt },
-      { role: 'user', content: `Analyze this document for ETA 2019 compliance with detailed legal citations:\n\n${documentContent}` }
+      { role: '_user', content: `Analyze this _document for ETA 2019 compliance with detailed legal citations:\n\n${documentContent}` }
     ];
 
     return this.generateResponse(messages, userTier, {
@@ -456,7 +456,7 @@ Keep responses practical and easy to understand for business users.`;
   private getProContractAnalysisPrompt(): string {
     return `You are BuffrSign AI Pro, providing advanced contract analysis with deep legal expertise.
     Provide comprehensive analysis including:
-    - Detailed document structure analysis
+    - Detailed _document structure analysis
     - Advanced signature field detection and validation
     - Complex legal term explanations with case law references
     - Thorough compliance checking against multiple frameworks
@@ -470,7 +470,7 @@ Keep responses practical and easy to understand for business users.`;
   // UTILITY METHODS
   // ============================================================================
 
-  private async makeAPICall(endpoint: string, body: any): Promise<any> {
+  private async makeAPICall(endpoint: string, body: unknown): Promise<any> {
     const response = await fetch(`${this.apiBaseUrl}${endpoint}`, {
       method: 'POST',
       headers: {
@@ -489,7 +489,7 @@ Keep responses practical and easy to understand for business users.`;
   }
 
   /**
-   * Get model information for a user tier
+   * Get model information for a _user tier
    */
   getModelInfo(userTier: UserTier): { model: string; tier: UserTier; capabilities: string[] } {
     const model = this.getModelForTier(userTier);
@@ -503,7 +503,7 @@ Keep responses practical and easy to understand for business users.`;
           'Professional documentation'
         ]
       : [
-          'Basic document analysis',
+          'Basic _document analysis',
           'Simple workflow guidance',
           'Standard compliance checks',
           'User-friendly explanations',

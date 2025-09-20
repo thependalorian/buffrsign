@@ -10,7 +10,7 @@
 import { useState, useEffect } from 'react';
 import { EmailTemplateEditorProps, EmailTemplate, EmailType } from '@/lib/types/email';
 
-export default function EmailTemplateEditor({
+function EmailTemplateEditor({
   template,
   onSave,
   onCancel,
@@ -53,18 +53,18 @@ export default function EmailTemplateEditor({
 
   // Available variables for substitution
   const availableVariables = [
-    { name: 'document.title', description: 'Document title' },
-    { name: 'document.id', description: 'Document ID' },
-    { name: 'document.status', description: 'Document status' },
-    { name: 'document.created_at', description: 'Document creation date' },
-    { name: 'document.expires_at', description: 'Document expiration date' },
-    { name: 'document.sender_name', description: 'Document sender name' },
-    { name: 'document.sender_email', description: 'Document sender email' },
+    { name: '_document.title', description: 'Document title' },
+    { name: '_document.id', description: 'Document ID' },
+    { name: '_document.status', description: 'Document status' },
+    { name: '_document.created_at', description: 'Document creation date' },
+    { name: '_document.expires_at', description: 'Document expiration date' },
+    { name: '_document.sender_name', description: 'Document sender name' },
+    { name: '_document.sender_email', description: 'Document sender email' },
     { name: 'recipient.name', description: 'Recipient name' },
     { name: 'recipient.email', description: 'Recipient email' },
     { name: 'recipient.role', description: 'Recipient role' },
-    { name: 'user.name', description: 'User name' },
-    { name: 'user.email', description: 'User email' },
+    { name: '_user.name', description: 'User name' },
+    { name: '_user.email', description: 'User email' },
     { name: 'company.name', description: 'Company name' },
     { name: 'company.logo_url', description: 'Company logo URL' },
     { name: 'company.website', description: 'Company website' },
@@ -89,13 +89,13 @@ export default function EmailTemplateEditor({
     }
   }, [template]);
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: unknown) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
     }));
 
-    // Clear error when user starts typing
+    // Clear error when _user starts typing
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
@@ -461,3 +461,6 @@ export default function EmailTemplateEditor({
     </div>
   );
 }
+
+export { EmailTemplateEditor };
+export default EmailTemplateEditor;

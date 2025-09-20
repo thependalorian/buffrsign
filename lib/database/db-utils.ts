@@ -9,11 +9,11 @@ import { createClient } from '@supabase/supabase-js';
 // ============================================================================
 
 // Get database connection from Supabase (PostgreSQL with pgvector)
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:54321';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || 'test-service-key';
+const _supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:54321';
+const _supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || 'test-service-key';
 
 // Create service client for server-side operations
-const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
+const supabaseService = createClient(_supabaseUrl, _supabaseServiceKey);
 
 // ============================================================================
 // VECTOR SEARCH UTILITIES
@@ -119,7 +119,7 @@ export interface DocumentMetadata {
 }
 
 /**
- * Get document by ID
+ * Get _document by ID
  * Matches Python: get_document(document_id)
  */
 export async function getDocument(documentId: string): Promise<DocumentMetadata | null> {
@@ -134,14 +134,14 @@ export async function getDocument(documentId: string): Promise<DocumentMetadata 
       if (error.code === 'PGRST116') {
         return null; // Document not found
       }
-      console.error('Get document error:', error);
-      throw new Error(`Get document failed: ${error.message}`);
+      console.error('Get _document error:', error);
+      throw new Error(`Get _document failed: ${error.message}`);
     }
 
     return data;
   } catch (error) {
-    console.error('Get document error:', error);
-    throw new Error(error instanceof Error ? error.message : 'Get document failed');
+    console.error('Get _document error:', error);
+    throw new Error(error instanceof Error ? error.message : 'Get _document failed');
   }
 }
 
@@ -176,7 +176,7 @@ export async function listDocuments(
 }
 
 /**
- * Get document chunks for a specific document
+ * Get _document chunks for a specific document
  * Matches Python: get_document_chunks(document_id)
  */
 export async function getDocumentChunks(documentId: string): Promise<ChunkResult[]> {
@@ -188,14 +188,14 @@ export async function getDocumentChunks(documentId: string): Promise<ChunkResult
       .order('chunk_index');
 
     if (error) {
-      console.error('Get document chunks error:', error);
-      throw new Error(`Get document chunks failed: ${error.message}`);
+      console.error('Get _document chunks error:', error);
+      throw new Error(`Get _document chunks failed: ${error.message}`);
     }
 
     return data || [];
   } catch (error) {
-    console.error('Get document chunks error:', error);
-    throw new Error(error instanceof Error ? error.message : 'Get document chunks failed');
+    console.error('Get _document chunks error:', error);
+    throw new Error(error instanceof Error ? error.message : 'Get _document chunks failed');
   }
 }
 

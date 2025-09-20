@@ -76,7 +76,7 @@ export class SendGridProvider {
         messageId,
         provider: 'sendgrid' as EmailProvider,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('SendGrid send error:', error);
       
       return {
@@ -130,7 +130,7 @@ export class SendGridProvider {
         messageId,
         provider: 'sendgrid' as EmailProvider,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('SendGrid template send error:', error);
       
       return {
@@ -144,18 +144,18 @@ export class SendGridProvider {
   /**
    * Verify webhook signature
    */
-  verifyWebhookSignature(
+  async verifyWebhookSignature(
     payload: string,
     signature: string,
     timestamp: string
-  ): boolean {
+  ): Promise<boolean> {
     if (!this.config.webhookSecret) {
       console.warn('SendGrid webhook secret not configured');
       return false;
     }
 
     try {
-      const crypto = require('crypto');
+      const crypto = await import('crypto');
       const expectedSignature = crypto
         .createHmac('sha256', this.config.webhookSecret)
         .update(timestamp + payload)
@@ -171,7 +171,7 @@ export class SendGridProvider {
   /**
    * Parse SendGrid webhook event
    */
-  parseWebhookEvent(event: any): EmailWebhookEvent | null {
+  parseWebhookEvent(event: unknown): EmailWebhookEvent | null {
     try {
       return {
         event: event.event,

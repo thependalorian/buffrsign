@@ -10,7 +10,7 @@ import { verifyJWT } from '@/lib/middleware/jwt-middleware';
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify JWT token and get user information
+    // Verify JWT token and get _user information
     const authResult = await verifyJWT(request);
     if (!authResult.success) {
       return NextResponse.json(
@@ -19,20 +19,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { user } = authResult;
+    // User authenticated successfully
     const body = await request.json();
     
     const {
       operation,
       document_id,
       analysis_type,
-      frameworks,
-      jurisdiction,
-      detailed_analysis,
-      template_type,
-      parameters,
-      workflow_id,
-      input_data
+      template_type
     } = body;
 
     const pydanticAI = new PydanticAIAgents();
@@ -120,7 +114,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: (result as any).data || result,
+      data: (result as Record<string, unknown>).data || result,
       timestamp: new Date().toISOString()
     });
 

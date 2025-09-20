@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ShieldCheck, Download } from 'lucide-react'
+import { Download } from 'lucide-react'
 
 // Mock data for the compliance dashboard
 const complianceStatus = [
@@ -34,23 +34,23 @@ const mockAuditEvents = [
   {
     id: 'evt_1JqL2m..._A',
     timestamp: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
-    user: 'admin@buffrsign.ai',
+    _user: 'admin@buffrsign.ai',
     action: 'Viewed Admin Dashboard',
-    details: 'Accessed the user management page.',
+    details: 'Accessed the _user management page.',
     status: 'Success',
   },
   {
     id: 'evt_1JqL2m..._B',
     timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    user: 'user@example.com',
+    _user: '_user@example.com',
     action: 'Document Signed',
-    details: 'Signed document: Employment_Contract_2024.pdf',
+    details: 'Signed _document: Employment_Contract_2024.pdf',
     status: 'Success',
   },
   {
     id: 'evt_1JqL2m..._C',
     timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-    user: 'user@example.com',
+    _user: '_user@example.com',
     action: 'Password Changed',
     details: 'User updated their password successfully.',
     status: 'Success',
@@ -58,7 +58,7 @@ const mockAuditEvents = [
   {
     id: 'evt_1JqL2m..._D',
     timestamp: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
-    user: 'guest@example.com',
+    _user: 'guest@example.com',
     action: 'Login Failed',
     details: 'Attempted login with incorrect password.',
     status: 'Failure',
@@ -66,7 +66,7 @@ const mockAuditEvents = [
   {
     id: 'evt_1JqL2m..._E',
     timestamp: new Date(Date.now() - 62 * 60 * 1000).toISOString(),
-    user: 'user@example.com',
+    _user: '_user@example.com',
     action: 'Document Uploaded',
     details: 'Uploaded file: NDA_Vendor.pdf',
     status: 'Success',
@@ -74,7 +74,7 @@ const mockAuditEvents = [
   {
     id: 'evt_1JqL2m..._F',
     timestamp: new Date(Date.now() - 120 * 60 * 1000).toISOString(),
-    user: 'user@example.com',
+    _user: '_user@example.com',
     action: 'User Login',
     details: 'Successfully authenticated via email/password.',
     status: 'Success',
@@ -137,7 +137,7 @@ export default function CompliancePage() {
               {mockAuditEvents.map((event) => (
                 <TableRow key={event.id}>
                   <TableCell>{new Date(event.timestamp).toLocaleString()}</TableCell>
-                  <TableCell>{event.user}</TableCell>
+                  <TableCell>{event._user}</TableCell>
                   <TableCell className="font-medium">{event.action}</TableCell>
                   <TableCell className="text-muted-foreground">{event.details}</TableCell>
                   <TableCell>

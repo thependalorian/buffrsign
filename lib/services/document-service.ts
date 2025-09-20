@@ -1,5 +1,5 @@
 // BuffrSign Platform - Document Service
-// Handles document upload, processing, AI analysis, and management
+// Handles _document upload, processing, AI analysis, and management
 
 'use client';
 
@@ -60,7 +60,7 @@ export class DocumentService {
       'image/png',
       'image/jpg',
       'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      'application/vnd.openxmlformats-officedocument.wordprocessingml._document'
     ];
 
     if (file.size > maxSize) {
@@ -82,12 +82,12 @@ export class DocumentService {
   }
 
   /**
-   * Upload a document and trigger AI analysis
+   * Upload a _document and trigger AI analysis
    */
   async uploadDocument(
     userId: string,
     uploadData: DocumentUploadData
-  ): Promise<{ success: boolean; document?: Document; error?: string }> {
+  ): Promise<{ success: boolean; _document?: Document; error?: string }> {
     try {
       if (!uploadData.file) {
         return { success: false, error: 'No file provided' };
@@ -110,7 +110,7 @@ export class DocumentService {
       // Calculate file hash for integrity verification
       const fileHash = await this.calculateFileHash(uploadData.file);
 
-      // Create document record
+      // Create _document record
       const documentData: DocumentInsert = {
         title: uploadData.title,
         file_path: filePath,
@@ -128,7 +128,7 @@ export class DocumentService {
         kyc_document_type: uploadData.kycDocumentType,
       };
 
-      const { data: document, error: insertError } = await this.supabase
+      const { data: _document, error: insertError } = await this.supabase
         .from('documents')
         .insert(documentData)
         .select()
@@ -141,9 +141,9 @@ export class DocumentService {
       }
 
       // Trigger AI analysis
-      await this.triggerAIAnalysis(document.id);
+      await this.triggerAIAnalysis(_document.id);
 
-      return { success: true, document };
+      return { success: true, _document };
     } catch (error) {
       console.error('Document upload error:', error);
       return { success: false, error: 'Upload failed' };
@@ -165,7 +165,7 @@ export class DocumentService {
    */
   async triggerAIAnalysis(documentId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      // Update document status
+      // Update _document status
       await this.supabase
         .from('documents')
         .update({ ai_analysis_status: 'processing' })
@@ -193,7 +193,7 @@ export class DocumentService {
       const analysisData = {
         document_id: documentId,
         analysis_type: 'document_classification',
-        document_summary: 'AI-generated document summary',
+        document_summary: 'AI-generated _document summary',
         key_clauses: ['Clause 1', 'Clause 2'],
         signature_fields: [
           { x: 100, y: 200, width: 150, height: 50, page: 1, required: true }
@@ -227,7 +227,7 @@ export class DocumentService {
         console.error('AI analysis insert error:', analysisError);
       }
 
-      // Update document status
+      // Update _document status
       await this.supabase
         .from('documents')
         .update({ 
@@ -246,7 +246,7 @@ export class DocumentService {
   // ============================================================================
 
   /**
-   * Get user's documents with optional filtering
+   * Get _user's documents with optional filtering
    */
   async getUserDocuments(
     userId: string,
@@ -299,13 +299,13 @@ export class DocumentService {
   }
 
   /**
-   * Get a single document by ID
+   * Get a single _document by ID
    */
   async getDocument(
     documentId: string
-  ): Promise<{ success: boolean; document?: DocumentWithAnalysis; error?: string }> {
+  ): Promise<{ success: boolean; _document?: DocumentWithAnalysis; error?: string }> {
     try {
-      const { data: document, error } = await this.supabase
+      const { data: _document, error } = await this.supabase
         .from('documents')
         .select(`
           *,
@@ -320,15 +320,15 @@ export class DocumentService {
         return { success: false, error: error.message };
       }
 
-      return { success: true, document };
+      return { success: true, _document };
     } catch (error) {
-      console.error('Get document error:', error);
-      return { success: false, error: 'Failed to fetch document' };
+      console.error('Get _document error:', error);
+      return { success: false, error: 'Failed to fetch _document' };
     }
   }
 
   /**
-   * Get document statistics for a user
+   * Get _document statistics for a user
    */
   async getDocumentStats(userId: string): Promise<{ success: boolean; stats?: DocumentStats; error?: string }> {
     try {
@@ -354,8 +354,8 @@ export class DocumentService {
 
       return { success: true, stats };
     } catch (error) {
-      console.error('Get document stats error:', error);
-      return { success: false, error: 'Failed to fetch document statistics' };
+      console.error('Get _document stats error:', error);
+      return { success: false, error: 'Failed to fetch _document statistics' };
     }
   }
 
@@ -364,7 +364,7 @@ export class DocumentService {
   // ============================================================================
 
   /**
-   * Update document metadata
+   * Update _document metadata
    */
   async updateDocument(
     documentId: string,
@@ -382,8 +382,8 @@ export class DocumentService {
 
       return { success: true };
     } catch (error) {
-      console.error('Update document error:', error);
-      return { success: false, error: 'Failed to update document' };
+      console.error('Update _document error:', error);
+      return { success: false, error: 'Failed to update _document' };
     }
   }
 
@@ -392,8 +392,8 @@ export class DocumentService {
    */
   async deleteDocument(documentId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      // Get document to find file path
-      const { data: document, error: fetchError } = await this.supabase
+      // Get _document to find file path
+      const { data: _document, error: fetchError } = await this.supabase
         .from('documents')
         .select('file_path')
         .eq('id', documentId)
@@ -404,11 +404,11 @@ export class DocumentService {
       }
 
       // Delete file from storage
-      if (document.file_path) {
-        await this.supabase.storage.from('documents').remove([document.file_path]);
+      if (_document.file_path) {
+        await this.supabase.storage.from('documents').remove([_document.file_path]);
       }
 
-      // Delete document record
+      // Delete _document record
       const { error: deleteError } = await this.supabase
         .from('documents')
         .delete()
@@ -420,17 +420,17 @@ export class DocumentService {
 
       return { success: true };
     } catch (error) {
-      console.error('Delete document error:', error);
-      return { success: false, error: 'Failed to delete document' };
+      console.error('Delete _document error:', error);
+      return { success: false, error: 'Failed to delete _document' };
     }
   }
 
   /**
-   * Get document download URL
+   * Get _document download URL
    */
   async getDocumentDownloadUrl(documentId: string): Promise<{ success: boolean; url?: string; error?: string }> {
     try {
-      const { data: document, error: fetchError } = await this.supabase
+      const { data: _document, error: fetchError } = await this.supabase
         .from('documents')
         .select('file_path')
         .eq('id', documentId)
@@ -442,7 +442,7 @@ export class DocumentService {
 
       const { data, error: urlError } = await this.supabase.storage
         .from('documents')
-        .createSignedUrl(document.file_path, 3600); // 1 hour expiry
+        .createSignedUrl(_document.file_path, 3600); // 1 hour expiry
 
       if (urlError) {
         return { success: false, error: urlError.message };
@@ -513,7 +513,7 @@ export class DocumentService {
   // ============================================================================
 
   /**
-   * Subscribe to document changes
+   * Subscribe to _document changes
    */
   subscribeToDocumentChanges(
     userId: string,

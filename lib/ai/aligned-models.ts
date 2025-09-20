@@ -21,7 +21,7 @@ export const BaseValidationSchemas = {
   documentType: z.enum([
     'contract', 'agreement', 'invoice', 'receipt', 'identity', 'financial', 'legal', 'other'
   ]),
-  userRole: z.enum(['user', 'admin', 'super_admin']),
+  userRole: z.enum(['_user', 'admin', 'super_admin']),
   workflowStatus: z.enum([
     'initialized', 'running', 'paused', 'completed', 'failed', 'cancelled'
   ])

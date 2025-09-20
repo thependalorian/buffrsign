@@ -63,7 +63,7 @@ describe('BuffrSignAIIntegration', () => {
   });
 
   describe('Document Intelligence Tools', () => {
-    test('should process document with OCR', async () => {
+    test('should process _document with OCR', async () => {
       const mockResult = {
         text: 'Extracted text content',
         confidence: 0.95,
@@ -78,7 +78,7 @@ describe('BuffrSignAIIntegration', () => {
       expect(mockLlamaIndex.processDocumentWithOCR).toHaveBeenCalledWith('doc123', 'base64data');
     });
 
-    test('should extract document fields', async () => {
+    test('should extract _document fields', async () => {
       const mockResult = {
         fields: {
           name: 'John Doe',
@@ -96,7 +96,7 @@ describe('BuffrSignAIIntegration', () => {
       expect(mockLlamaIndex.extractDocumentFields).toHaveBeenCalledWith('doc123');
     });
 
-    test('should perform semantic document query', async () => {
+    test('should perform semantic _document query', async () => {
       const mockResult = {
         answer: 'Document contains information about...',
         sources: ['page1', 'page2'],
@@ -111,7 +111,7 @@ describe('BuffrSignAIIntegration', () => {
       expect(mockLlamaIndex.semanticDocumentQuery).toHaveBeenCalledWith('doc123', 'What is the main topic?');
     });
 
-    test('should analyze document compliance', async () => {
+    test('should analyze _document compliance', async () => {
       const mockResult = {
         complianceScore: 0.85,
         violations: [],
@@ -191,7 +191,7 @@ describe('BuffrSignAIIntegration', () => {
   });
 
   describe('Workflow Orchestration Tools', () => {
-    test('should execute document processing workflow', async () => {
+    test('should execute _document processing workflow', async () => {
       const mockResult = {
         workflowId: 'wf123',
         status: 'completed',
@@ -215,10 +215,10 @@ describe('BuffrSignAIIntegration', () => {
       
       mockLangGraph.executeKYCWorkflow.mockResolvedValue(mockResult);
       
-      const result = await aiIntegration.executeKYCWorkflow('user123', 'doc123');
+      const result = await aiIntegration.executeKYCWorkflow('_user123', 'doc123');
       
       expect(result).toEqual(mockResult);
-      expect(mockLangGraph.executeKYCWorkflow).toHaveBeenCalledWith('user123', 'doc123');
+      expect(mockLangGraph.executeKYCWorkflow).toHaveBeenCalledWith('_user123', 'doc123');
     });
 
     test('should manage workflow state', async () => {
@@ -266,7 +266,7 @@ describe('BuffrSignAIIntegration', () => {
       expect(mockLlamaIndex.performComputerVisionAnalysis).toHaveBeenCalledWith('doc123');
     });
 
-    test('should generate document insights', async () => {
+    test('should generate _document insights', async () => {
       const mockResult = {
         insights: ['High compliance score', 'Missing signature field'],
         recommendations: ['Add signature field', 'Update template']
@@ -284,7 +284,7 @@ describe('BuffrSignAIIntegration', () => {
       const mockResult = {
         riskLevel: 'low',
         score: 0.15,
-        factors: ['Valid signature', 'Complete document']
+        factors: ['Valid signature', 'Complete _document']
       };
       
       mockPydanticAI.performRiskAssessment.mockResolvedValue(mockResult);
@@ -295,7 +295,7 @@ describe('BuffrSignAIIntegration', () => {
       expect(mockPydanticAI.performRiskAssessment).toHaveBeenCalledWith('doc123');
     });
 
-    test('should optimize document processing', async () => {
+    test('should optimize _document processing', async () => {
       const mockResult = {
         optimizations: ['Use GPT-4 Vision', 'Enable caching'],
         performanceGain: 0.25

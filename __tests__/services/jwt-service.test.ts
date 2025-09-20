@@ -2,7 +2,7 @@
  * JWT Service Tests for BuffrSign
  * 
  * This file contains comprehensive tests for the JWT service functionality
- * including document and signature token management.
+ * including _document and signature token management.
  */
 
 import { JWTService, jwtService } from '../../lib/services/jwt-service';
@@ -16,9 +16,9 @@ jest.mock('../../lib/supabase/server', () => ({
         eq: jest.fn(() => ({
           single: jest.fn(() => ({
             data: {
-              id: 'test-user-id',
+              id: 'test-_user-id',
               email: 'test@example.com',
-              role: 'user',
+              role: '_user',
               permissions: ['read', 'write'],
             },
             error: null,
@@ -64,9 +64,9 @@ describe('JWTService', () => {
   describe('Token Creation', () => {
     it('should create an access token', async () => {
       const payload = {
-        sub: 'test-user-id',
+        sub: 'test-_user-id',
         email: 'test@example.com',
-        role: 'user',
+        role: '_user',
         permissions: ['read', 'write'],
         tokenType: 'access' as const,
       };
@@ -78,17 +78,17 @@ describe('JWTService', () => {
       expect(token.split('.')).toHaveLength(3); // JWT has 3 parts
     });
 
-    it('should create a document token', async () => {
+    it('should create a _document token', async () => {
       const payload = {
-        sub: 'test-user-id',
+        sub: 'test-_user-id',
         email: 'test@example.com',
-        role: 'user',
+        role: '_user',
         permissions: ['read', 'write'],
-        tokenType: 'document' as const,
-        documentId: 'test-document-id',
+        tokenType: '_document' as const,
+        documentId: 'test-_document-id',
       };
 
-      const token = await service.createToken(payload, 'document');
+      const token = await service.createToken(payload, '_document');
 
       expect(token).toBeDefined();
       expect(typeof token).toBe('string');
@@ -97,12 +97,12 @@ describe('JWTService', () => {
 
     it('should create a signature token', async () => {
       const payload = {
-        sub: 'test-user-id',
+        sub: 'test-_user-id',
         email: 'test@example.com',
-        role: 'user',
+        role: '_user',
         permissions: ['sign'],
         tokenType: 'signature' as const,
-        documentId: 'test-document-id',
+        documentId: 'test-_document-id',
         signatureId: 'test-signature-id',
         workflowId: 'test-workflow-id',
       };
@@ -115,14 +115,14 @@ describe('JWTService', () => {
     });
 
     it('should create a token pair', async () => {
-      const user = {
-        id: 'test-user-id',
+      const _user = {
+        id: 'test-_user-id',
         email: 'test@example.com',
-        role: 'user',
+        role: '_user',
         permissions: ['read', 'write'],
       };
 
-      const tokenPair = await service.createTokenPair(user);
+      const tokenPair = await service.createTokenPair(_user);
 
       expect(tokenPair).toHaveProperty('accessToken');
       expect(tokenPair).toHaveProperty('refreshToken');
@@ -133,10 +133,10 @@ describe('JWTService', () => {
   });
 
   describe('Document Token Management', () => {
-    it('should create document access token', async () => {
+    it('should create _document access token', async () => {
       const documentToken = await service.createDocumentToken(
-        'test-user-id',
-        'test-document-id',
+        'test-_user-id',
+        'test-_document-id',
         ['read', 'write']
       );
 
@@ -148,8 +148,8 @@ describe('JWTService', () => {
 
     it('should create signature session token', async () => {
       const signatureToken = await service.createSignatureToken(
-        'test-user-id',
-        'test-document-id',
+        'test-_user-id',
+        'test-_document-id',
         'test-signature-id',
         'test-workflow-id'
       );
@@ -160,16 +160,16 @@ describe('JWTService', () => {
       expect(signatureToken.expiresIn).toBe(30 * 60); // 30 minutes
     });
 
-    it('should validate document access', async () => {
+    it('should validate _document access', async () => {
       const documentToken = await service.createDocumentToken(
-        'test-user-id',
-        'test-document-id',
+        'test-_user-id',
+        'test-_document-id',
         ['read']
       );
 
       const hasAccess = await service.validateDocumentAccess(
         documentToken.documentToken,
-        'test-document-id',
+        'test-_document-id',
         'read'
       );
 
@@ -178,15 +178,15 @@ describe('JWTService', () => {
 
     it('should validate signature access', async () => {
       const signatureToken = await service.createSignatureToken(
-        'test-user-id',
-        'test-document-id',
+        'test-_user-id',
+        'test-_document-id',
         'test-signature-id'
       );
 
       const canSign = await service.validateSignatureAccess(
         signatureToken.documentToken,
         'test-signature-id',
-        'test-document-id'
+        'test-_document-id'
       );
 
       expect(canSign).toBe(true);
@@ -196,9 +196,9 @@ describe('JWTService', () => {
   describe('Token Verification', () => {
     it('should verify a valid access token', async () => {
       const payload = {
-        sub: 'test-user-id',
+        sub: 'test-_user-id',
         email: 'test@example.com',
-        role: 'user',
+        role: '_user',
         permissions: ['read', 'write'],
         tokenType: 'access' as const,
       };
@@ -215,18 +215,18 @@ describe('JWTService', () => {
       });
     });
 
-    it('should verify a valid document token', async () => {
+    it('should verify a valid _document token', async () => {
       const payload = {
-        sub: 'test-user-id',
+        sub: 'test-_user-id',
         email: 'test@example.com',
-        role: 'user',
+        role: '_user',
         permissions: ['read'],
-        tokenType: 'document' as const,
-        documentId: 'test-document-id',
+        tokenType: '_document' as const,
+        documentId: 'test-_document-id',
       };
 
-      const token = await service.createToken(payload, 'document');
-      const verifiedPayload = await service.verifyToken(token, 'document');
+      const token = await service.createToken(payload, '_document');
+      const verifiedPayload = await service.verifyToken(token, '_document');
 
       expect(verifiedPayload).toMatchObject({
         sub: payload.sub,
@@ -240,12 +240,12 @@ describe('JWTService', () => {
 
     it('should verify a valid signature token', async () => {
       const payload = {
-        sub: 'test-user-id',
+        sub: 'test-_user-id',
         email: 'test@example.com',
-        role: 'user',
+        role: '_user',
         permissions: ['sign'],
         tokenType: 'signature' as const,
-        documentId: 'test-document-id',
+        documentId: 'test-_document-id',
         signatureId: 'test-signature-id',
         workflowId: 'test-workflow-id',
       };
@@ -273,29 +273,29 @@ describe('JWTService', () => {
 
     it('should throw error for wrong token type', async () => {
       const payload = {
-        sub: 'test-user-id',
+        sub: 'test-_user-id',
         email: 'test@example.com',
-        role: 'user',
+        role: '_user',
         permissions: ['read', 'write'],
         tokenType: 'access' as const,
       };
 
       const token = await service.createToken(payload, 'access');
 
-      await expect(service.verifyToken(token, 'document')).rejects.toThrow();
+      await expect(service.verifyToken(token, '_document')).rejects.toThrow();
     });
   });
 
   describe('Token Refresh', () => {
     it('should refresh access token with valid refresh token', async () => {
-      const user = {
-        id: 'test-user-id',
+      const _user = {
+        id: 'test-_user-id',
         email: 'test@example.com',
-        role: 'user',
+        role: '_user',
         permissions: ['read', 'write'],
       };
 
-      const tokenPair = await service.createTokenPair(user);
+      const tokenPair = await service.createTokenPair(_user);
       const newTokenPair = await service.refreshAccessToken(tokenPair.refreshToken);
 
       expect(newTokenPair).toHaveProperty('accessToken');
@@ -313,9 +313,9 @@ describe('JWTService', () => {
   describe('Token Blacklisting', () => {
     it('should blacklist an access token', async () => {
       const payload = {
-        sub: 'test-user-id',
+        sub: 'test-_user-id',
         email: 'test@example.com',
-        role: 'user',
+        role: '_user',
         permissions: ['read', 'write'],
         tokenType: 'access' as const,
       };
@@ -326,17 +326,17 @@ describe('JWTService', () => {
       await expect(service.blacklistToken(token)).resolves.not.toThrow();
     });
 
-    it('should blacklist a document token', async () => {
+    it('should blacklist a _document token', async () => {
       const payload = {
-        sub: 'test-user-id',
+        sub: 'test-_user-id',
         email: 'test@example.com',
-        role: 'user',
+        role: '_user',
         permissions: ['read'],
-        tokenType: 'document' as const,
-        documentId: 'test-document-id',
+        tokenType: '_document' as const,
+        documentId: 'test-_document-id',
       };
 
-      const token = await service.createToken(payload, 'document');
+      const token = await service.createToken(payload, '_document');
       
       // Should not throw
       await expect(service.blacklistToken(token)).resolves.not.toThrow();
@@ -344,12 +344,12 @@ describe('JWTService', () => {
 
     it('should blacklist a signature token', async () => {
       const payload = {
-        sub: 'test-user-id',
+        sub: 'test-_user-id',
         email: 'test@example.com',
-        role: 'user',
+        role: '_user',
         permissions: ['sign'],
         tokenType: 'signature' as const,
-        documentId: 'test-document-id',
+        documentId: 'test-_document-id',
         signatureId: 'test-signature-id',
       };
 
@@ -372,8 +372,8 @@ describe('JWTService', () => {
       await expect(service.cleanupExpiredTokens()).resolves.not.toThrow();
     });
 
-    it('should revoke all user tokens', async () => {
-      const userId = 'test-user-id';
+    it('should revoke all _user tokens', async () => {
+      const userId = 'test-_user-id';
 
       // Should not throw
       await expect(service.revokeAllUserTokens(userId)).resolves.not.toThrow();
@@ -383,9 +383,9 @@ describe('JWTService', () => {
   describe('Legacy Token Methods', () => {
     it('should create token using legacy method', () => {
       const payload = {
-        sub: 'test-user-id',
+        sub: 'test-_user-id',
         email: 'test@example.com',
-        role: 'user',
+        role: '_user',
         permissions: ['read', 'write'],
         tokenType: 'access' as const,
       };
@@ -399,9 +399,9 @@ describe('JWTService', () => {
 
     it('should verify token using legacy method', () => {
       const payload = {
-        sub: 'test-user-id',
+        sub: 'test-_user-id',
         email: 'test@example.com',
-        role: 'user',
+        role: '_user',
         permissions: ['read', 'write'],
         tokenType: 'access' as const,
       };
@@ -435,48 +435,48 @@ describe('JWTService', () => {
   });
 
   describe('Document Access Validation', () => {
-    it('should validate document access with correct document ID', async () => {
+    it('should validate _document access with correct _document ID', async () => {
       const documentToken = await service.createDocumentToken(
-        'test-user-id',
-        'test-document-id',
+        'test-_user-id',
+        'test-_document-id',
         ['read']
       );
 
       const hasAccess = await service.validateDocumentAccess(
         documentToken.documentToken,
-        'test-document-id',
+        'test-_document-id',
         'read'
       );
 
       expect(hasAccess).toBe(true);
     });
 
-    it('should reject document access with wrong document ID', async () => {
+    it('should reject _document access with wrong _document ID', async () => {
       const documentToken = await service.createDocumentToken(
-        'test-user-id',
-        'test-document-id',
+        'test-_user-id',
+        'test-_document-id',
         ['read']
       );
 
       const hasAccess = await service.validateDocumentAccess(
         documentToken.documentToken,
-        'wrong-document-id',
+        'wrong-_document-id',
         'read'
       );
 
       expect(hasAccess).toBe(false);
     });
 
-    it('should reject document access with insufficient permissions', async () => {
+    it('should reject _document access with insufficient permissions', async () => {
       const documentToken = await service.createDocumentToken(
-        'test-user-id',
-        'test-document-id',
+        'test-_user-id',
+        'test-_document-id',
         ['read']
       );
 
       const hasAccess = await service.validateDocumentAccess(
         documentToken.documentToken,
-        'test-document-id',
+        'test-_document-id',
         'write'
       );
 
@@ -487,15 +487,15 @@ describe('JWTService', () => {
   describe('Signature Access Validation', () => {
     it('should validate signature access with correct IDs', async () => {
       const signatureToken = await service.createSignatureToken(
-        'test-user-id',
-        'test-document-id',
+        'test-_user-id',
+        'test-_document-id',
         'test-signature-id'
       );
 
       const canSign = await service.validateSignatureAccess(
         signatureToken.documentToken,
         'test-signature-id',
-        'test-document-id'
+        'test-_document-id'
       );
 
       expect(canSign).toBe(true);
@@ -503,31 +503,31 @@ describe('JWTService', () => {
 
     it('should reject signature access with wrong signature ID', async () => {
       const signatureToken = await service.createSignatureToken(
-        'test-user-id',
-        'test-document-id',
+        'test-_user-id',
+        'test-_document-id',
         'test-signature-id'
       );
 
       const canSign = await service.validateSignatureAccess(
         signatureToken.documentToken,
         'wrong-signature-id',
-        'test-document-id'
+        'test-_document-id'
       );
 
       expect(canSign).toBe(false);
     });
 
-    it('should reject signature access with wrong document ID', async () => {
+    it('should reject signature access with wrong _document ID', async () => {
       const signatureToken = await service.createSignatureToken(
-        'test-user-id',
-        'test-document-id',
+        'test-_user-id',
+        'test-_document-id',
         'test-signature-id'
       );
 
       const canSign = await service.validateSignatureAccess(
         signatureToken.documentToken,
         'test-signature-id',
-        'wrong-document-id'
+        'wrong-_document-id'
       );
 
       expect(canSign).toBe(false);

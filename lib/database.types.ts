@@ -18,7 +18,7 @@ export interface Database {
   public: {
     Tables: {
       // ============================================================================
-      // USERS TABLE (Main user table)
+      // USERS TABLE (Main _user table)
       // ============================================================================
       users: {
         Row: {
@@ -79,7 +79,7 @@ export interface Database {
       }
 
       // ============================================================================
-      // PROFILES TABLE (Extended user profile information)
+      // PROFILES TABLE (Extended _user profile information)
       // ============================================================================
       profiles: {
         Row: {
@@ -842,7 +842,7 @@ export interface Database {
         | "auto_rejected"
         | "completed"
         | "failed"
-      user_role: "user" | "admin" | "super_admin"
+      user_role: "_user" | "admin" | "super_admin"
     }
   }
 }

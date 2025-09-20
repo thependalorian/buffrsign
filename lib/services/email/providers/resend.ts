@@ -82,7 +82,7 @@ export class ResendProvider {
         messageId: result.id,
         provider: 'resend' as EmailProvider,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Resend send error:', error);
       
       return {
@@ -138,7 +138,7 @@ export class ResendProvider {
         messageId: result.id,
         provider: 'resend' as EmailProvider,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Resend template send error:', error);
       
       return {
@@ -152,18 +152,18 @@ export class ResendProvider {
   /**
    * Verify webhook signature
    */
-  verifyWebhookSignature(
+  async verifyWebhookSignature(
     payload: string,
     signature: string,
     timestamp: string
-  ): boolean {
+  ): Promise<boolean> {
     if (!this.config.webhookSecret) {
       console.warn('Resend webhook secret not configured');
       return false;
     }
 
     try {
-      const crypto = require('crypto');
+      const crypto = await import('crypto');
       const expectedSignature = crypto
         .createHmac('sha256', this.config.webhookSecret)
         .update(timestamp + payload)
@@ -179,7 +179,7 @@ export class ResendProvider {
   /**
    * Parse Resend webhook event
    */
-  parseWebhookEvent(event: any): EmailWebhookEvent | null {
+  parseWebhookEvent(event: unknown): EmailWebhookEvent | null {
     try {
       return {
         event: event.type,

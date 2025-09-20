@@ -3,7 +3,7 @@
 /**
  * Document Email Manager Component
  * 
- * Comprehensive email management interface for document workflows
+ * Comprehensive email management interface for _document workflows
  */
 
 import React, { useState } from 'react';
@@ -143,7 +143,7 @@ export const DocumentEmailManager: React.FC<DocumentEmailManagerProps> = ({
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Email Management</h2>
-          <p className="text-gray-600">Manage email notifications for "{documentTitle}"</p>
+          <p className="text-muted-foreground">Manage email notifications for "{documentTitle}"</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -189,7 +189,7 @@ export const DocumentEmailManager: React.FC<DocumentEmailManagerProps> = ({
               >
                 Clear Selection
               </button>
-              <span className="text-sm text-gray-600 self-center">
+              <span className="text-sm text-muted-foreground self-center">
                 {selectedRecipients.length} selected
               </span>
             </div>
@@ -220,7 +220,7 @@ export const DocumentEmailManager: React.FC<DocumentEmailManagerProps> = ({
           <h3 className="card-title">Document Recipients</h3>
           
           {recipients.length === 0 ? (
-            <p className="text-gray-500">No recipients added to this document.</p>
+            <p className="text-muted-foreground">No recipients added to this _document.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="table table-zebra">
@@ -256,7 +256,7 @@ export const DocumentEmailManager: React.FC<DocumentEmailManagerProps> = ({
                         <div className="font-medium">{recipient.name}</div>
                       </td>
                       <td>
-                        <div className="text-sm text-gray-600">{recipient.email}</div>
+                        <div className="text-sm text-muted-foreground">{recipient.email}</div>
                       </td>
                       <td>
                         <span className="badge badge-outline">
@@ -319,7 +319,7 @@ export const DocumentEmailManager: React.FC<DocumentEmailManagerProps> = ({
           <h3 className="card-title">Email Notifications History</h3>
           
           {notifications.length === 0 ? (
-            <p className="text-gray-500">No email notifications sent yet.</p>
+            <p className="text-muted-foreground">No email notifications sent yet.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="table table-zebra">
@@ -339,7 +339,7 @@ export const DocumentEmailManager: React.FC<DocumentEmailManagerProps> = ({
                       <td>
                         <div>
                           <div className="font-medium">{notification.recipient_name}</div>
-                          <div className="text-sm text-gray-600">{notification.recipient_email}</div>
+                          <div className="text-sm text-muted-foreground">{notification.recipient_email}</div>
                         </div>
                       </td>
                       <td>

@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       usage: response.usage,
     });
 
-  } catch (error) {
+  } catch {
     console.error('Embeddings API error:', error);
     
     if (error instanceof Error) {

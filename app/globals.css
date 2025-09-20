@@ -11,36 +11,40 @@
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    
-    /* Primary Brand Color - BuffrSign Blue */
-    --primary: 220 70% 50%;        /* #3b82f6 - Main brand color */
+
+    /* --- BuffrSign Official Color Palette --- */
+    /* Values aligned with UI_UX_STRATEGY.md */
+
+    /* Primary Brand Color - BuffrBlue */
+    --primary: 225 69% 40%;        /* #1E40AF - BuffrBlue */
     --primary-foreground: 0 0% 98%; /* #fafafa - Text on primary */
-    
+
     /* Secondary & Accent Colors */
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    
+    --secondary: 265 82% 61%;      /* #7C3AED - BuffrPurple */
+    --secondary-foreground: 0 0% 98%;
+    --accent: 243 75% 58%;         /* #4F46E5 - BuffrIndigo */
+    --accent-foreground: 0 0% 98%;
+
     /* UI State Colors */
     --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 38.1%;  /* Improved contrast for better readability */
-    --destructive: 0 84.2% 60.2%;
+    --muted-foreground: 0 0% 38.1%;
+    --destructive: 0 72% 51%;      /* #DC2626 - Error Red */
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
-    --ring: 220 70% 50%;           /* Use primary for ring focus */
-    
-    /* Chart Color System - Feature-Specific Colors */
-    --chart-1: 220 70% 50%;        /* #3b82f6 - Digital Signatures (Primary) */
-    --chart-2: 160 60% 45%;        /* #10b981 - Compliance & Success */
-    --chart-3: 30 80% 55%;         /* #f59e0b - Warnings & Notifications */
-    --chart-4: 280 65% 60%;        /* #8b5cf6 - AI Features & Intelligence */
-    --chart-5: 340 75% 55%;        /* #ef4444 - Security & Alerts */
-    
+    --ring: 225 69% 40%;           /* Use primary for ring focus */
+
+    /* Chart & Semantic Color System (Aligned with Strategy) */
+    --chart-1: 225 69% 40%;        /* #1E40AF - BuffrBlue (Primary, Legal) */
+    --chart-2: 160 90% 30%;        /* #059669 - Success Green (Compliance) */
+    --chart-3: 35 92% 53%;         /* #F59E0B - Warning Orange */
+    --chart-4: 265 82% 61%;        /* #7C3AED - BuffrPurple (AI, Info) */
+    --chart-5: 0 72% 51%;          /* #DC2626 - Error Red (Security) */
+    --info-blue: 217 91% 60%;      /* #3B82F6 - Info Blue */
+
     /* Utility Colors */
     --radius: 0.5rem;
-    
+
     /* BuffrSign Specific Semantic Colors */
     --signature-primary: hsl(var(--chart-1));      /* Digital signature actions */
     --signature-success: hsl(var(--chart-2));      /* Compliance verification */
@@ -53,40 +57,41 @@
   }
   
   .dark {
-    /* Dark Theme - Maintain brand consistency */
+    /* Dark Theme - Aligned with UI_UX_STRATEGY.md */
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
     --card: 0 0% 3.9%;
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
-    
+
     /* Primary in dark mode - Brighter blue for better contrast */
-    --primary: 220 70% 60%;
+    --primary: 225 69% 50%;
     --primary-foreground: 0 0% 98%;
-    
+
     /* Secondary & Accent in dark mode */
-    --secondary: 0 0% 14.9%;
+    --secondary: 265 82% 71%;
     --secondary-foreground: 0 0% 98%;
-    --accent: 0 0% 14.9%;
+    --accent: 243 75% 68%;
     --accent-foreground: 0 0% 98%;
-    
+
     /* UI State Colors in dark mode */
     --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 70.9%;  /* Improved contrast for dark mode readability */
-    --destructive: 0 62.8% 30.6%;
+    --muted-foreground: 0 0% 70.9%;
+    --destructive: 0 72% 61%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
-    
-    /* Chart colors adjusted for dark mode - maintain brand recognition */
-    --chart-1: 220 70% 60%;        /* Brighter blue for dark backgrounds */
-    --chart-2: 160 60% 55%;        /* Brighter green for dark backgrounds */
-    --chart-3: 30 80% 65%;         /* Brighter orange for dark backgrounds */
-    --chart-4: 280 65% 70%;        /* Brighter purple for dark backgrounds */
-    --chart-5: 340 75% 65%;        /* Brighter red for dark backgrounds */
-    
+
+    /* Chart colors adjusted for dark mode */
+    --chart-1: 225 69% 50%;        /* Brighter BuffrBlue */
+    --chart-2: 160 90% 40%;        /* Brighter Success Green */
+    --chart-3: 35 92% 63%;         /* Brighter Warning Orange */
+    --chart-4: 265 82% 71%;        /* Brighter BuffrPurple */
+    --chart-5: 0 72% 61%;          /* Brighter Error Red */
+    --info-blue: 217 91% 70%;      /* Brighter Info Blue */
+
     /* BuffrSign semantic colors in dark mode */
     --signature-primary: hsl(var(--chart-1));
     --signature-success: hsl(var(--chart-2));

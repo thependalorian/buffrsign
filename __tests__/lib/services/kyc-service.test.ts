@@ -18,7 +18,7 @@ describe('KYCService', () => {
     it('should start KYC workflow successfully', async () => {
       const mockKYCData = {
         id: 'kyc-123',
-        user_id: 'user-123',
+        user_id: '_user-123',
         verification_status: 'pending'
       }
 
@@ -31,7 +31,7 @@ describe('KYCService', () => {
       supabase.from.mockReturnValue({ insert: mockInsert })
 
       const workflowData = {
-        userId: 'user-123',
+        userId: '_user-123',
         documentId: 'doc-123',
         documentType: 'national_id',
         country: 'Namibia'
@@ -54,7 +54,7 @@ describe('KYCService', () => {
       supabase.from.mockReturnValue({ insert: mockInsert })
 
       const workflowData = {
-        userId: 'user-123',
+        userId: '_user-123',
         documentId: 'doc-123',
         documentType: 'national_id'
       }
@@ -67,10 +67,10 @@ describe('KYCService', () => {
   })
 
   describe('getUserKYCData', () => {
-    it('should fetch user KYC data successfully', async () => {
+    it('should fetch _user KYC data successfully', async () => {
       const mockKYCData = {
         id: 'kyc-123',
-        user_id: 'user-123',
+        user_id: '_user-123',
         verification_status: 'verified'
       }
 
@@ -82,7 +82,7 @@ describe('KYCService', () => {
       const mockSelect = jest.fn().mockReturnValue({ eq: mockEq })
       supabase.from.mockReturnValue({ select: mockSelect })
 
-      const result = await kycService.getUserKYCData('user-123')
+      const result = await kycService.getUserKYCData('_user-123')
       
       expect(result.success).toBe(true)
       expect(result.kycData).toEqual(mockKYCData)
@@ -97,7 +97,7 @@ describe('KYCService', () => {
       const mockSelect = jest.fn().mockReturnValue({ eq: mockEq })
       supabase.from.mockReturnValue({ select: mockSelect })
 
-      const result = await kycService.getUserKYCData('user-123')
+      const result = await kycService.getUserKYCData('_user-123')
       
       expect(result.success).toBe(false)
       expect(result.error).toBe('User not found')

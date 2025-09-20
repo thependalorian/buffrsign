@@ -1,5 +1,5 @@
 // BuffrSign Platform - Document Intelligence Service
-// LlamaIndex-inspired document processing with TypeScript
+// LlamaIndex-inspired _document processing with TypeScript
 // Based on Pydantic AI and Data Science principles
 
 'use client';
@@ -445,7 +445,7 @@ export class DocumentIntelligenceService {
   private async preprocessDocument(request: DocumentAnalysisRequest): Promise<PreprocessedDocument> {
     this.emitEvent('preprocessing:started', { request });
 
-    // Simulate document preprocessing
+    // Simulate _document preprocessing
     await this.delay(500);
 
     const preprocessed: PreprocessedDocument = {
@@ -453,7 +453,7 @@ export class DocumentIntelligenceService {
       filePath: request.filePath,
       documentType: request.documentType,
       userId: request.userId,
-      text: 'Extracted document text content...',
+      text: 'Extracted _document text content...',
       pages: [
         {
           pageNumber: 1,
@@ -482,38 +482,38 @@ export class DocumentIntelligenceService {
   // ============================================================================
 
   private async performAIAnalysis(
-    document: PreprocessedDocument,
+    _document: PreprocessedDocument,
     options: AnalysisOptions
   ): Promise<DocumentAnalysis> {
-    this.emitEvent('ai_analysis:started', { document, options });
+    this.emitEvent('ai_analysis:started', { _document, options });
 
     const analysis: DocumentAnalysis = {
-      summary: await this.generateSummary(document, options),
-      extractedFields: await this.extractFields(document, options),
-      signatureFields: await this.detectSignatureFields(document, options),
-      clauses: await this.identifyClauses(document, options),
-      compliance: await this.checkCompliance(document, options),
-      riskAssessment: await this.assessRisk(document, options),
+      summary: await this.generateSummary(_document, options),
+      extractedFields: await this.extractFields(_document, options),
+      signatureFields: await this.detectSignatureFields(_document, options),
+      clauses: await this.identifyClauses(_document, options),
+      compliance: await this.checkCompliance(_document, options),
+      riskAssessment: await this.assessRisk(_document, options),
       recommendations: []
     };
 
-    this.emitEvent('ai_analysis:completed', { document, analysis });
+    this.emitEvent('ai_analysis:completed', { _document, analysis });
     
     return analysis;
   }
 
-  private async generateSummary(document: PreprocessedDocument, options: AnalysisOptions): Promise<DocumentSummary> {
+  private async generateSummary(_document: PreprocessedDocument, options: AnalysisOptions): Promise<DocumentSummary> {
     if (!options.generateSummary) {
       return {
         title: 'Document Summary',
-        type: document.documentType,
+        type: _document.documentType,
         keyPoints: [],
         parties: [],
         dates: [],
         amounts: [],
         confidence: 0,
         wordCount: 0,
-        pageCount: document.metadata.pageCount
+        pageCount: _document.metadata.pageCount
       };
     }
 
@@ -521,8 +521,8 @@ export class DocumentIntelligenceService {
     await this.delay(1000);
 
     return {
-      title: `${document.documentType} Document`,
-      type: document.documentType,
+      title: `${_document.documentType} Document`,
+      type: _document.documentType,
       keyPoints: [
         'Key point 1: Important information extracted',
         'Key point 2: Critical clause identified',
@@ -533,11 +533,11 @@ export class DocumentIntelligenceService {
       amounts: ['$10,000', '$500/month'],
       confidence: 0.92,
       wordCount: 1500,
-      pageCount: document.metadata.pageCount
+      pageCount: _document.metadata.pageCount
     };
   }
 
-  private async extractFields(document: PreprocessedDocument, options: AnalysisOptions): Promise<ExtractedField[]> {
+  private async extractFields(_document: PreprocessedDocument, options: AnalysisOptions): Promise<ExtractedField[]> {
     if (!options.extractFields) return [];
 
     // Simulate field extraction
@@ -595,7 +595,7 @@ export class DocumentIntelligenceService {
     ];
   }
 
-  private async detectSignatureFields(document: PreprocessedDocument, options: AnalysisOptions): Promise<SignatureField[]> {
+  private async detectSignatureFields(_document: PreprocessedDocument, options: AnalysisOptions): Promise<SignatureField[]> {
     if (!options.detectSignatures) return [];
 
     // Simulate signature field detection
@@ -628,7 +628,7 @@ export class DocumentIntelligenceService {
     ];
   }
 
-  private async identifyClauses(document: PreprocessedDocument, options: AnalysisOptions): Promise<DocumentClause[]> {
+  private async identifyClauses(_document: PreprocessedDocument, options: AnalysisOptions): Promise<DocumentClause[]> {
     if (!options.identifyClauses) return [];
 
     // Simulate clause identification
@@ -665,7 +665,7 @@ export class DocumentIntelligenceService {
     ];
   }
 
-  private async checkCompliance(document: PreprocessedDocument, options: AnalysisOptions): Promise<ComplianceAnalysis> {
+  private async checkCompliance(_document: PreprocessedDocument, options: AnalysisOptions): Promise<ComplianceAnalysis> {
     if (!options.checkCompliance) {
       return {
         etaCompliance: { compliant: true, score: 100, issues: [] },
@@ -713,7 +713,7 @@ export class DocumentIntelligenceService {
     };
   }
 
-  private async assessRisk(document: PreprocessedDocument, options: AnalysisOptions): Promise<RiskAssessment> {
+  private async assessRisk(_document: PreprocessedDocument, options: AnalysisOptions): Promise<RiskAssessment> {
     if (!options.riskAssessment) {
       return {
         overallRisk: RiskLevel.LOW,
@@ -779,7 +779,7 @@ export class DocumentIntelligenceService {
         priority: RecommendationPriority.HIGH,
         title: 'Improve ETA 2019 Compliance',
         description: 'Document compliance score is below recommended threshold',
-        action: 'Review and update document to meet ETA 2019 requirements',
+        action: 'Review and update _document to meet ETA 2019 requirements',
         impact: 'Ensures legal validity and reduces compliance risk',
         effort: EffortLevel.MEDIUM
       });
@@ -853,9 +853,9 @@ export class DocumentIntelligenceService {
 
   removeEventListener(eventType: string, listener: AnalysisEventListener): void {
     const listeners = this.eventListeners.get(eventType) || [];
-    const index = listeners.indexOf(listener);
-    if (index > -1) {
-      listeners.splice(index, 1);
+    const _index = listeners.indexOf(listener);
+    if (_index > -1) {
+      listeners.splice(_index, 1);
     }
   }
 
@@ -878,7 +878,7 @@ export class DocumentIntelligenceService {
 interface AIModelInterface {
   name: string;
   version: string;
-  analyze(document: PreprocessedDocument, options: AnalysisOptions): Promise<Partial<DocumentAnalysis>>;
+  analyze(_document: PreprocessedDocument, options: AnalysisOptions): Promise<Partial<DocumentAnalysis>>;
 }
 
 class GPT4VisionModel implements AIModelInterface {

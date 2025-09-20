@@ -20,7 +20,7 @@ export default function AdminEmailTemplatesPage() {
         <div className="card bg-base-100 shadow-xl">
           <div className="card-body">
             <h2 className="card-title">Document Invitation Template</h2>
-            <p>Template for document signature invitations</p>
+            <p>Template for _document signature invitations</p>
             <div className="card-actions justify-end">
               <EmailTemplateEditor 
                 templateType="document_invitation"
@@ -48,7 +48,7 @@ export default function AdminEmailTemplatesPage() {
         <div className="card bg-base-100 shadow-xl">
           <div className="card-body">
             <h2 className="card-title">Document Completed Template</h2>
-            <p>Template for document completion notifications</p>
+            <p>Template for _document completion notifications</p>
             <div className="card-actions justify-end">
               <EmailTemplateEditor 
                 templateType="document_completed"
@@ -62,7 +62,7 @@ export default function AdminEmailTemplatesPage() {
         <div className="card bg-base-100 shadow-xl">
           <div className="card-body">
             <h2 className="card-title">Document Expired Template</h2>
-            <p>Template for document expiration notifications</p>
+            <p>Template for _document expiration notifications</p>
             <div className="card-actions justify-end">
               <EmailTemplateEditor 
                 templateType="document_expired"

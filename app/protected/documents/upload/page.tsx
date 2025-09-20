@@ -15,7 +15,7 @@ export default function DocumentUploadPage() {
         {/* Header */}
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900">Upload Document</h1>
-          <p className="text-gray-600">Upload your document for AI-powered analysis and digital signatures</p>
+          <p className="text-gray-600">Upload your _document for AI-powered analysis and digital signatures</p>
         </div>
 
         {/* Upload Area */}
@@ -173,7 +173,7 @@ export default function DocumentUploadPage() {
             </label>
             <textarea
               rows={3}
-              placeholder="Brief description of the document..."
+              placeholder="Brief description of the _document..."
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -272,7 +272,7 @@ export default function DocumentUploadPage() {
         {/* Placeholder Note */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
           <p className="text-blue-800 text-sm">
-            <strong>Note:</strong> This is a placeholder page for the document upload system. 
+            <strong>Note:</strong> This is a placeholder page for the _document upload system. 
             The actual implementation will include real-time file processing, AI-powered field 
             detection, comprehensive compliance validation, and advanced signature workflow setup.
           </p>

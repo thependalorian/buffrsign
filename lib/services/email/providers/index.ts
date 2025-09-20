@@ -11,7 +11,7 @@ export { SESProvider } from './ses';
 // Provider factory function
 export function createEmailProvider(
   provider: 'sendgrid' | 'resend' | 'ses',
-  config: any
+  config: unknown
 ) {
   switch (provider) {
     case 'sendgrid':

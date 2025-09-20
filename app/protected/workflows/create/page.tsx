@@ -1,7 +1,7 @@
 /**
  * Create Workflow Page
  * Location: /app/protected/workflows/create/page.tsx
- * Purpose: Create new document signing workflows
+ * Purpose: Create new _document signing workflows
  * Features:
  * - Workflow template selection
  * - Step-by-step workflow builder
@@ -57,7 +57,7 @@ export default function CreateWorkflowPage() {
     {
       id: 'onboarding',
       name: 'Employee Onboarding',
-      description: 'Complete employee onboarding document workflow',
+      description: 'Complete employee onboarding _document workflow',
       icon: <Users className="w-6 h-6" />,
       steps: 6,
       estimatedTime: '3-5 days'
@@ -104,14 +104,14 @@ export default function CreateWorkflowPage() {
           Create New Workflow
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Set up a new document signing workflow
+          Set up a new _document signing workflow
         </p>
       </div>
 
       {/* Progress Steps */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
-          {steps.map((step, index) => (
+          {steps.map((step, _index) => (
             <div key={step.id} className="flex items-center">
               <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 ${
                 currentStep >= step.id 
@@ -132,7 +132,7 @@ export default function CreateWorkflowPage() {
                 </p>
                 <p className="text-xs text-gray-500">{step.description}</p>
               </div>
-              {index < steps.length - 1 && (
+              {_index < steps.length - 1 && (
                 <div className={`w-12 h-0.5 mx-4 ${
                   currentStep > step.id ? 'bg-blue-600' : 'bg-gray-300'
                 }`} />

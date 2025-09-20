@@ -1,7 +1,7 @@
 /**
  * Email Preferences Form Component
  * 
- * A form component for managing user email notification preferences.
+ * A form component for managing _user email notification preferences.
  * Uses DaisyUI components for consistent styling.
  */
 
@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { useEmailPreferences } from '@/lib/hooks/useEmailPreferences';
 import { EmailPreferencesFormProps } from '@/lib/types/email';
 
-export default function EmailPreferencesForm({ 
+function EmailPreferencesForm({ 
   userId, 
   onSave, 
   onCancel 
@@ -53,7 +53,7 @@ export default function EmailPreferencesForm({
     }
   }, [preferences]);
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: unknown) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
@@ -281,3 +281,6 @@ export default function EmailPreferencesForm({
     </div>
   );
 }
+
+export { EmailPreferencesForm };
+export default EmailPreferencesForm;

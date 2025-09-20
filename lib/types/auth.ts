@@ -1,4 +1,4 @@
-export type UserRole = 'user' | 'admin' | 'super_admin';
+export type UserRole = '_user' | 'admin' | 'super_admin';
 
 export interface UserProfile {
   id: string;
@@ -41,7 +41,7 @@ export interface UserPermissions {
 }
 
 export interface AuthState {
-  user: UserProfile | null;
+  _user: UserProfile | null;
   session: unknown | null;
   loading: boolean;
   error: string | null;

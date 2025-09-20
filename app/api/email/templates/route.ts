@@ -13,11 +13,11 @@ const createTemplateSchema = z.object({
   is_active: z.boolean().default(true)
 });
 
-const updateTemplateSchema = createTemplateSchema.partial();
+const _updateTemplateSchema = createTemplateSchema.partial();
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const supabase = createClient();
+    const _supabase = createClient();
     const { searchParams } = new URL(request.url);
     
     const type = searchParams.get('type');
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ templates });
-  } catch (error) {
+  } catch {
     console.error('Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -59,15 +59,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const _supabase = createClient();
     const body = await request.json();
 
     // Validate request body
     const validatedData = createTemplateSchema.parse(body);
 
-    // Check if user is authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    // Check if _user is authenticated
+    const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !_user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       .from('email_templates')
       .insert({
         ...validatedData,
-        created_by: user.id
+        created_by: _user.id
       })
       .select()
       .single();
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
       success: true,
       template
     }, { status: 201 });
-  } catch (error) {
+  } catch {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation error', details: error.errors },

@@ -9,20 +9,20 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 export default function ProfilePage() {
-  const supabase = createClient()
-  const [user, setUser] = useState<User | null>(null)
+  const _supabase = createClient()
+  const [_user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [fullName, setFullName] = useState<string | null>(null)
   const [website, setWebsite] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
 
-  const getProfile = useCallback(async (user: User) => {
+  const getProfile = useCallback(async (_user: User) => {
     try {
       setLoading(true)
       const { data, error, status } = await supabase
         .from('profiles')
         .select(`full_name, website`)
-        .eq('id', user.id)
+        .eq('id', _user.id)
         .single()
 
       if (error && status !== 406) {
@@ -34,8 +34,8 @@ export default function ProfilePage() {
         setWebsite(data.website)
       }
     } catch (error) {
-      console.error('Error loading user data!', error)
-      setFeedback('Error loading user data!')
+      console.error('Error loading _user data!', error)
+      setFeedback('Error loading _user data!')
     } finally {
       setLoading(false)
     }
@@ -43,10 +43,10 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchUserAndProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        setUser(user)
-        await getProfile(user)
+      const { data: { _user } } = await supabase.auth.getUser()
+      if (_user) {
+        setUser(_user)
+        await getProfile(_user)
       } else {
         setLoading(false)
       }
@@ -56,12 +56,12 @@ export default function ProfilePage() {
   }, [supabase, getProfile])
 
   async function updateProfile() {
-    if (!user) return
+    if (!_user) return
 
     try {
       setLoading(true)
       const { error } = await supabase.from('profiles').upsert({
-        id: user.id,
+        id: _user.id,
         full_name: fullName,
         website: website,
         updated_at: new Date().toISOString(),
@@ -89,7 +89,7 @@ export default function ProfilePage() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" value={user?.email || ''} disabled />
+            <Input id="email" type="email" value={_user?.email || ''} disabled />
           </div>
           <div className="space-y-2">
             <Label htmlFor="fullName">Full Name</Label>

@@ -17,12 +17,12 @@ import { signIn, signUp, signOut, getCurrentSession, refreshSession } from '../.
 
 // Test component to access auth context
 const TestComponent = () => {
-  const { user, loading, signIn, signOut } = useAuth()
+  const { _user, loading, signIn, signOut } = useAuth()
   
   return (
     <div>
       <div data-testid="loading">{loading ? 'Loading' : 'Not Loading'}</div>
-      <div data-testid="user">{user ? user.email : 'No User'}</div>
+      <div data-testid="_user">{_user ? _user.email : 'No User'}</div>
       <button onClick={() => signIn('test@example.com', 'password')}>
         Sign In
       </button>
@@ -34,10 +34,10 @@ const TestComponent = () => {
 describe('AuthContext', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Mock getCurrentSession to return no user by default
+    // Mock getCurrentSession to return no _user by default
     getCurrentSession.mockResolvedValue({
       session: null,
-      user: null
+      _user: null
     });
   });
 
@@ -49,7 +49,7 @@ describe('AuthContext', () => {
     )
 
     expect(screen.getByTestId('loading')).toBeInTheDocument()
-    expect(screen.getByTestId('user')).toBeInTheDocument()
+    expect(screen.getByTestId('_user')).toBeInTheDocument()
     expect(screen.getByText('Sign In')).toBeInTheDocument()
     expect(screen.getByText('Sign Out')).toBeInTheDocument()
   })
@@ -64,7 +64,7 @@ describe('AuthContext', () => {
     expect(screen.getByTestId('loading')).toHaveTextContent('Loading')
   })
 
-  it('should handle no user state', async () => {
+  it('should handle no _user state', async () => {
     render(
       <AuthProvider>
         <TestComponent />
@@ -72,7 +72,7 @@ describe('AuthContext', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByTestId('user')).toHaveTextContent('No User')
+      expect(screen.getByTestId('_user')).toHaveTextContent('No User')
     })
   })
 

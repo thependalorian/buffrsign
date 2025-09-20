@@ -1,0 +1,1 @@
+import { EmailNotification, EmailQueueItem } from '@/lib/types/email';
