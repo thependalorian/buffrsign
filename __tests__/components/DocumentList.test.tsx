@@ -3,8 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import DocumentList from '../../components/DocumentList'
 
-// Mock the document service
-jest.mock('../../lib/services/document-service', () => ({
+// Mock the _document service
+jest.mock('../../lib/services/_document-service', () => ({
   documentService: {
     getUserDocuments: jest.fn(),
     getDocumentStats: jest.fn(),
@@ -23,7 +23,7 @@ const mockDocuments = [
     status: 'active',
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-01T00:00:00Z',
-    created_by: 'user-1'
+    created_by: '_user-1'
   },
   {
     id: '2',
@@ -34,13 +34,13 @@ const mockDocuments = [
     status: 'pending',
     created_at: '2024-01-02T00:00:00Z',
     updated_at: '2024-01-02T00:00:00Z',
-    created_by: 'user-1'
+    created_by: '_user-1'
   }
 ]
 
 describe('DocumentList Component', () => {
   // Get the mocked service
-  const { documentService } = require('../../lib/services/document-service')
+  const { documentService } = require('../../lib/services/_document-service')
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -62,7 +62,7 @@ describe('DocumentList Component', () => {
 
   it('should render component without crashing', async () => {
     render(
-      <DocumentList userId="user-123" />
+      <DocumentList userId="_user-123" />
     )
 
     // Should show loading initially
@@ -70,7 +70,7 @@ describe('DocumentList Component', () => {
     
     // Wait for documents to load
     await waitFor(() => {
-      expect(documentService.getUserDocuments).toHaveBeenCalledWith('user-123', expect.any(Object))
+      expect(documentService.getUserDocuments).toHaveBeenCalledWith('_user-123', expect.any(Object))
     })
   })
 
@@ -78,7 +78,7 @@ describe('DocumentList Component', () => {
     documentService.getUserDocuments.mockRejectedValue(new Error('Network error'))
 
     render(
-      <DocumentList userId="user-123" />
+      <DocumentList userId="_user-123" />
     )
 
     await waitFor(() => {
@@ -86,14 +86,14 @@ describe('DocumentList Component', () => {
     })
   })
 
-  it('should call document service on mount', async () => {
+  it('should call _document service on mount', async () => {
     render(
-      <DocumentList userId="user-123" />
+      <DocumentList userId="_user-123" />
     )
 
     await waitFor(() => {
-      expect(documentService.getUserDocuments).toHaveBeenCalledWith('user-123', expect.any(Object))
-      expect(documentService.getDocumentStats).toHaveBeenCalledWith('user-123')
+      expect(documentService.getUserDocuments).toHaveBeenCalledWith('_user-123', expect.any(Object))
+      expect(documentService.getDocumentStats).toHaveBeenCalledWith('_user-123')
     })
   })
 })

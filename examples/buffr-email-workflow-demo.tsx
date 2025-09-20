@@ -1,7 +1,7 @@
 /**
  * BuffrSign Email Workflow Demo
  * 
- * Complete demonstration of email integration with BuffrSign document workflow
+ * Complete demonstration of email integration with BuffrSign _document workflow
  * using the buffr.ai domain
  */
 
@@ -14,8 +14,8 @@ import { useDocumentEmailIntegration } from '@/lib/hooks/useDocumentEmailIntegra
 const demoDocument = {
   id: 'demo-doc-123',
   title: 'BuffrSign Service Agreement',
-  description: 'This is a demo document showing email integration with BuffrSign workflow',
-  ownerId: 'demo-user-123',
+  description: 'This is a demo _document showing email integration with BuffrSign workflow',
+  ownerId: 'demo-_user-123',
   ownerName: 'John Smith',
   ownerEmail: 'john@buffr.ai',
   status: 'draft',
@@ -41,7 +41,7 @@ const demoDocument = {
 };
 
 export const BuffrEmailWorkflowDemo: React.FC = () => {
-  const [activeDemo, setActiveDemo] = useState<'document' | 'dashboard' | 'integration'>('document');
+  const [activeDemo, setActiveDemo] = useState<'_document' | 'dashboard' | 'integration'>('_document');
   const [emailLog, setEmailLog] = useState<string[]>([]);
 
   const addToLog = (message: string) => {
@@ -62,8 +62,8 @@ export const BuffrEmailWorkflowDemo: React.FC = () => {
       {/* Demo Navigation */}
       <div className="tabs tabs-boxed mb-8 justify-center">
         <button
-          className={`tab ${activeDemo === 'document' ? 'tab-active' : ''}`}
-          onClick={() => setActiveDemo('document')}
+          className={`tab ${activeDemo === '_document' ? 'tab-active' : ''}`}
+          onClick={() => setActiveDemo('_document')}
         >
           📄 Document Workflow
         </button>
@@ -82,13 +82,13 @@ export const BuffrEmailWorkflowDemo: React.FC = () => {
       </div>
 
       {/* Document Workflow Demo */}
-      {activeDemo === 'document' && (
+      {activeDemo === '_document' && (
         <div className="space-y-6">
           <div className="card bg-base-100 shadow-xl">
             <div className="card-body">
               <h2 className="card-title">📄 Document Email Workflow</h2>
               <p className="text-gray-600">
-                This demonstrates how email notifications are integrated with document workflows in BuffrSign.
+                This demonstrates how email notifications are integrated with _document workflows in BuffrSign.
                 All emails will be sent from <strong>noreply@buffr.ai</strong> with links to <strong>sign.buffr.ai</strong>.
               </p>
             </div>
@@ -148,8 +148,8 @@ export const BuffrEmailWorkflowDemo: React.FC = () => {
               <p className="text-gray-500 italic">No email activity yet. Try sending some emails!</p>
             ) : (
               <div className="space-y-1">
-                {emailLog.map((log, index) => (
-                  <div key={index} className="text-sm font-mono">
+                {emailLog.map((log, _index) => (
+                  <div key={_index} className="text-sm font-mono">
                     {log}
                   </div>
                 ))}

@@ -3,8 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import DocumentUpload from '../../components/DocumentUpload'
 
-// Mock the document service
-jest.mock('../../lib/services/document-service', () => ({
+// Mock the _document service
+jest.mock('../../lib/services/_document-service', () => ({
   documentService: {
     uploadDocument: jest.fn(),
     getDocument: jest.fn(),
@@ -26,33 +26,33 @@ describe('DocumentUpload Component', () => {
   const mockOnUploadError = jest.fn()
   
   // Get the mocked service
-  const { documentService } = require('../../lib/services/document-service')
+  const { documentService } = require('../../lib/services/_document-service')
 
   beforeEach(() => {
     jest.clearAllMocks()
     documentService.uploadDocument.mockResolvedValue({
       success: true,
-      document: { id: 'doc-123', name: 'test.pdf' }
+      _document: { id: 'doc-123', name: 'test.pdf' }
     })
   })
 
   it('should render upload component', () => {
     render(
       <DocumentUpload
-        userId="user-123"
+        userId="_user-123"
         onUploadSuccess={mockOnUploadSuccess}
         onUploadError={mockOnUploadError}
       />
     )
 
-    expect(screen.getByText(/drop your document here/i)).toBeInTheDocument()
+    expect(screen.getByText(/drop your _document here/i)).toBeInTheDocument()
     expect(screen.getByText(/select file/i)).toBeInTheDocument()
   })
 
   it('should handle file selection', async () => {
     render(
       <DocumentUpload
-        userId="user-123"
+        userId="_user-123"
         onUploadSuccess={mockOnUploadSuccess}
         onUploadError={mockOnUploadError}
       />
@@ -64,7 +64,7 @@ describe('DocumentUpload Component', () => {
     fireEvent.click(fileInput)
     
     // Simulate file input change
-    const hiddenInput = document.querySelector('input[type="file"]') as HTMLInputElement
+    const hiddenInput = _document.querySelector('input[type="file"]') as HTMLInputElement
     Object.defineProperty(hiddenInput, 'files', {
       value: [file],
       writable: false,
@@ -79,7 +79,7 @@ describe('DocumentUpload Component', () => {
   it('should show file validation errors', async () => {
     render(
       <DocumentUpload
-        userId="user-123"
+        userId="_user-123"
         onUploadSuccess={mockOnUploadSuccess}
         onUploadError={mockOnUploadError}
       />
@@ -90,7 +90,7 @@ describe('DocumentUpload Component', () => {
 
     fireEvent.click(fileInput)
     
-    const hiddenInput = document.querySelector('input[type="file"]') as HTMLInputElement
+    const hiddenInput = _document.querySelector('input[type="file"]') as HTMLInputElement
     Object.defineProperty(hiddenInput, 'files', {
       value: [invalidFile],
       writable: false,
@@ -98,20 +98,20 @@ describe('DocumentUpload Component', () => {
     fireEvent.change(hiddenInput)
 
     await waitFor(() => {
-      expect(screen.getByText(/please select a valid document file/i)).toBeInTheDocument()
+      expect(screen.getByText(/please select a valid _document file/i)).toBeInTheDocument()
     })
   })
 
   it('should handle drag and drop', async () => {
     render(
       <DocumentUpload
-        userId="user-123"
+        userId="_user-123"
         onUploadSuccess={mockOnUploadSuccess}
         onUploadError={mockOnUploadError}
       />
     )
 
-    const dropZone = screen.getByText(/drop your document here/i).closest('div')
+    const dropZone = screen.getByText(/drop your _document here/i).closest('div')
     const file = new File(['test content'], 'test.pdf', { type: 'application/pdf' })
 
     fireEvent.dragOver(dropZone!)
@@ -129,7 +129,7 @@ describe('DocumentUpload Component', () => {
   it('should show upload progress', async () => {
     render(
       <DocumentUpload
-        userId="user-123"
+        userId="_user-123"
         onUploadSuccess={mockOnUploadSuccess}
         onUploadError={mockOnUploadError}
       />
@@ -140,7 +140,7 @@ describe('DocumentUpload Component', () => {
 
     fireEvent.click(fileInput)
     
-    const hiddenInput = document.querySelector('input[type="file"]') as HTMLInputElement
+    const hiddenInput = _document.querySelector('input[type="file"]') as HTMLInputElement
     Object.defineProperty(hiddenInput, 'files', {
       value: [file],
       writable: false,
@@ -152,10 +152,10 @@ describe('DocumentUpload Component', () => {
     })
 
     // Fill in required title
-    const titleInput = screen.getByPlaceholderText(/enter document title/i)
+    const titleInput = screen.getByPlaceholderText(/enter _document title/i)
     fireEvent.change(titleInput, { target: { value: 'Test Document' } })
 
-    const uploadButton = screen.getByRole('button', { name: /upload document/i })
+    const uploadButton = screen.getByRole('button', { name: /upload _document/i })
     fireEvent.click(uploadButton)
 
     await waitFor(() => {
@@ -163,10 +163,10 @@ describe('DocumentUpload Component', () => {
     })
   })
 
-  it('should require document title', async () => {
+  it('should require _document title', async () => {
     render(
       <DocumentUpload
-        userId="user-123"
+        userId="_user-123"
         onUploadSuccess={mockOnUploadSuccess}
         onUploadError={mockOnUploadError}
       />
@@ -177,7 +177,7 @@ describe('DocumentUpload Component', () => {
 
     fireEvent.click(fileInput)
     
-    const hiddenInput = document.querySelector('input[type="file"]') as HTMLInputElement
+    const hiddenInput = _document.querySelector('input[type="file"]') as HTMLInputElement
     Object.defineProperty(hiddenInput, 'files', {
       value: [file],
       writable: false,
@@ -189,12 +189,12 @@ describe('DocumentUpload Component', () => {
     })
 
     // Clear the auto-populated title
-    const titleInput = screen.getByPlaceholderText(/enter document title/i)
+    const titleInput = screen.getByPlaceholderText(/enter _document title/i)
     fireEvent.change(titleInput, { target: { value: '' } })
 
     // Now the upload button should be disabled
     await waitFor(() => {
-      const uploadButton = screen.getByRole('button', { name: /upload document/i })
+      const uploadButton = screen.getByRole('button', { name: /upload _document/i })
       expect(uploadButton).toBeDisabled()
     })
   })
@@ -202,7 +202,7 @@ describe('DocumentUpload Component', () => {
   it('should handle upload success', async () => {
     render(
       <DocumentUpload
-        userId="user-123"
+        userId="_user-123"
         onUploadSuccess={mockOnUploadSuccess}
         onUploadError={mockOnUploadError}
       />
@@ -213,7 +213,7 @@ describe('DocumentUpload Component', () => {
 
     fireEvent.click(fileInput)
     
-    const hiddenInput = document.querySelector('input[type="file"]') as HTMLInputElement
+    const hiddenInput = _document.querySelector('input[type="file"]') as HTMLInputElement
     Object.defineProperty(hiddenInput, 'files', {
       value: [file],
       writable: false,
@@ -224,10 +224,10 @@ describe('DocumentUpload Component', () => {
       expect(screen.getByText('test.pdf')).toBeInTheDocument()
     })
 
-    const titleInput = screen.getByPlaceholderText(/enter document title/i)
+    const titleInput = screen.getByPlaceholderText(/enter _document title/i)
     fireEvent.change(titleInput, { target: { value: 'Test Document' } })
 
-    const uploadButton = screen.getByRole('button', { name: /upload document/i })
+    const uploadButton = screen.getByRole('button', { name: /upload _document/i })
     fireEvent.click(uploadButton)
 
     await waitFor(() => {

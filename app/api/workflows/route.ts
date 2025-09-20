@@ -10,7 +10,7 @@ import { verifyJWT } from '@/lib/middleware/jwt-middleware';
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify JWT token and get user information
+    // Verify JWT token and get _user information
     const authResult = await verifyJWT(request);
     if (!authResult.success) {
       return NextResponse.json(
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { user } = authResult;
+    const { _user } = authResult;
     const body = await request.json();
     
     const {
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     switch (workflow_type) {
       case 'kyc':
         response = await aiIntegration.processKYCWorkflow(
-          user?.sub || 'unknown',
+          _user?.sub || 'unknown',
           input_data.document_id,
           input_data.kyc_type || 'individual'
         );
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
         );
         break;
         
-      case 'document':
+      case '_document':
         response = await aiIntegration.startDocumentWorkflow(
           input_data.document_id,
           input_data.analysis_type || 'comprehensive',
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
         
       default:
         return NextResponse.json(
-          { error: 'Invalid workflow_type. Must be "kyc", "signature", or "document"' },
+          { error: 'Invalid workflow_type. Must be "kyc", "signature", or "_document"' },
           { status: 400 }
         );
     }
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-  } catch (error) {
+  } catch {
     console.error('Workflow API Error:', error);
     
     return NextResponse.json(
@@ -104,9 +104,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    // Verify JWT token and get user information
+    // Verify JWT token and get _user information
     const authResult = await verifyJWT(request);
     if (!authResult.success) {
       return NextResponse.json(
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { user } = authResult;
+    // User authenticated successfully
     const { searchParams } = new URL(request.url);
     const workflowId = searchParams.get('workflow_id');
 
@@ -143,7 +143,7 @@ export async function GET(request: NextRequest) {
         }
       });
     } else {
-      // List user's workflows (placeholder implementation)
+      // List _user's workflows (placeholder implementation)
       const response = { success: true, workflows: [] };
 
       return NextResponse.json({
@@ -156,7 +156,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-  } catch (error) {
+  } catch {
     console.error('Workflow API Error:', error);
     
     return NextResponse.json(

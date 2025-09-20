@@ -13,11 +13,11 @@ describe('Supabase Types', () => {
       const mockDocument: DocumentRow = {
         id: 'doc123',
         title: 'Test Document',
-        file_path: '/path/to/document.pdf',
+        file_path: '/path/to/_document.pdf',
         file_hash: 'abc123',
         file_size: 1024,
         mime_type: 'application/pdf',
-        created_by: 'user123',
+        created_by: '_user123',
         created_at: '2024-01-01T00:00:00Z',
         updated_at: '2024-01-01T00:00:00Z',
         status: 'active',
@@ -79,7 +79,7 @@ describe('Supabase Types', () => {
       
       const mockWorkflow: KYCWorkflowRow = {
         id: 'kyc123',
-        user_id: 'user123',
+        user_id: '_user123',
         document_id: 'doc123',
         workflow_state: 'initialized',
         created_at: '2024-01-01T00:00:00Z',
@@ -101,7 +101,7 @@ describe('Supabase Types', () => {
       };
 
       expect(mockWorkflow.id).toBe('kyc123');
-      expect(mockWorkflow.user_id).toBe('user123');
+      expect(mockWorkflow.user_id).toBe('_user123');
       expect(mockWorkflow.workflow_state).toBe('initialized');
       expect(mockWorkflow.final_decision).toBe('pending');
     });
@@ -110,7 +110,7 @@ describe('Supabase Types', () => {
       type UserRow = Tables<'users'>;
       
       const mockUser: UserRow = {
-        id: 'user123',
+        id: '_user123',
         email: 'john.doe@example.com',
         first_name: 'John',
         last_name: 'Doe',
@@ -125,10 +125,10 @@ describe('Supabase Types', () => {
         namibian_id: '123456789',
         password_hash: 'hashed_password',
         phone: '+264811234567',
-        role: 'user'
+        role: '_user'
       };
 
-      expect(mockUser.id).toBe('user123');
+      expect(mockUser.id).toBe('_user123');
       expect(mockUser.email).toBe('john.doe@example.com');
       expect(mockUser.first_name).toBe('John');
       expect(mockUser.last_name).toBe('Doe');
@@ -142,11 +142,11 @@ describe('Supabase Types', () => {
       
       const mockDocumentInsert: DocumentInsert = {
         title: 'Test Document',
-        file_path: '/path/to/document.pdf',
+        file_path: '/path/to/_document.pdf',
         file_hash: 'abc123',
         file_size: 1024,
         mime_type: 'application/pdf',
-        created_by: 'user123'
+        created_by: '_user123'
       };
 
       expect(mockDocumentInsert.title).toBe('Test Document');
@@ -252,17 +252,17 @@ describe('Supabase Types', () => {
       expect(validStates).toContain('failed');
     });
 
-    test('should have correct user role enum values', () => {
+    test('should have correct _user role enum values', () => {
       type UserRole = Enums<'user_role'>;
       
       const validRoles: UserRole[] = [
-        'user',
+        '_user',
         'admin',
         'super_admin'
       ];
 
       expect(validRoles).toHaveLength(3);
-      expect(validRoles).toContain('user');
+      expect(validRoles).toContain('_user');
       expect(validRoles).toContain('admin');
       expect(validRoles).toContain('super_admin');
     });
@@ -275,7 +275,7 @@ describe('Supabase Types', () => {
       // This should compile without errors
       const validInsert: DocumentInsert = {
         title: 'Test Document',
-        file_path: '/path/to/document.pdf',
+        file_path: '/path/to/_document.pdf',
         file_hash: 'abc123',
         file_size: 1024,
         mime_type: 'application/pdf'
@@ -290,16 +290,16 @@ describe('Supabase Types', () => {
       // This should compile without errors
       const validInsert: DocumentInsert = {
         title: 'Test Document',
-        file_path: '/path/to/document.pdf',
+        file_path: '/path/to/_document.pdf',
         file_hash: 'abc123',
         file_size: 1024,
         mime_type: 'application/pdf',
-        created_by: 'user123',
+        created_by: '_user123',
         status: 'active',
         document_type: 'contract'
       };
 
-      expect(validInsert.created_by).toBe('user123');
+      expect(validInsert.created_by).toBe('_user123');
       expect(validInsert.status).toBe('active');
     });
 

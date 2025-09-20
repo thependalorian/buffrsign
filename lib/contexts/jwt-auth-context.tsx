@@ -3,7 +3,7 @@
  * 
  * This context integrates JWT tokens with Supabase authentication,
  * providing enhanced security and token management capabilities
- * with specialized document and signature token support.
+ * with specialized _document and signature token support.
  */
 
 'use client';
@@ -74,7 +74,7 @@ const JWTAuthContext = createContext<JWTAuthContextType | undefined>(undefined);
 
 export function JWTAuthProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<JWTAuthState>({
-    user: null,
+    _user: null,
     session: null,
     loading: true,
     error: null,
@@ -86,7 +86,7 @@ export function JWTAuthProvider({ children }: { children: React.ReactNode }) {
     signatureTokens: new Map(),
   });
 
-  const supabase = createClient();
+  const _supabase = createClient();
 
   // JWT Token Management
   const getStoredTokens = useCallback((): JWTTokens | null => {
@@ -193,13 +193,13 @@ export function JWTAuthProvider({ children }: { children: React.ReactNode }) {
 
       const data = await response.json();
       const tokens: JWTTokens = data.data;
-      const user: JWTUser = data.user;
+      const _user: JWTUser = data._user;
 
       storeTokens(tokens);
       setState(prev => ({
         ...prev,
         jwtTokens: tokens,
-        jwtUser: user,
+        jwtUser: _user,
         isTokenValid: true,
         tokenExpiry: new Date(Date.now() + tokens.expiresIn * 1000),
       }));
@@ -297,7 +297,7 @@ export function JWTAuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const token = state.documentTokens.get(documentId);
       if (!token) {
-        return { error: 'No document token found' };
+        return { error: 'No _document token found' };
       }
 
       const response = await fetch(`/api/documents/${documentId}/token`, {
@@ -383,7 +383,7 @@ export function JWTAuthProvider({ children }: { children: React.ReactNode }) {
         return { error: 'No signature token found' };
       }
 
-      // Extract document ID from the token (this would need to be stored or extracted)
+      // Extract _document ID from the token (this would need to be stored or extracted)
       // For now, we'll use a placeholder approach
       const response = await fetch(`/api/documents/placeholder/token`, {
         method: 'DELETE',
@@ -458,12 +458,12 @@ export function JWTAuthProvider({ children }: { children: React.ReactNode }) {
         password: credentials.password,
       });
 
-      if (authError || !authData.user) {
+      if (authError || !authData._user) {
         return { error: authError || 'Authentication failed' };
       }
 
       // Create JWT tokens
-      const jwtResult = await createJWTTokens(authData.user.id);
+      const jwtResult = await createJWTTokens(authData._user.id);
       if (jwtResult.error) {
         return { error: jwtResult.error };
       }
@@ -487,7 +487,7 @@ export function JWTAuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.signOut();
       
       setState({
-        user: null,
+        _user: null,
         session: null,
         loading: false,
         error: null,
@@ -528,7 +528,7 @@ export function JWTAuthProvider({ children }: { children: React.ReactNode }) {
             last_name: credentials.last_name,
             company_name: credentials.company_name,
             phone: credentials.phone,
-            role: credentials.role || 'user',
+            role: credentials.role || '_user',
           },
           emailRedirectTo: `${window.location.origin}/auth/confirm?next=/protected`,
         },
@@ -547,12 +547,12 @@ export function JWTAuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateProfile = useCallback(async (updates: Partial<UserProfile>): Promise<{ error: unknown }> => {
     try {
-      if (!state.user) throw new Error('No user logged in');
+      if (!state._user) throw new Error('No _user logged in');
 
       const { error } = await supabase
         .from('profiles')
         .update(updates)
-        .eq('id', state.user.id);
+        .eq('id', state._user.id);
 
       if (error) throw error;
 
@@ -561,7 +561,7 @@ export function JWTAuthProvider({ children }: { children: React.ReactNode }) {
       setState(prev => ({ ...prev, error: error instanceof Error ? error.message : 'An error occurred' }));
       return { error };
     }
-  }, [state.user, supabase]);
+  }, [state._user, supabase]);
 
   const resetPassword = useCallback(async (email: string): Promise<{ error: unknown }> => {
     try {
@@ -575,7 +575,7 @@ export function JWTAuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase]);
 
   const refreshUser = useCallback(async () => {
-    // This would typically refresh the user profile
+    // This would typically refresh the _user profile
     // Implementation depends on your specific needs
   }, []);
 

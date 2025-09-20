@@ -16,8 +16,8 @@ type Template = {
 };
 
 export default function TemplatesPage() {
-  const supabase = createClient()
-  const [user, setUser] = useState<User | null>(null)
+  const _supabase = createClient()
+  const [_user, setUser] = useState<User | null>(null)
   const [templates, setTemplates] = useState<Template[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -45,10 +45,10 @@ export default function TemplatesPage() {
 
   useEffect(() => {
     const initialize = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        setUser(user)
-        await fetchTemplates(user.id)
+      const { data: { _user } } = await supabase.auth.getUser()
+      if (_user) {
+        setUser(_user)
+        await fetchTemplates(_user.id)
       } else {
         setLoading(false)
         setError('You must be logged in to view templates.')
@@ -103,7 +103,7 @@ export default function TemplatesPage() {
           <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
           <h3 className="mt-4 text-lg font-medium">No templates created yet</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Get started by creating your first document template.
+            Get started by creating your first _document template.
           </p>
           <Button className="mt-6">
             <PlusCircle className="mr-2 h-4 w-4" />

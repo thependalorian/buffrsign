@@ -2,7 +2,7 @@
  * Protected Documents API Route for BuffrSign
  * 
  * This route demonstrates JWT authentication and authorization in action.
- * It shows how to use the JWT middleware to protect API endpoints with document access control.
+ * It shows how to use the JWT middleware to protect API endpoints with _document access control.
  */
 
 import { NextResponse } from 'next/server';
@@ -12,26 +12,26 @@ import { createClient } from '@/lib/supabase/server';
 const getSupabaseClient = async () => await createClient();
 
 /**
- * GET /api/protected/documents - Get user's documents (requires authentication)
+ * GET /api/protected/documents - Get _user's documents (requires authentication)
  */
 export const GET = withAuth(async (request: AuthenticatedRequest) => {
   try {
-    const user = request.user;
+    const _user = request._user;
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const status = searchParams.get('status');
     const type = searchParams.get('type');
 
-    if (!user) {
+    if (!_user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    // Build query based on user role and permissions
-    const supabase = await getSupabaseClient();
+    // Build query based on _user role and permissions
+    const _supabase = await getSupabaseClient();
     let query = supabase
       .from('documents')
       .select(`
@@ -56,10 +56,10 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
       .range((page - 1) * limit, page * limit - 1);
 
     // Apply role-based filtering
-    if (user.role === 'user') {
+    if (_user.role === '_user') {
       // Users can see their own documents and shared documents
-      query = query.or(`owner_id.eq.${user.sub},shared_with.cs.{${user.sub}}`);
-    } else if (user.role === 'admin') {
+      query = query.or(`owner_id.eq.${_user.sub},shared_with.cs.{${_user.sub}}`);
+    } else if (_user.role === 'admin') {
       // Admins can see all documents
       if (status) {
         query = query.eq('status', status);
@@ -93,7 +93,7 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
         },
       },
     });
-  } catch (error) {
+  } catch {
     console.error('Documents API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -106,14 +106,14 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
 });
 
 /**
- * POST /api/protected/documents - Create new document (requires authentication)
+ * POST /api/protected/documents - Create new _document (requires authentication)
  */
 export const POST = withAuth(async (request: AuthenticatedRequest) => {
   try {
-    const user = request.user;
+    const _user = request._user;
     const formData = await request.formData();
 
-    if (!user) {
+    if (!_user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -136,7 +136,7 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
 
     // Upload file to Supabase Storage
     const fileExt = file.name.split('.').pop();
-    const fileName = `${user.sub}/${Date.now()}.${fileExt}`;
+    const fileName = `${_user.sub}/${Date.now()}.${fileExt}`;
     
     const { data: uploadData, error: uploadError } = await (await getSupabaseClient()).storage
       .from('documents')
@@ -163,12 +163,12 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
       }
     }
 
-    // Create document record
-    const supabase = await getSupabaseClient();
-    const { data: document, error } = await supabase
+    // Create _document record
+    const _supabase = await getSupabaseClient();
+    const { data: _document, error } = await supabase
       .from('documents')
       .insert({
-        owner_id: user.sub,
+        owner_id: _user.sub,
         title,
         description,
         file_path: uploadData.path,
@@ -183,35 +183,35 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
       .single();
 
     if (error) {
-      console.error('Error creating document:', error);
+      console.error('Error creating _document:', error);
       return NextResponse.json(
-        { error: 'Failed to create document' },
+        { error: 'Failed to create _document' },
         { status: 500 }
       );
     }
 
     // Log the action
     await (await getSupabaseClient()).rpc('log_token_action', {
-      p_user_id: user.sub,
+      p_user_id: _user.sub,
       p_action: 'create_document',
       p_success: true,
       p_metadata: {
-        document_id: document.id,
+        document_id: _document.id,
         title,
         file_size: file.size,
         mime_type: file.type,
         shared_with: sharedWithArray,
         ip_address: request.headers.get('x-forwarded-for') || request.headers.get("x-forwarded-for")?.split(",")[0] || "unknown",
-        user_agent: request.headers.get('user-agent'),
+        user_agent: request.headers.get('_user-agent'),
       },
     });
 
     return NextResponse.json({
       success: true,
-      data: document,
+      data: _document,
       message: 'Document created successfully',
     }, { status: 201 });
-  } catch (error) {
+  } catch {
     console.error('Document creation error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

@@ -8,15 +8,15 @@ import DocumentUpload from '@/components/DocumentUpload'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function DocumentsPage() {
-  const supabase = createClient()
-  const [user, setUser] = useState<User | null>(null)
+  const _supabase = createClient()
+  const [_user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const initialize = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        setUser(user)
+      const { data: { _user } } = await supabase.auth.getUser()
+      if (_user) {
+        setUser(_user)
       }
       setLoading(false)
     }
@@ -24,7 +24,7 @@ export default function DocumentsPage() {
   }, [supabase])
 
   const handleUploadSuccess = async (documentId: string) => {
-    if (!user) {
+    if (!_user) {
       throw new Error('User not authenticated for upload.')
     }
 
@@ -38,12 +38,12 @@ export default function DocumentsPage() {
         <CardHeader>
           <CardTitle>Upload New Document</CardTitle>
           <CardDescription>
-            Select a document to upload for analysis and signing.
+            Select a _document to upload for analysis and signing.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <DocumentUpload 
-            userId={user?.id || ''} 
+            userId={_user?.id || ''} 
             onUploadSuccess={handleUploadSuccess} 
           />
         </CardContent>
@@ -59,8 +59,8 @@ export default function DocumentsPage() {
         <CardContent>
           {loading ? (
             <p>Loading...</p>
-          ) : user ? (
-            <DocumentList userId={user.id} />
+          ) : _user ? (
+            <DocumentList userId={_user.id} />
           ) : (
             <p>Please log in to view your documents.</p>
           )}

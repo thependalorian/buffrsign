@@ -12,7 +12,7 @@ jest.mock('../lib/database/db-utils');
 
 describe('LangGraphWorkflows', () => {
   let langGraphWorkflows: LangGraphWorkflowOrchestrator;
-  let mockSupabase: any;
+  let mockSupabase: unknown;
 
   beforeEach(() => {
     mockSupabase = {
@@ -30,7 +30,7 @@ describe('LangGraphWorkflows', () => {
   });
 
   describe('Document Processing Workflow', () => {
-    test('should execute document processing workflow successfully', async () => {
+    test('should execute _document processing workflow successfully', async () => {
       const mockResult = {
         workflowId: 'wf123',
         status: 'completed',
@@ -47,7 +47,7 @@ describe('LangGraphWorkflows', () => {
       expect(result).toEqual(mockResult);
       expect(result.status).toBe('completed');
       expect(result.workflowId).toBe('wf123');
-      expect(global.fetch).toHaveBeenCalledWith('/api/ai/execute-document-processing', {
+      expect(global.fetch).toHaveBeenCalledWith('/api/ai/execute-_document-processing', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ documentId: 'doc123' })
@@ -87,7 +87,7 @@ describe('LangGraphWorkflows', () => {
         json: () => Promise.resolve(mockResult)
       });
 
-      const result = await langGraphWorkflows.executeKYCWorkflow('user123', 'doc123');
+      const result = await langGraphWorkflows.executeKYCWorkflow('_user123', 'doc123');
 
       expect(result).toEqual(mockResult);
       expect(result.status).toBe('approved');
@@ -95,7 +95,7 @@ describe('LangGraphWorkflows', () => {
       expect(global.fetch).toHaveBeenCalledWith('/api/ai/execute-kyc-workflow', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: 'user123', documentId: 'doc123' })
+        body: JSON.stringify({ userId: '_user123', documentId: 'doc123' })
       });
     });
 
@@ -106,7 +106,7 @@ describe('LangGraphWorkflows', () => {
         confidence: 0.45,
         steps: ['document_upload', 'ocr_extraction', 'country_detection'],
         decision: 'rejected',
-        reasons: ['Invalid document format', 'Low confidence score']
+        reasons: ['Invalid _document format', 'Low confidence score']
       };
 
       global.fetch = jest.fn().mockResolvedValue({
@@ -114,7 +114,7 @@ describe('LangGraphWorkflows', () => {
         json: () => Promise.resolve(mockResult)
       });
 
-      const result = await langGraphWorkflows.executeKYCWorkflow('user123', 'doc123');
+      const result = await langGraphWorkflows.executeKYCWorkflow('_user123', 'doc123');
 
       expect(result.status).toBe('rejected');
       expect(result.confidence).toBeLessThan(0.5);
@@ -136,7 +136,7 @@ describe('LangGraphWorkflows', () => {
         json: () => Promise.resolve(mockResult)
       });
 
-      const result = await langGraphWorkflows.executeKYCWorkflow('user123', 'doc123');
+      const result = await langGraphWorkflows.executeKYCWorkflow('_user123', 'doc123');
 
       expect(result.status).toBe('pending');
       expect(result.nextSteps).toContain('Manual review required');
@@ -235,7 +235,7 @@ describe('LangGraphWorkflows', () => {
   });
 
   describe('Performance Optimization', () => {
-    test('should optimize document processing', async () => {
+    test('should optimize _document processing', async () => {
       const mockResult = {
         optimizations: ['Use GPT-4 Vision', 'Enable caching', 'Parallel processing'],
         performanceGains: 0.25,
@@ -252,7 +252,7 @@ describe('LangGraphWorkflows', () => {
       expect(result).toEqual(mockResult);
       expect(result.performanceGains).toBe(0.25);
       expect(result.optimizations).toHaveLength(3);
-      expect(global.fetch).toHaveBeenCalledWith('/api/ai/optimize-document-processing', {
+      expect(global.fetch).toHaveBeenCalledWith('/api/ai/optimize-_document-processing', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ documentId: 'doc123' })
@@ -322,7 +322,7 @@ describe('LangGraphWorkflows', () => {
 
       await langGraphWorkflows.saveWorkflowResults('doc123', mockWorkflow);
 
-      expect(consoleSpy).toHaveBeenCalledWith('Saving workflow results for document:', 'doc123', mockWorkflow);
+      expect(consoleSpy).toHaveBeenCalledWith('Saving workflow results for _document:', 'doc123', mockWorkflow);
       
       consoleSpy.mockRestore();
     });

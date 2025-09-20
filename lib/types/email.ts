@@ -305,7 +305,7 @@ export interface TemplateVariable {
 }
 
 export interface TemplateContext {
-  document?: {
+  _document?: {
     id: string;
     title: string;
     status: string;
@@ -320,7 +320,7 @@ export interface TemplateContext {
     email: string;
     role: string;
   };
-  user?: {
+  _user?: {
     id: string;
     name: string;
     email: string;
@@ -399,7 +399,7 @@ export interface EmailAnalyticsResponse {
 
 export interface UseEmailNotificationsOptions {
   documentId?: string;
-  emailType?: EmailType;
+  _emailType?: EmailType;
   limit?: number;
   offset?: number;
 }
@@ -411,7 +411,7 @@ export interface UseEmailPreferencesOptions {
 export interface UseEmailAnalyticsOptions {
   startDate: string;
   endDate: string;
-  emailType?: EmailType;
+  _emailType?: EmailType;
   groupBy?: 'day' | 'week' | 'month';
 }
 
@@ -439,7 +439,7 @@ export interface EmailTemplateEditorProps {
 
 export interface EmailNotificationListProps {
   documentId?: string;
-  emailType?: EmailType;
+  _emailType?: EmailType;
   limit?: number;
   showFilters?: boolean;
 }
@@ -457,7 +457,7 @@ export interface EmailError {
 
 export interface EmailValidationError extends EmailError {
   field: string;
-  value: any;
+  value: unknown;
 }
 
 // ===================================================================

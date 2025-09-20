@@ -3,8 +3,8 @@
  * Tests actual functionality with minimal mocking to ensure everything works together
  */
 
-import { DocumentService } from '../../lib/services/document-service';
-import { DocumentAnalyzer } from '../../lib/services/document-analyzer';
+import { DocumentService } from '../../lib/services/_document-service';
+import { DocumentAnalyzer } from '../../lib/services/_document-analyzer';
 import { WorkflowEngine } from '../../lib/services/workflow-engine';
 import { WorkflowOrchestrator, WorkflowStepType, WorkflowStatus } from '../../lib/ai/workflow-orchestrator';
 import { WorkflowNodeType, WorkflowActionType } from '../../lib/ai-types';
@@ -33,7 +33,7 @@ jest.mock('../../lib/supabase', () => ({
               status: 'uploaded',
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
-              created_by: 'user-123'
+              created_by: '_user-123'
             },
             error: null
           })
@@ -99,7 +99,7 @@ describe('Real System Integration Tests', () => {
   });
 
   describe('Document Processing Pipeline', () => {
-    it('should handle complete document lifecycle', async () => {
+    it('should handle complete _document lifecycle', async () => {
       // 1. File Validation (Real Logic)
       const testFile = new File(['test content'], 'contract.pdf', { type: 'application/pdf' });
       Object.defineProperty(testFile, 'size', { value: 1024 * 1024 }); // 1MB
@@ -109,7 +109,7 @@ describe('Real System Integration Tests', () => {
       expect(validation.errors).toHaveLength(0);
 
       // 2. Document Upload (Real Service Logic)
-      const uploadResult = await documentService.uploadDocument('user-123', {
+      const uploadResult = await documentService.uploadDocument('_user-123', {
         file: testFile,
         title: 'Integration Test Contract',
         documentType: 'contract',
@@ -117,24 +117,24 @@ describe('Real System Integration Tests', () => {
       });
 
       expect(uploadResult.success).toBe(true);
-      expect(uploadResult.document).toBeDefined();
-      expect(uploadResult.document?.title).toBe('Test Document');
+      expect(uploadResult._document).toBeDefined();
+      expect(uploadResult._document?.title).toBe('Test Document');
 
       // 3. Document Analysis (Real Business Logic)
       const analysisResult = await documentAnalyzer.analyzeDocument(
         'This is a test contract with signature requirements and compliance clauses.',
-        uploadResult.document!.id,
+        uploadResult._document!.id,
         { documentType: 'contract', industry: 'finance' }
       );
 
       expect(analysisResult).toBeDefined();
-      expect(analysisResult.document_id).toBe(uploadResult.document!.id);
+      expect(analysisResult.document_id).toBe(uploadResult._document!.id);
       expect(analysisResult.document_type).toBeDefined();
       expect(analysisResult.compliance_status).toBeDefined();
       expect(analysisResult.signature_locations).toBeDefined();
 
       // 4. Document Statistics (Real Calculation Logic)
-      const statsResult = await documentService.getDocumentStats('user-123');
+      const statsResult = await documentService.getDocumentStats('_user-123');
       expect(statsResult.success).toBe(true);
       expect(statsResult.stats).toBeDefined();
       expect(typeof statsResult.stats?.total).toBe('number');
@@ -165,7 +165,7 @@ describe('Real System Integration Tests', () => {
           id: 'start',
           type: WorkflowNodeType.START,
           name: 'Document Processing Start',
-          description: 'Initialize document processing workflow',
+          description: 'Initialize _document processing workflow',
           action: {
             type: WorkflowActionType.UPDATE_STATUS,
             parameters: { status: 'processing' },
@@ -178,7 +178,7 @@ describe('Real System Integration Tests', () => {
           id: 'validate',
           type: WorkflowNodeType.VALIDATION,
           name: 'Document Validation',
-          description: 'Validate document format and content',
+          description: 'Validate _document format and content',
           action: {
             type: WorkflowActionType.VALIDATE_DOCUMENT,
             parameters: { 
@@ -194,7 +194,7 @@ describe('Real System Integration Tests', () => {
           id: 'analyze',
           type: WorkflowNodeType.DOCUMENT_ANALYSIS,
           name: 'AI Analysis',
-          description: 'Perform AI-powered document analysis',
+          description: 'Perform AI-powered _document analysis',
           action: {
             type: WorkflowActionType.ANALYZE_DOCUMENT,
             parameters: { 
@@ -210,7 +210,7 @@ describe('Real System Integration Tests', () => {
           id: 'complete',
           type: WorkflowNodeType.COMPLETION,
           name: 'Processing Complete',
-          description: 'Finalize document processing',
+          description: 'Finalize _document processing',
           action: {
             type: WorkflowActionType.UPDATE_STATUS,
             parameters: { status: 'completed' },
@@ -309,7 +309,7 @@ describe('Real System Integration Tests', () => {
       // Create workflow using orchestrator (Real Logic)
       const workflowId = await workflowOrchestrator.createWorkflow({
         name: 'Document Analysis Workflow',
-        description: 'Complex document analysis workflow',
+        description: 'Complex _document analysis workflow',
         steps: [
           {
             id: 'start',
@@ -374,7 +374,7 @@ describe('Real System Integration Tests', () => {
   });
 
   describe('Document Analysis Integration', () => {
-    it('should perform real document analysis with business logic', async () => {
+    it('should perform real _document analysis with business logic', async () => {
       const contractText = `
         EMPLOYMENT CONTRACT
         
@@ -426,7 +426,7 @@ describe('Real System Integration Tests', () => {
       expect(Array.isArray(riskAssessment.risk_factors)).toBe(true);
     });
 
-    it('should handle different document types', async () => {
+    it('should handle different _document types', async () => {
       const invoiceText = `
         INVOICE #INV-2024-001
         
@@ -461,8 +461,8 @@ describe('Real System Integration Tests', () => {
 
   describe('Error Handling and Recovery', () => {
     it('should handle service errors gracefully', async () => {
-      // Test document service error handling
-      const result = await documentService.uploadDocument('user-123', {
+      // Test _document service error handling
+      const result = await documentService.uploadDocument('_user-123', {
         file: null, // Invalid file
         title: 'Test'
       });
@@ -475,7 +475,7 @@ describe('Real System Integration Tests', () => {
         workflowEngine.createWorkflowFromNodes([], 'nonexistent');
       }).toThrow();
 
-      // Test document analyzer error handling
+      // Test _document analyzer error handling
       try {
         await documentAnalyzer.analyzeDocument('', '', {});
         // Should not reach here
@@ -531,7 +531,7 @@ describe('Real System Integration Tests', () => {
               id: 'start',
               type: WorkflowStepType.DOCUMENT_ANALYSIS,
               name: `Workflow ${i}`,
-              config: { index: i }
+              config: { _index: i }
             }
           ]
         });
@@ -553,9 +553,9 @@ describe('Real System Integration Tests', () => {
       expect(activeWorkflows.length).toBeGreaterThanOrEqual(5);
     });
 
-    it('should handle large document analysis efficiently', async () => {
-      // Create a large document text
-      const largeText = 'This is a test document. '.repeat(1000); // ~25KB of text
+    it('should handle large _document analysis efficiently', async () => {
+      // Create a large _document text
+      const largeText = 'This is a test _document. '.repeat(1000); // ~25KB of text
       
       const startTime = Date.now();
       const analysis = await documentAnalyzer.analyzeDocument(

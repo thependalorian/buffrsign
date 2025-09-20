@@ -111,7 +111,7 @@ export default function AdminEmailQueuePage() {
               <div className="flex items-center space-x-3">
                 <div className="badge badge-success">Completed</div>
                 <div className="text-sm">
-                  <p className="font-medium">Document invitation sent to user@example.com</p>
+                  <p className="font-medium">Document invitation sent to _user@example.com</p>
                   <p className="text-base-content/70">2 minutes ago</p>
                 </div>
               </div>

@@ -52,7 +52,7 @@ export const BaseValidationSchemas = {
   ]),
   
   // User role validation
-  userRole: z.enum(['user', 'admin', 'super_admin']),
+  userRole: z.enum(['_user', 'admin', 'super_admin']),
   
   // Workflow status validation
   workflowStatus: z.enum([

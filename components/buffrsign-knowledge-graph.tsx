@@ -14,7 +14,8 @@ import {
   CheckCircle2,
   ZoomIn,
   ZoomOut,
-  Brain
+  Brain,
+  PenTool
 } from 'lucide-react';
 
 interface KnowledgeNode {
@@ -274,6 +275,18 @@ const BuffrSignKnowledgeGraph = () => {
       description: 'Comprehensive legal compliance guidelines for digital signatures'
     },
 
+    // Digital Signature Technology (Center right - new)
+    { 
+      id: 'digital-signature-technology', 
+      label: 'Digital Signature\nTechnology', 
+      type: 'digital-signature', 
+      x: 650, 
+      y: 300, 
+      size: 30,
+      category: 'digital-signature',
+      description: 'Advanced digital signature technology and cryptographic implementation'
+    },
+
     // Regional Documents (Left side - expanded)
     { 
       id: 'fica-requirements', 
@@ -306,6 +319,7 @@ const BuffrSignKnowledgeGraph = () => {
     { from: 'buffrsign-ai', to: 'consumer-protection', strength: 4 },
     { from: 'buffrsign-ai', to: 'digital-signature-best-practices', strength: 4 },
     { from: 'buffrsign-ai', to: 'legal-compliance-guidelines', strength: 4 },
+    { from: 'buffrsign-ai', to: 'digital-signature-technology', strength: 5 },
     
     // ETA 2019 section connections
     { from: 'eta-2019', to: 'section-17', strength: 4 },
@@ -349,6 +363,13 @@ const BuffrSignKnowledgeGraph = () => {
     { from: 'cran-requirements', to: 'legal-compliance-guidelines', strength: 3 },
     { from: 'uncitral-model', to: 'digital-signature-best-practices', strength: 2 },
     
+    // Digital signature technology connections
+    { from: 'digital-signature-technology', to: 'eta-2019', strength: 4 },
+    { from: 'digital-signature-technology', to: 'cran-requirements', strength: 4 },
+    { from: 'digital-signature-technology', to: 'iso-14533', strength: 3 },
+    { from: 'digital-signature-technology', to: 'digital-signature-best-practices', strength: 3 },
+    { from: 'digital-signature-technology', to: 'section-20', strength: 3 },
+    
     // Cross-border and regional connections
     { from: 'cross-border-recognition', to: 'eidas-regulation', strength: 2 },
     { from: 'cross-border-recognition', to: 'uncitral-model', strength: 2 },
@@ -356,14 +377,15 @@ const BuffrSignKnowledgeGraph = () => {
     { from: 'fica-requirements', to: 'cran-requirements', strength: 2 }
   ];
 
-  // Color schemes for different node types
+  // Color schemes for different node types - using design system colors
   const nodeColors: Record<string, string> = {
-    'ai': '#6366f1', // Indigo
-    'legal': '#dc2626', // Red
-    'legal-section': '#ef4444', // Red (lighter)
-    'compliance': '#059669', // Emerald
-    'international': '#7c3aed', // Violet
-    'regional': '#ea580c' // Orange
+    'ai': 'hsl(var(--chart-4))', // AI Purple
+    'legal': 'hsl(var(--chart-5))', // Security Red
+    'legal-section': 'hsl(var(--chart-5))', // Security Red (lighter)
+    'compliance': 'hsl(var(--chart-2))', // Compliance Green
+    'international': 'hsl(var(--chart-4))', // AI Purple
+    'regional': 'hsl(var(--chart-3))', // Warning Orange
+    'digital-signature': 'hsl(var(--chart-1))' // Primary Blue
   };
 
   // Get node icon based on type
@@ -374,7 +396,8 @@ const BuffrSignKnowledgeGraph = () => {
       'legal-section': Scale,
       'compliance': Shield,
       'international': Globe,
-      'regional': MapPin
+      'regional': MapPin,
+      'digital-signature': PenTool
     };
     return iconMap[type] || FileText;
   };
@@ -405,6 +428,7 @@ const BuffrSignKnowledgeGraph = () => {
               <Button
                 variant="outline"
                 size="sm"
+                state="default"
                 onClick={() => {
                   setZoomLevel(0.8);
                   setPanOffset({ x: -50, y: -30 });
@@ -418,17 +442,19 @@ const BuffrSignKnowledgeGraph = () => {
               <Button
                 variant="outline"
                 size="sm"
+                state="default"
                 onClick={() => setZoomLevel(Math.max(0.3, zoomLevel - 0.1))}
                 className="h-8 w-8 p-0"
               >
                 <ZoomOut className="h-4 w-4" />
               </Button>
-              <span className="text-sm text-gray-600 min-w-[60px] text-center">
+              <span className="text-sm text-muted-foreground min-w-[60px] text-center">
                 {Math.round(zoomLevel * 100)}%
               </span>
               <Button
                 variant="outline"
                 size="sm"
+                state="default"
                 onClick={() => setZoomLevel(Math.min(1.5, zoomLevel + 0.1))}
                 className="h-8 w-8 p-0"
               >
@@ -438,7 +464,7 @@ const BuffrSignKnowledgeGraph = () => {
           </div>
 
           {/* Graph Visualization - Compact */}
-          <div className="relative bg-white rounded-lg border border-gray-200 overflow-hidden flex-1 min-h-0">
+          <div className="relative bg-background rounded-lg border border-border overflow-hidden flex-1 min-h-0">
             <svg
               width="100%"
               height="100%"
@@ -549,26 +575,27 @@ const BuffrSignKnowledgeGraph = () => {
                     {React.createElement(getNodeIcon(selectedNode.type), { className: "h-6 w-6" })}
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">{selectedNode.label}</h3>
-                    <p className="text-gray-600 capitalize">{selectedNode.type.replace('-', ' ')}</p>
+                    <h3 className="text-xl font-bold text-foreground">{selectedNode.label}</h3>
+                    <p className="text-muted-foreground capitalize">{selectedNode.type.replace('-', ' ')}</p>
                   </div>
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
+                  state="default"
                   onClick={() => setSelectedNode(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-muted-foreground hover:text-foreground"
                 >
                   ×
                 </Button>
               </div>
               
-              <p className="text-gray-700 mb-4">{selectedNode.description}</p>
+              <p className="text-muted-foreground mb-4">{selectedNode.description}</p>
               
               {selectedNode.sections && (
                 <div className="mb-4">
-                  <h4 className="font-semibold text-gray-900 mb-2">Legal Sections:</h4>
-                  <ul className="list-disc list-inside space-y-1 text-gray-700">
+                  <h4 className="font-semibold text-foreground mb-2">Legal Sections:</h4>
+                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                     {selectedNode.sections.map((section, i) => (
                       <li key={i}>{section}</li>
                     ))}
@@ -579,8 +606,8 @@ const BuffrSignKnowledgeGraph = () => {
 
               {selectedNode.requirements && (
                 <div className="mb-4">
-                  <h4 className="font-semibold text-gray-900 mb-2">Requirements:</h4>
-                  <ul className="list-disc list-inside space-y-1 text-gray-700">
+                  <h4 className="font-semibold text-foreground mb-2">Requirements:</h4>
+                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                     {selectedNode.requirements.map((requirement, i) => (
                       <li key={i}>{requirement}</li>
                     ))}
@@ -590,10 +617,10 @@ const BuffrSignKnowledgeGraph = () => {
 
               {selectedNode.documents && (
                 <div className="mb-4">
-                  <h4 className="font-semibold text-gray-900 mb-2">Legal Documents:</h4>
+                  <h4 className="font-semibold text-foreground mb-2">Legal Documents:</h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedNode.documents.map((document, i) => (
-                      <span key={i} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                      <span key={i} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
                         {document}
                       </span>
                     ))}

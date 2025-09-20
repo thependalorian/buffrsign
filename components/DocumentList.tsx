@@ -1,5 +1,5 @@
 // BuffrSign Platform - Document List Component
-// Displays user documents with AI analysis and status
+// Displays _user documents with AI analysis and status
 
 'use client';
 
@@ -92,7 +92,7 @@ export default function DocumentList({ userId, className = '' }: DocumentListPro
   // ============================================================================
 
   const handleDeleteDocument = async (documentId: string) => {
-    if (!confirm('Are you sure you want to delete this document?')) return;
+    if (!confirm('Are you sure you want to delete this _document?')) return;
 
     try {
       const result = await documentService.deleteDocument(documentId);
@@ -100,10 +100,10 @@ export default function DocumentList({ userId, className = '' }: DocumentListPro
         setDocuments(prev => prev.filter(doc => doc.id !== documentId));
         fetchStats(); // Refresh stats
       } else {
-        alert(result.error || 'Failed to delete document');
+        alert(result.error || 'Failed to delete _document');
       }
     } catch {
-      alert('Failed to delete document');
+      alert('Failed to delete _document');
     }
   };
 
@@ -116,7 +116,7 @@ export default function DocumentList({ userId, className = '' }: DocumentListPro
         alert(result.error || 'Failed to generate download URL');
       }
     } catch {
-      alert('Failed to download document');
+      alert('Failed to download _document');
     }
   };
 
@@ -275,15 +275,15 @@ export default function DocumentList({ userId, className = '' }: DocumentListPro
             <h3 className="text-lg font-medium text-gray-900 mb-2">No documents found</h3>
             <p className="text-gray-600">
               {filter === 'all' 
-                ? 'Upload your first document to get started'
+                ? 'Upload your first _document to get started'
                 : `No documents with status "${filter}" found`
               }
             </p>
           </div>
         ) : (
-          documents.map((document) => (
+          documents.map((_document) => (
             <div
-              key={document.id}
+              key={_document.id}
               className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between">
@@ -297,39 +297,39 @@ export default function DocumentList({ userId, className = '' }: DocumentListPro
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 mb-2">
                       <h3 className="text-lg font-medium text-gray-900 truncate">
-                        {document.title}
+                        {_document.title}
                       </h3>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(document.status || 'unknown')}`}>
-                        {getStatusIcon(document.status || 'unknown')}
-                        <span className="ml-1 capitalize">{document.status || 'Unknown'}</span>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(_document.status || 'unknown')}`}>
+                        {getStatusIcon(_document.status || 'unknown')}
+                        <span className="ml-1 capitalize">{_document.status || 'Unknown'}</span>
                       </span>
                     </div>
 
                     <div className="flex items-center space-x-4 text-sm text-gray-500 mb-3">
-                      <span>{formatFileSize(document.file_size)}</span>
+                      <span>{formatFileSize(_document.file_size)}</span>
                       <span>•</span>
-                      <span>{document.mime_type}</span>
+                      <span>{_document.mime_type}</span>
                       <span>•</span>
-                      <span>{formatDate(document.created_at || '')}</span>
+                      <span>{formatDate(_document.created_at || '')}</span>
                     </div>
 
                     <div className="flex items-center space-x-4 text-sm">
-                      {document.document_type && (
+                      {_document.document_type && (
                         <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
-                          {document.document_type}
+                          {_document.document_type}
                         </span>
                       )}
-                      {document.industry && (
+                      {_document.industry && (
                         <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
-                          {document.industry}
+                          {_document.industry}
                         </span>
                       )}
-                      {document.jurisdiction && (
+                      {_document.jurisdiction && (
                         <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
-                          {document.jurisdiction}
+                          {_document.jurisdiction}
                         </span>
                       )}
-                      {document.is_kyc_document && (
+                      {_document.is_kyc_document && (
                         <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center">
                           <Shield className="w-3 h-3 mr-1" />
                           KYC Document
@@ -338,15 +338,15 @@ export default function DocumentList({ userId, className = '' }: DocumentListPro
                     </div>
 
                     {/* AI Analysis Status */}
-                    {document.ai_analysis_enabled && (
+                    {_document.ai_analysis_enabled && (
                       <div className="mt-3 flex items-center space-x-2">
                         <Brain className="w-4 h-4 text-purple-600" />
                         <span className="text-sm text-gray-600">
-                          AI Analysis: {document.ai_analysis_status || 'Pending'}
+                          AI Analysis: {_document.ai_analysis_status || 'Pending'}
                         </span>
-                        {document.ai_analysis_requests && document.ai_analysis_requests.length > 0 && document.ai_analysis_requests[0].confidence_score && (
+                        {_document.ai_analysis_requests && _document.ai_analysis_requests.length > 0 && _document.ai_analysis_requests[0].confidence_score && (
                           <span className="text-sm text-green-600">
-                            • Score: {Math.round(document.ai_analysis_requests[0].confidence_score * 100)}%
+                            • Score: {Math.round(_document.ai_analysis_requests[0].confidence_score * 100)}%
                           </span>
                         )}
                       </div>
@@ -357,21 +357,21 @@ export default function DocumentList({ userId, className = '' }: DocumentListPro
                 {/* Actions */}
                 <div className="flex items-center space-x-2">
                   <button
-                    onClick={() => handleDownloadDocument(document.id)}
+                    onClick={() => handleDownloadDocument(_document.id)}
                     className="btn btn-ghost btn-sm"
                     title="Download"
                   >
                     <Download className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => window.open(`/protected/documents/${document.id}`, '_blank')}
+                    onClick={() => window.open(`/protected/documents/${_document.id}`, '_blank')}
                     className="btn btn-ghost btn-sm"
                     title="View"
                   >
                     <Eye className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => handleDeleteDocument(document.id)}
+                    onClick={() => handleDeleteDocument(_document.id)}
                     className="btn btn-ghost btn-sm text-red-600 hover:text-red-800"
                     title="Delete"
                   >

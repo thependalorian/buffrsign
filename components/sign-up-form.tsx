@@ -47,7 +47,7 @@ export function SignUpForm({
         last_name: "",
         company_name: "",
         phone: "",
-        role: "user",
+        role: "_user",
       });
       if (error) throw error;
       router.push("/auth/sign-up-success");
@@ -103,7 +103,7 @@ export function SignUpForm({
                   onChange={(e) => setRepeatPassword(e.target.value)}
                 />
               </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              {error && <p className="text-sm text-chart-5">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Creating an account..." : "Sign up"}
               </Button>

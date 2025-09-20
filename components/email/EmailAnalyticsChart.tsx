@@ -8,9 +8,9 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { EmailAnalyticsChartProps } from '@/lib/types/email';
+import { EmailAnalyticsChartProps, EmailAnalytics } from '@/lib/types/email';
 
-export default function EmailAnalyticsChart({ 
+function EmailAnalyticsChart({ 
   data, 
   type, 
   groupBy 
@@ -38,16 +38,16 @@ export default function EmailAnalyticsChart({
     const height = canvas.offsetHeight - margin.top - margin.bottom;
 
     // Get data values based on type
-    const getValue = (item: any) => {
+    const getValue = (item: EmailAnalytics) => {
       switch (type) {
         case 'delivery':
-          return item.deliveryRate || 0;
+          return item.delivery_rate || 0;
         case 'open':
-          return item.openRate || 0;
+          return item.open_rate || 0;
         case 'click':
-          return item.clickRate || 0;
+          return item.click_rate || 0;
         case 'bounce':
-          return item.bounceRate || 0;
+          return item.bounce_rate || 0;
         default:
           return 0;
       }
@@ -164,10 +164,10 @@ export default function EmailAnalyticsChart({
           <h3 className="card-title">Email Analytics</h3>
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="mx-auto h-12 w-12 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
-              <p className="mt-2 text-sm text-gray-500">No data available</p>
+              <p className="mt-2 text-sm text-muted-foreground">No data available</p>
             </div>
           </div>
         </div>
@@ -194,10 +194,10 @@ export default function EmailAnalyticsChart({
             <div className="stat-title">Average</div>
             <div className="stat-value text-primary">
               {Math.round(data.reduce((sum, item) => {
-                const value = type === 'delivery' ? item.deliveryRate :
-                             type === 'open' ? item.openRate :
-                             type === 'click' ? item.clickRate :
-                             item.bounceRate;
+                const value = type === 'delivery' ? item.delivery_rate :
+                             type === 'open' ? item.open_rate :
+                             type === 'click' ? item.click_rate :
+                             item.bounce_rate;
                 return sum + (value || 0);
               }, 0) / data.length)}%
             </div>
@@ -206,10 +206,10 @@ export default function EmailAnalyticsChart({
             <div className="stat-title">Peak</div>
             <div className="stat-value text-secondary">
               {Math.max(...data.map(item => {
-                const value = type === 'delivery' ? item.deliveryRate :
-                             type === 'open' ? item.openRate :
-                             type === 'click' ? item.clickRate :
-                             item.bounceRate;
+                const value = type === 'delivery' ? item.delivery_rate :
+                             type === 'open' ? item.open_rate :
+                             type === 'click' ? item.click_rate :
+                             item.bounce_rate;
                 return value || 0;
               }))}%
             </div>
@@ -218,10 +218,10 @@ export default function EmailAnalyticsChart({
             <div className="stat-title">Lowest</div>
             <div className="stat-value text-accent">
               {Math.min(...data.map(item => {
-                const value = type === 'delivery' ? item.deliveryRate :
-                             type === 'open' ? item.openRate :
-                             type === 'click' ? item.clickRate :
-                             item.bounceRate;
+                const value = type === 'delivery' ? item.delivery_rate :
+                             type === 'open' ? item.open_rate :
+                             type === 'click' ? item.click_rate :
+                             item.bounce_rate;
                 return value || 0;
               }))}%
             </div>
@@ -231,3 +231,6 @@ export default function EmailAnalyticsChart({
     </div>
   );
 }
+
+export { EmailAnalyticsChart };
+export default EmailAnalyticsChart;

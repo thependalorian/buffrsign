@@ -30,7 +30,7 @@ export default function DocumentViewerPage() {
   const documentId = params.id;
   
   const [activeTab, setActiveTab] = useState('view');
-  const [document] = useState({
+  const [_document] = useState({
     id: documentId,
     title: 'Employment Contract - John Doe',
     status: 'pending',
@@ -94,8 +94,8 @@ export default function DocumentViewerPage() {
                 <FileText className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">{document.title}</h1>
-                <p className="text-sm text-gray-600">Document ID: {document.id}</p>
+                <h1 className="text-xl font-semibold text-gray-900">{_document.title}</h1>
+                <p className="text-sm text-gray-600">Document ID: {_document.id}</p>
               </div>
             </div>
             
@@ -165,7 +165,7 @@ export default function DocumentViewerPage() {
                     </div>
 
                     {/* Signature Fields Overlay */}
-                    {document.signatureFields.map((field) => (
+                    {_document.signatureFields.map((field) => (
                       <div
                         key={field.id}
                         className={`absolute border-2 rounded-lg p-2 cursor-pointer transition-all ${
@@ -301,8 +301,8 @@ export default function DocumentViewerPage() {
               <h3 className="text-lg font-semibold mb-4">Participants</h3>
               
               <div className="space-y-3">
-                {document.participants.map((participant, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                {_document.participants.map((participant, _index) => (
+                  <div key={_index} className="flex items-center justify-between p-3 border rounded-lg">
                     <div>
                       <p className="text-sm font-medium">{participant.name}</p>
                       <p className="text-xs text-gray-600">{participant.role}</p>
@@ -328,20 +328,20 @@ export default function DocumentViewerPage() {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Type:</span>
-                  <span className="font-medium">{document.type}</span>
+                  <span className="font-medium">{_document.type}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Created:</span>
-                  <span className="font-medium">{document.created}</span>
+                  <span className="font-medium">{_document.created}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Deadline:</span>
-                  <span className="font-medium">{document.deadline}</span>
+                  <span className="font-medium">{_document.deadline}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Status:</span>
-                  <span className={`badge badge-sm ${getStatusColor(document.status)}`}>
-                    {document.status}
+                  <span className={`badge badge-sm ${getStatusColor(_document.status)}`}>
+                    {_document.status}
                   </span>
                 </div>
               </div>

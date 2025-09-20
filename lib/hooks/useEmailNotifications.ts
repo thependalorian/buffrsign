@@ -20,7 +20,7 @@ export function useEmailNotifications(options: UseEmailNotificationsOptions = {}
   const [notifications, setNotifications] = useState<EmailNotification[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
+  const _supabase = createClient();
 
   /**
    * Fetch email notifications
@@ -39,8 +39,8 @@ export function useEmailNotifications(options: UseEmailNotificationsOptions = {}
         query = query.eq('document_id', options.documentId);
       }
 
-      if (options.emailType) {
-        query = query.eq('email_type', options.emailType);
+      if (options._emailType) {
+        query = query.eq('email_type', options._emailType);
       }
 
       if (options.limit) {
@@ -58,12 +58,12 @@ export function useEmailNotifications(options: UseEmailNotificationsOptions = {}
       }
 
       setNotifications(data || []);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message || 'Failed to fetch email notifications');
     } finally {
       setLoading(false);
     }
-  }, [options.documentId, options.emailType, options.limit, options.offset, supabase]);
+  }, [options.documentId, options._emailType, options.limit, options.offset, supabase]);
 
   /**
    * Send email
@@ -91,7 +91,7 @@ export function useEmailNotifications(options: UseEmailNotificationsOptions = {}
       await fetchNotifications();
 
       return result;
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message || 'Failed to send email');
       return {
         success: false,
@@ -118,7 +118,7 @@ export function useEmailNotifications(options: UseEmailNotificationsOptions = {}
       }
 
       return data;
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message || 'Failed to fetch email statistics');
       return null;
     } finally {
@@ -148,7 +148,7 @@ export function useEmailNotifications(options: UseEmailNotificationsOptions = {}
       await fetchNotifications();
 
       return result.success;
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message || 'Failed to retry email');
       return false;
     } finally {
@@ -178,7 +178,7 @@ export function useEmailNotifications(options: UseEmailNotificationsOptions = {}
       await fetchNotifications();
 
       return result.success;
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message || 'Failed to cancel email');
       return false;
     } finally {
@@ -202,7 +202,7 @@ export function useEmailNotifications(options: UseEmailNotificationsOptions = {}
       }
 
       return data;
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message || 'Failed to fetch notification');
       return null;
     }

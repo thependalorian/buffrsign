@@ -58,7 +58,7 @@ export class WorkflowEngine {
           id: 'document_analysis',
           type: WorkflowNodeType.DOCUMENT_ANALYSIS,
           name: 'Document Analysis',
-          description: 'AI-powered document analysis and compliance checking',
+          description: 'AI-powered _document analysis and compliance checking',
           action: {
             type: WorkflowActionType.ANALYZE_DOCUMENT,
             parameters: { analysis_types: ['compliance_check', 'risk_assessment'] },

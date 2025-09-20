@@ -17,7 +17,7 @@ jest.mock('../lib/database/db-utils', () => ({
 
 describe('PydanticAIAgents', () => {
   let pydanticAIAgents: PydanticAIAgents;
-  let mockSupabase: any;
+  let mockSupabase: unknown;
   let mockGetDocument: jest.MockedFunction<typeof getDocument>;
 
   beforeEach(() => {
@@ -80,7 +80,7 @@ describe('PydanticAIAgents', () => {
   });
 
   describe('Entity Extraction', () => {
-    test('should extract entities from document', async () => {
+    test('should extract entities from _document', async () => {
       const mockResult = {
         entities: [
           { type: 'PERSON', value: 'John Doe', confidence: 0.95 },
@@ -124,7 +124,7 @@ describe('PydanticAIAgents', () => {
   });
 
   describe('Sentiment Analysis', () => {
-    test('should analyze document sentiment', async () => {
+    test('should analyze _document sentiment', async () => {
       const mockResult = {
         sentiment: 'positive',
         confidence: 0.87,
@@ -219,7 +219,7 @@ describe('PydanticAIAgents', () => {
       const mockResult = {
         riskLevel: 'low',
         score: 0.15,
-        factors: ['Valid signature', 'Complete document', 'Verified identity'],
+        factors: ['Valid signature', 'Complete _document', 'Verified identity'],
         recommendations: ['Continue with standard processing']
       };
 
@@ -305,12 +305,12 @@ describe('PydanticAIAgents', () => {
 
       await pydanticAIAgents.saveValidationResults('doc123', mockValidation);
 
-      expect(consoleSpy).toHaveBeenCalledWith('Saving validation results for document:', 'doc123', mockValidation);
+      expect(consoleSpy).toHaveBeenCalledWith('Saving validation results for _document:', 'doc123', mockValidation);
       
       consoleSpy.mockRestore();
     });
 
-    test('should retrieve document metadata', async () => {
+    test('should retrieve _document metadata', async () => {
       const mockDocument = {
         id: 'doc123',
         title: 'Test Document',

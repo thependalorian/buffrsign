@@ -1,6 +1,6 @@
 /**
  * AI Chat API Route
- * Handles general AI interactions for document processing
+ * Handles general AI interactions for _document processing
  * Matches Python backend: /api/v1/ai/chat
  */
 
@@ -11,7 +11,7 @@ import type { UserTier } from '@/lib/ai/ai-types';
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify JWT token and get user information
+    // Verify JWT token and get _user information
     const authResult = await verifyJWT(request);
     if (!authResult.success) {
       return NextResponse.json(
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { user } = authResult;
+    // User authenticated successfully
     const body = await request.json();
     
     const {
@@ -40,10 +40,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate user tier
+    // Validate _user tier
     if (!['standard', 'pro'].includes(userTier)) {
       return NextResponse.json(
-        { error: 'Invalid user tier. Must be "standard" or "pro"' },
+        { error: 'Invalid _user tier. Must be "standard" or "pro"' },
         { status: 400 }
       );
     }
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-  } catch (error) {
+  } catch {
     console.error('AI Chat API Error:', error);
     
     return NextResponse.json(

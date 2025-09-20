@@ -12,21 +12,21 @@ import { EmailAnalyticsRequest, EmailAnalyticsResponse } from '@/lib/types/email
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     // Get authenticated user
-    const supabase = createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const _supabase = createClient();
+    const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user) {
+    if (authError || !_user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    // Check if user is admin
+    // Check if _user is admin
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
-      .eq('id', user.id)
+      .eq('id', _user.id)
       .single();
 
     if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
@@ -103,33 +103,33 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     };
 
     return NextResponse.json(response);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Email analytics API error:', error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
+      { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }
 }
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
+export async function GET(): Promise<NextResponse> {
   try {
     // Get authenticated user
-    const supabase = createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const _supabase = createClient();
+    const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user) {
+    if (authError || !_user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    // Check if user is admin
+    // Check if _user is admin
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
-      .eq('id', user.id)
+      .eq('id', _user.id)
       .single();
 
     if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
@@ -143,7 +143,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get('start_date');
     const endDate = searchParams.get('end_date');
-    const emailType = searchParams.get('email_type');
+    const _emailType = searchParams.get('email_type');
 
     if (!startDate || !endDate) {
       return NextResponse.json(
@@ -160,8 +160,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       .lte('date', endDate)
       .order('date', { ascending: true });
 
-    if (emailType) {
-      query = query.eq('email_type', emailType);
+    if (_emailType) {
+      query = query.eq('email_type', _emailType);
     }
 
     const { data: analytics, error: analyticsError } = await query;
@@ -190,10 +190,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     };
 
     return NextResponse.json(response);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Email analytics API error:', error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
+      { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }

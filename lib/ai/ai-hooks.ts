@@ -154,10 +154,10 @@ export function useCompleteDocumentAnalysis(documentId: string) {
       if (result.success && result.analysis) {
         setAnalysis(result.analysis);
       } else {
-        setError(result.error || 'Complete document analysis failed');
+        setError(result.error || 'Complete _document analysis failed');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Complete document analysis failed');
+      setError(err instanceof Error ? err.message : 'Complete _document analysis failed');
     } finally {
       setLoading(false);
     }

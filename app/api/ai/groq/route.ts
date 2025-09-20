@@ -1,6 +1,6 @@
 /**
  * Groq LLM API Route
- * Handles AI requests with user tier-based model selection
+ * Handles AI requests with _user tier-based model selection
  * Integrated with existing BuffrSign AI services
  */
 
@@ -11,7 +11,7 @@ import type { UserTier } from '@/lib/ai/ai-types';
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify JWT token and get user information
+    // Verify JWT token and get _user information
     const authResult = await verifyJWT(request);
     if (!authResult.success) {
       return NextResponse.json(
@@ -20,20 +20,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { user } = authResult;
+    // User authenticated successfully
     const body = await request.json();
     
     const {
       messages,
       userTier,
-      options = {},
+      options = {} as Record<string, unknown>,
       type = 'chat' // 'chat', 'analyze', 'explain', 'compliance'
     } = body;
 
-    // Validate user tier
+    // Validate _user tier
     if (!userTier || !['standard', 'pro'].includes(userTier)) {
       return NextResponse.json(
-        { error: 'Invalid user tier. Must be "standard" or "pro"' },
+        { error: 'Invalid _user tier. Must be "standard" or "pro"' },
         { status: 400 }
       );
     }
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
       model: aiIntegration.getGroqModelInfo(userTier as UserTier).model
     });
 
-  } catch (error) {
+  } catch {
     console.error('Groq API Error:', error);
     
     return NextResponse.json(
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Verify JWT token
     const authResult = await verifyJWT(request);
@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
 
     if (!userTier || !['standard', 'pro'].includes(userTier)) {
       return NextResponse.json(
-        { error: 'Invalid user tier. Must be "standard" or "pro"' },
+        { error: 'Invalid _user tier. Must be "standard" or "pro"' },
         { status: 400 }
       );
     }
@@ -158,7 +158,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-  } catch (error) {
+  } catch {
     console.error('Groq API Error:', error);
     
     return NextResponse.json(

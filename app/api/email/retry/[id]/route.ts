@@ -15,10 +15,10 @@ export async function POST(
 ): Promise<NextResponse> {
   try {
     // Get authenticated user
-    const supabase = createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const _supabase = createClient();
+    const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user) {
+    if (authError || !_user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -48,15 +48,15 @@ export async function POST(
       );
     }
 
-    // Check if user has permission to retry this email
+    // Check if _user has permission to retry this email
     if (notification.document_id) {
-      const { data: document } = await supabase
+      const { data: _document } = await supabase
         .from('documents')
         .select('created_by')
         .eq('id', notification.document_id)
         .single();
 
-      if (!document || document.created_by !== user.id) {
+      if (!_document || _document.created_by !== _user.id) {
         return NextResponse.json(
           { error: 'Insufficient permissions' },
           { status: 403 }
@@ -131,10 +131,10 @@ export async function POST(
       success: true,
       messageId: result.messageId,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Email retry API error:', error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
+      { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }

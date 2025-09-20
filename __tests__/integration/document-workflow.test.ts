@@ -1,10 +1,10 @@
 /**
  * Integration Tests for Document Workflow
- * Tests the complete document processing pipeline
+ * Tests the complete _document processing pipeline
  */
 
-import { DocumentService } from '../../lib/services/document-service'
-import { DocumentAnalyzer } from '../../lib/services/document-analyzer'
+import { DocumentService } from '../../lib/services/_document-service'
+import { DocumentAnalyzer } from '../../lib/services/_document-analyzer'
 import { WorkflowEngine } from '../../lib/services/workflow-engine'
 import { WorkflowNodeType, WorkflowActionType } from '../../lib/ai-types'
 
@@ -28,7 +28,7 @@ jest.mock('../../lib/supabase', () => ({
             data: {
               id: 'doc-123',
               title: 'Test Document',
-              file_path: 'documents/user-123/test.pdf',
+              file_path: 'documents/_user-123/test.pdf',
               status: 'uploaded',
               is_kyc_document: false,
               kyc_document_type: null
@@ -43,7 +43,7 @@ jest.mock('../../lib/supabase', () => ({
             data: {
               id: 'doc-123',
               title: 'Test Document',
-              file_path: 'documents/user-123/test.pdf',
+              file_path: 'documents/_user-123/test.pdf',
               status: 'uploaded'
             },
             error: null
@@ -105,24 +105,24 @@ describe('Document Workflow Integration', () => {
   })
 
   describe('Complete Document Processing Pipeline', () => {
-    it('should process document from upload to analysis', async () => {
+    it('should process _document from upload to analysis', async () => {
       // Step 1: Upload document
       const mockFile = new File(['test contract content'], 'contract.pdf', { 
         type: 'application/pdf' 
       })
       
-      const uploadResult = await documentService.uploadDocument('user-123', {
+      const uploadResult = await documentService.uploadDocument('_user-123', {
         file: mockFile,
         title: 'Test Contract'
       })
       
       expect(uploadResult.success).toBe(true)
-      expect(uploadResult.document).toBeDefined()
+      expect(uploadResult._document).toBeDefined()
       
       // Step 2: Analyze document
       const analysisResult = await documentAnalyzer.analyzeDocument(
         'test contract content', // documentText
-        uploadResult.document!.id, // documentId
+        uploadResult._document!.id, // documentId
         { analysisTypes: ['document_classification', 'field_extraction', 'compliance_check'] }
       )
       
@@ -130,13 +130,13 @@ describe('Document Workflow Integration', () => {
       expect(analysisResult.document_type).toBeDefined()
       expect(analysisResult.compliance_status).toBeDefined()
       
-      // Step 3: Create workflow for document processing
+      // Step 3: Create workflow for _document processing
       const workflowNodes = [
         {
           id: 'start',
           type: WorkflowNodeType.START,
           name: 'Start Processing',
-          description: 'Initialize document processing',
+          description: 'Initialize _document processing',
           action: {
             type: WorkflowActionType.UPDATE_STATUS,
             parameters: { status: 'processing' },
@@ -149,11 +149,11 @@ describe('Document Workflow Integration', () => {
           id: 'analyze',
           type: WorkflowNodeType.DOCUMENT_ANALYSIS,
           name: 'Analyze Document',
-          description: 'Perform document analysis',
+          description: 'Perform _document analysis',
           action: {
             type: WorkflowActionType.ANALYZE_DOCUMENT,
             parameters: { 
-              document_id: uploadResult.document!.id,
+              document_id: uploadResult._document!.id,
               analysis_types: ['compliance_check', 'risk_assessment']
             },
             async: true
@@ -165,7 +165,7 @@ describe('Document Workflow Integration', () => {
           id: 'complete',
           type: WorkflowNodeType.COMPLETION,
           name: 'Complete Processing',
-          description: 'Finalize document processing',
+          description: 'Finalize _document processing',
           action: {
             type: WorkflowActionType.UPDATE_STATUS,
             parameters: { status: 'completed' },
@@ -193,9 +193,9 @@ describe('Document Workflow Integration', () => {
       expect(workflowStatus?.status).toBe('completed')
     })
 
-    it('should handle document processing errors gracefully', async () => {
+    it('should handle _document processing errors gracefully', async () => {
       // Test with no file
-      const uploadResult = await documentService.uploadDocument('user-123', {
+      const uploadResult = await documentService.uploadDocument('_user-123', {
         file: null,
         title: 'Invalid Document'
       })
@@ -204,7 +204,7 @@ describe('Document Workflow Integration', () => {
       expect(uploadResult.error).toBe('No file provided')
     })
 
-    it('should validate document before processing', async () => {
+    it('should validate _document before processing', async () => {
       const mockFile = new File(['x'.repeat(11 * 1024 * 1024)], 'large.pdf', { 
         type: 'application/pdf' 
       })
@@ -221,7 +221,7 @@ describe('Document Workflow Integration', () => {
         type: 'image/jpeg' 
       })
       
-      const uploadResult = await documentService.uploadDocument('user-123', {
+      const uploadResult = await documentService.uploadDocument('_user-123', {
         file: kycFile,
         title: 'Namibian ID',
         documentType: 'kyc_document',
@@ -230,13 +230,13 @@ describe('Document Workflow Integration', () => {
       })
       
       expect(uploadResult.success).toBe(true)
-      expect(uploadResult.document).toBeDefined()
+      expect(uploadResult._document).toBeDefined()
       // Note: The mock returns is_kyc_document: false, but in real implementation it would be true
       
       // Analyze KYC document
       const analysisResult = await documentAnalyzer.analyzeDocument(
         'namibian id content', // documentText
-        uploadResult.document!.id, // documentId
+        uploadResult._document!.id, // documentId
         { analysisTypes: ['field_extraction', 'compliance_check'] }
       )
       
@@ -251,7 +251,7 @@ describe('Document Workflow Integration', () => {
         type: 'application/pdf' 
       })
       
-      const uploadResult = await documentService.uploadDocument('user-123', {
+      const uploadResult = await documentService.uploadDocument('_user-123', {
         file: electronicDoc,
         title: 'Electronic Contract'
       })
@@ -260,7 +260,7 @@ describe('Document Workflow Integration', () => {
       
       const analysisResult = await documentAnalyzer.analyzeDocument(
         'electronic contract', // documentText
-        uploadResult.document!.id, // documentId
+        uploadResult._document!.id, // documentId
         { analysisTypes: ['compliance_check'] }
       )
       
@@ -306,7 +306,7 @@ describe('Document Workflow Integration', () => {
     })
 
     it('should handle analysis failures gracefully', async () => {
-      // Test error handling for failed document analysis
+      // Test error handling for failed _document analysis
       const mockFile = new File(['test'], 'test.pdf', { type: 'application/pdf' })
       
       // Mock a failed analysis

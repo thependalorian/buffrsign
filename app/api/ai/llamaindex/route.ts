@@ -1,6 +1,6 @@
 /**
  * LlamaIndex API Route
- * Handles LlamaIndex document intelligence operations
+ * Handles LlamaIndex _document intelligence operations
  * Matches Python backend: /api/v1/ai/llamaindex
  */
 
@@ -10,7 +10,7 @@ import { verifyJWT } from '@/lib/middleware/jwt-middleware';
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify JWT token and get user information
+    // Verify JWT token and get _user information
     const authResult = await verifyJWT(request);
     if (!authResult.success) {
       return NextResponse.json(
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { user } = authResult;
+    const { _user } = authResult;
     const body = await request.json();
     
     const {
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error) {
+  } catch {
     console.error('LlamaIndex API Error:', error);
     
     return NextResponse.json(

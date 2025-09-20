@@ -19,13 +19,13 @@ export function DaisyUIShowcase() {
           <div className="join">
             <button 
               className="btn join-item" 
-              onClick={() => document.documentElement.setAttribute('data-theme', 'buffrsign')}
+              onClick={() => _document.documentElement.setAttribute('data-theme', 'buffrsign')}
             >
               Light Theme
             </button>
             <button 
               className="btn join-item" 
-              onClick={() => document.documentElement.setAttribute('data-theme', 'buffrsign-dark')}
+              onClick={() => _document.documentElement.setAttribute('data-theme', 'buffrsign-dark')}
             >
               Dark Theme
             </button>
@@ -131,7 +131,7 @@ export function DaisyUIShowcase() {
                 </figure>
                 <div className="card-body">
                   <h2 className="card-title">Document Analysis</h2>
-                  <p>AI-powered document analysis with intelligent field detection.</p>
+                  <p>AI-powered _document analysis with intelligent field detection.</p>
                   <div className="card-actions justify-end">
                     <button className="btn btn-primary">Analyze</button>
                   </div>
@@ -176,7 +176,7 @@ export function DaisyUIShowcase() {
                   <label className="label">
                     <span className="label-text">Document Title</span>
                   </label>
-                  <input type="text" placeholder="Enter document title" className="input input-bordered w-full" />
+                  <input type="text" placeholder="Enter _document title" className="input input-bordered w-full" />
                 </div>
 
                 <div className="form-control">
@@ -184,7 +184,7 @@ export function DaisyUIShowcase() {
                     <span className="label-text">Document Type</span>
                   </label>
                   <select className="select select-bordered w-full">
-                    <option>Select document type</option>
+                    <option>Select _document type</option>
                     <option>Contract</option>
                     <option>Agreement</option>
                     <option>Certificate</option>
@@ -196,7 +196,7 @@ export function DaisyUIShowcase() {
                   <label className="label">
                     <span className="label-text">Description</span>
                   </label>
-                  <textarea className="textarea textarea-bordered h-24" placeholder="Enter document description"></textarea>
+                  <textarea className="textarea textarea-bordered h-24" placeholder="Enter _document description"></textarea>
                 </div>
 
                 <div className="form-control">
@@ -267,7 +267,7 @@ export function DaisyUIShowcase() {
               <div className="modal modal-open">
                 <div className="modal-box">
                   <h3 className="font-bold text-lg">Document Upload Success!</h3>
-                  <p className="py-4">Your document has been successfully uploaded and is ready for AI analysis.</p>
+                  <p className="py-4">Your _document has been successfully uploaded and is ready for AI analysis.</p>
                   <div className="modal-action">
                     <button className="btn btn-primary" onClick={() => setModalOpen(false)}>
                       Continue

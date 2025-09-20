@@ -30,7 +30,7 @@ export default function SignatureCollectionPage() {
   const documentId = params.id;
   
   const [signatureMethod, setSignatureMethod] = useState('draw');
-  const [signatureData, setSignatureData] = useState('');
+  const [_signatureData, setSignatureData] = useState('');
   const [isSigning, setIsSigning] = useState(false);
   const [currentField, setCurrentField] = useState(0);
   
@@ -60,7 +60,7 @@ export default function SignatureCollectionPage() {
 
   useEffect(() => {
     // Initialize signature canvas
-    const canvas = document.getElementById('signature-canvas') as HTMLCanvasElement;
+    const canvas = _document.getElementById('signature-canvas') as HTMLCanvasElement;
     if (canvas) {
       setSignatureCanvas(canvas);
       const ctx = canvas.getContext('2d');
@@ -159,10 +159,10 @@ export default function SignatureCollectionPage() {
       // Simulate signature processing
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Update document state
+      // Update _document state
       const updatedFields = [...documentData.signatureFields];
       updatedFields[currentField].signed = true;
-      // Note: In a real app, this would update the document state
+      // Note: In a real app, this would update the _document state
       // setDocumentData({ ...documentData, signatureFields: updatedFields });
       
       // Move to next field or complete
@@ -175,8 +175,8 @@ export default function SignatureCollectionPage() {
         router.push(`/protected/documents/${documentId}`);
       }
     } catch (error) {
-      console.error('Error signing document:', error);
-      alert('Error signing document. Please try again.');
+      console.error('Error signing _document:', error);
+      alert('Error signing _document. Please try again.');
     } finally {
       setIsSigning(false);
     }
@@ -230,22 +230,22 @@ export default function SignatureCollectionPage() {
               <h3 className="text-lg font-semibold mb-4">Signature Progress</h3>
               
               <div className="space-y-3">
-                {documentData.signatureFields.map((field, index) => (
+                {documentData.signatureFields.map((field, _index) => (
                   <div 
                     key={field.id}
                     className={`flex items-center justify-between p-3 rounded-lg border ${
-                      index === currentField ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                      _index === currentField ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
                     }`}
                   >
                     <div className="flex items-center space-x-3">
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
                         field.signed ? 'bg-green-500 text-white' : 
-                        index === currentField ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                        _index === currentField ? 'bg-blue-500 text-white' : 'bg-gray-200'
                       }`}>
                         {field.signed ? (
                           <CheckCircle className="w-4 h-4" />
                         ) : (
-                          <span className="text-xs font-medium">{index + 1}</span>
+                          <span className="text-xs font-medium">{_index + 1}</span>
                         )}
                       </div>
                       <div>
@@ -478,7 +478,7 @@ export default function SignatureCollectionPage() {
                 <div className="text-center text-gray-500">
                   <FileText className="w-16 h-16 mx-auto mb-4 text-gray-400" />
                   <p className="text-sm">Document preview will be displayed here</p>
-                  <p className="text-xs text-gray-400">Click &quot;Preview&quot; button to view full document</p>
+                  <p className="text-xs text-gray-400">Click &quot;Preview&quot; button to view full _document</p>
                 </div>
               </div>
             </div>
@@ -487,7 +487,7 @@ export default function SignatureCollectionPage() {
             <div className="bg-blue-50 rounded-lg p-4">
               <h4 className="font-medium text-blue-800 mb-2">Need Help?</h4>
               <p className="text-sm text-blue-700 mb-3">
-                If you have any questions about signing this document, please contact support.
+                If you have any questions about signing this _document, please contact support.
               </p>
               <button className="btn btn-outline btn-sm text-blue-700 border-blue-300">
                 Contact Support

@@ -10,7 +10,7 @@ import type { UserTier } from '@/lib/ai/ai-types';
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify JWT token and get user information
+    // Verify JWT token and get _user information
     const authResult = await verifyJWT(request);
     if (!authResult.success) {
       return new Response(
@@ -30,10 +30,10 @@ export async function POST(request: NextRequest) {
       options = {}
     } = body;
 
-    // Validate user tier
+    // Validate _user tier
     if (!userTier || !['standard', 'pro'].includes(userTier)) {
       return new Response(
-        JSON.stringify({ error: 'Invalid user tier. Must be "standard" or "pro"' }),
+        JSON.stringify({ error: 'Invalid _user tier. Must be "standard" or "pro"' }),
         { 
           status: 400,
           headers: { 'Content-Type': 'application/json' }

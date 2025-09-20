@@ -1,8 +1,13 @@
 /**
- * AWS SES Email Provider
+ * SendGrid Email Provider (Replacing AWS SES)
  * 
- * Implementation of AWS SES email service for BuffrSign.
- * Handles sending emails through AWS SES API with webhook support.
+ * Implementation of SendGrid email service for BuffrSign.
+ * Handles sending emails through SendGrid API with webhook support.
+ * 
+ * Note: This replaces AWS SES to align with our actual infrastructure:
+ * - Database: Supabase (PostgreSQL)
+ * - Email: SendGrid
+ * - Knowledge Graph: Neo4j
  */
 
 import { 
@@ -16,37 +21,41 @@ import {
 export class SESProvider {
   private config: SESConfig;
   private isInitialized = false;
-  private ses: any; // AWS SES SDK instance
+  private sendGridApiKey: string;
 
   constructor(config: SESConfig) {
     this.config = config;
+    this.sendGridApiKey = config.apiKey || '';
     this.initialize();
   }
 
   private async initialize(): Promise<void> {
-    if (!this.config.apiKey || !this.config.secretAccessKey || !this.config.region) {
-      throw new Error('AWS SES configuration is incomplete');
+    if (!this.sendGridApiKey) {
+      throw new Error('SendGrid API key is required');
     }
 
     try {
-      // Dynamically import AWS SDK
-      const AWS = await import('aws-sdk');
-      
-      this.ses = new AWS.SES({
-        region: this.config.region,
-        accessKeyId: this.config.apiKey,
-        secretAccessKey: this.config.secretAccessKey,
+      // Test SendGrid connection
+      const response = await fetch('https://api.sendgrid.com/v3/_user/account', {
+        headers: {
+          'Authorization': `Bearer ${this.sendGridApiKey}`,
+          'Content-Type': 'application/json'
+        }
       });
+
+      if (!response.ok) {
+        throw new Error(`SendGrid API test failed: ${response.status}`);
+      }
 
       this.isInitialized = true;
     } catch (error) {
-      console.error('Failed to initialize AWS SES:', error);
-      throw new Error('Failed to initialize AWS SES provider');
+      console.error('Failed to initialize SendGrid:', error);
+      throw new Error('Failed to initialize SendGrid provider');
     }
   }
 
   /**
-   * Send email through AWS SES
+   * Send email through SendGrid
    */
   async sendEmail(emailData: EmailQueueData): Promise<EmailSendResult> {
     if (!this.isInitialized) {
@@ -54,69 +63,75 @@ export class SESProvider {
     }
 
     try {
-      const params = {
-        Source: `${this.config.fromName} <${this.config.fromEmail}>`,
-        Destination: {
-          ToAddresses: [emailData.to],
-        },
-        Message: {
-          Subject: {
-            Data: emailData.subject,
-            Charset: 'UTF-8',
-          },
-          Body: {
-            ...(emailData.html_content && {
-              Html: {
-                Data: emailData.html_content,
-                Charset: 'UTF-8',
-              },
-            }),
-            ...(emailData.text_content && {
-              Text: {
-                Data: emailData.text_content,
-                Charset: 'UTF-8',
-              },
-            }),
-          },
-        },
-        ReplyToAddresses: [this.config.replyTo || this.config.fromEmail],
-        Tags: [
+      const emailPayload = {
+        personalizations: [
           {
-            Name: 'document_id',
-            Value: emailData.document_id || '',
-          },
-          {
-            Name: 'email_type',
-            Value: emailData.email_type,
-          },
-          {
-            Name: 'recipient_id',
-            Value: emailData.recipient_id || '',
+            to: [{ email: emailData.to }],
+            subject: emailData.subject,
+            custom_args: {
+              document_id: emailData.document_id || '',
+              email_type: emailData.email_type,
+              recipient_id: emailData.recipient_id || '',
+            },
           },
         ],
-        ConfigurationSetName: 'buffrsign-config', // Optional: use SES configuration set
+        from: {
+          email: this.config.fromEmail,
+          name: this.config.fromName,
+        },
+        reply_to: {
+          email: this.config.replyTo || this.config.fromEmail,
+        },
+        content: [
+          ...(emailData.html_content ? [{
+            type: 'text/html',
+            value: emailData.html_content,
+          }] : []),
+          ...(emailData.text_content ? [{
+            type: 'text/plain',
+            value: emailData.text_content,
+          }] : []),
+        ],
+        tracking_settings: {
+          click_tracking: { enable: true },
+          open_tracking: { enable: true },
+        },
       };
 
-      const result = await this.ses.sendEmail(params).promise();
+      const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.sendGridApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(emailPayload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`SendGrid API error: ${response.status} - ${errorData}`);
+      }
+
+      const messageId = response.headers.get('X-Message-Id') || `sg-${Date.now()}`;
 
       return {
         success: true,
-        messageId: result.MessageId,
-        provider: 'ses' as EmailProvider,
+        messageId,
+        provider: 'sendgrid' as EmailProvider,
       };
-    } catch (error: any) {
-      console.error('AWS SES send error:', error);
+    } catch (error: unknown) {
+      console.error('SendGrid send error:', error);
       
       return {
         success: false,
-        error: error.message || 'Failed to send email via AWS SES',
-        provider: 'ses' as EmailProvider,
+        error: error.message || 'Failed to send email via SendGrid',
+        provider: 'sendgrid' as EmailProvider,
       };
     }
   }
 
   /**
-   * Send email using SES template
+   * Send email using SendGrid template
    */
   async sendTemplateEmail(
     to: string,
@@ -129,89 +144,111 @@ export class SESProvider {
     }
 
     try {
-      const params = {
-        Source: `${this.config.fromName} <${this.config.fromEmail}>`,
-        Destination: {
-          ToAddresses: [to],
+      const emailPayload = {
+        personalizations: [
+          {
+            to: [{ email: to }],
+            dynamic_template_data: templateData,
+            custom_args: customArgs || {},
+          },
+        ],
+        from: {
+          email: this.config.fromEmail,
+          name: this.config.fromName,
         },
-        Template: templateName,
-        TemplateData: JSON.stringify(templateData),
-        ReplyToAddresses: [this.config.replyTo || this.config.fromEmail],
-        Tags: Object.entries(customArgs || {}).map(([name, value]) => ({
-          Name: name,
-          Value: value,
-        })),
+        reply_to: {
+          email: this.config.replyTo || this.config.fromEmail,
+        },
+        template_id: templateName,
+        tracking_settings: {
+          click_tracking: { enable: true },
+          open_tracking: { enable: true },
+        },
       };
 
-      const result = await this.ses.sendTemplatedEmail(params).promise();
+      const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.sendGridApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(emailPayload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`SendGrid template API error: ${response.status} - ${errorData}`);
+      }
+
+      const messageId = response.headers.get('X-Message-Id') || `sg-${Date.now()}`;
 
       return {
         success: true,
-        messageId: result.MessageId,
-        provider: 'ses' as EmailProvider,
+        messageId,
+        provider: 'sendgrid' as EmailProvider,
       };
-    } catch (error: any) {
-      console.error('AWS SES template send error:', error);
+    } catch (error: unknown) {
+      console.error('SendGrid template send error:', error);
       
       return {
         success: false,
-        error: error.message || 'Failed to send template email via AWS SES',
-        provider: 'ses' as EmailProvider,
+        error: error.message || 'Failed to send template email via SendGrid',
+        provider: 'sendgrid' as EmailProvider,
       };
     }
   }
 
   /**
-   * Verify webhook signature (SES uses SNS for webhooks)
+   * Verify SendGrid webhook signature
    */
-  verifyWebhookSignature(
+  async verifyWebhookSignature(
     payload: string,
     signature: string,
     timestamp: string
-  ): boolean {
+  ): Promise<boolean> {
     if (!this.config.webhookSecret) {
-      console.warn('AWS SES webhook secret not configured');
+      console.warn('SendGrid webhook secret not configured');
       return false;
     }
 
     try {
-      const crypto = require('crypto');
+      const crypto = await import('crypto');
       const expectedSignature = crypto
         .createHmac('sha256', this.config.webhookSecret)
-        .update(timestamp + payload)
+        .update(payload)
         .digest('base64');
 
       return signature === expectedSignature;
     } catch (error) {
-      console.error('AWS SES webhook verification error:', error);
+      console.error('SendGrid webhook verification error:', error);
       return false;
     }
   }
 
   /**
-   * Parse SES webhook event (from SNS)
+   * Parse SendGrid webhook event
    */
-  parseWebhookEvent(event: any): EmailWebhookEvent | null {
+  parseWebhookEvent(event: unknown): EmailWebhookEvent | null {
     try {
-      // SES events come through SNS
-      if (event.Type === 'Notification') {
-        const message = JSON.parse(event.Message);
+      // SendGrid webhook events are arrays of events
+      if (Array.isArray(event) && event.length > 0) {
+        const webhookEvent = event[0];
         
         return {
-          event: message.eventType,
-          timestamp: new Date(message.mail.timestamp).getTime(),
-          messageId: message.mail.messageId,
-          email: message.mail.destination?.[0],
-          reason: message.bounce?.bounceType || message.complaint?.complaintFeedbackType,
-          url: message.click?.link,
-          userAgent: message.open?.userAgent,
-          ip: message.open?.ipAddress,
+          event: webhookEvent.event,
+          timestamp: new Date(webhookEvent.timestamp * 1000).getTime(),
+          messageId: webhookEvent.sg_message_id,
+          email: webhookEvent.email,
+          reason: webhookEvent.reason || webhookEvent.type,
+          url: webhookEvent.url,
+          userAgent: webhookEvent.useragent,
+          ip: webhookEvent.ip,
         };
       }
 
       return null;
     } catch (error) {
-      console.error('AWS SES webhook parsing error:', error);
+      console.error('SendGrid webhook parsing error:', error);
       return null;
     }
   }
@@ -235,7 +272,7 @@ export class SESProvider {
   }
 
   /**
-   * Test provider connection
+   * Test SendGrid connection
    */
   async testConnection(): Promise<boolean> {
     try {
@@ -243,17 +280,23 @@ export class SESProvider {
         await this.initialize();
       }
 
-      // Test connection by getting sending quota
-      const result = await this.ses.getSendQuota().promise();
-      return result !== null;
+      // Test connection by getting account info
+      const response = await fetch('https://api.sendgrid.com/v3/_user/account', {
+        headers: {
+          'Authorization': `Bearer ${this.sendGridApiKey}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return response.ok;
     } catch (error) {
-      console.error('AWS SES connection test failed:', error);
+      console.error('SendGrid connection test failed:', error);
       return false;
     }
   }
 
   /**
-   * Get delivery statistics
+   * Get delivery statistics from SendGrid
    */
   async getDeliveryStats(startDate: string, endDate: string): Promise<any> {
     try {
@@ -261,23 +304,36 @@ export class SESProvider {
         await this.initialize();
       }
 
-      // Get sending statistics
-      const result = await this.ses.getSendStatistics().promise();
+      const response = await fetch(
+        `https://api.sendgrid.com/v3/stats?start_date=${startDate}&end_date=${endDate}&aggregated_by=day`,
+        {
+          headers: {
+            'Authorization': `Bearer ${this.sendGridApiKey}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`SendGrid stats API error: ${response.status}`);
+      }
+
+      const stats = await response.json();
       
       return {
-        delivered: result.SendDataPoints?.reduce((sum: number, point: any) => sum + point.DeliveryAttempts, 0) || 0,
-        bounced: result.SendDataPoints?.reduce((sum: number, point: any) => sum + point.Bounces, 0) || 0,
-        complaints: result.SendDataPoints?.reduce((sum: number, point: any) => sum + point.Complaints, 0) || 0,
-        rejected: result.SendDataPoints?.reduce((sum: number, point: any) => sum + point.Rejects, 0) || 0,
+        delivered: stats.reduce((sum: number, day: unknown) => sum + (day.stats[0]?.metrics?.delivered || 0), 0),
+        bounced: stats.reduce((sum: number, day: unknown) => sum + (day.stats[0]?.metrics?.bounces || 0), 0),
+        complaints: stats.reduce((sum: number, day: unknown) => sum + (day.stats[0]?.metrics?.spam_reports || 0), 0),
+        rejected: stats.reduce((sum: number, day: unknown) => sum + (day.stats[0]?.metrics?.blocks || 0), 0),
       };
     } catch (error) {
-      console.error('AWS SES stats error:', error);
+      console.error('SendGrid stats error:', error);
       throw error;
     }
   }
 
   /**
-   * Get sending quota
+   * Get sending quota from SendGrid
    */
   async getSendingQuota(): Promise<any> {
     try {
@@ -285,15 +341,26 @@ export class SESProvider {
         await this.initialize();
       }
 
-      return await this.ses.getSendQuota().promise();
+      const response = await fetch('https://api.sendgrid.com/v3/_user/credits', {
+        headers: {
+          'Authorization': `Bearer ${this.sendGridApiKey}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`SendGrid quota API error: ${response.status}`);
+      }
+
+      return await response.json();
     } catch (error) {
-      console.error('AWS SES quota error:', error);
+      console.error('SendGrid quota error:', error);
       throw error;
     }
   }
 
   /**
-   * Verify email address
+   * Verify email address with SendGrid
    */
   async verifyEmailAddress(email: string): Promise<boolean> {
     try {
@@ -301,16 +368,29 @@ export class SESProvider {
         await this.initialize();
       }
 
-      await this.ses.verifyEmailIdentity({ EmailAddress: email }).promise();
-      return true;
+      const response = await fetch('https://api.sendgrid.com/v3/validations/email', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.sendGridApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        return false;
+      }
+
+      const result = await response.json();
+      return result.result?.verdict === 'Valid';
     } catch (error) {
-      console.error('AWS SES email verification error:', error);
+      console.error('SendGrid email verification error:', error);
       return false;
     }
   }
 
   /**
-   * List verified email addresses
+   * List verified email addresses from SendGrid
    */
   async listVerifiedEmails(): Promise<string[]> {
     try {
@@ -318,10 +398,21 @@ export class SESProvider {
         await this.initialize();
       }
 
-      const result = await this.ses.listVerifiedEmailAddresses().promise();
-      return result.VerifiedEmailAddresses || [];
+      const response = await fetch('https://api.sendgrid.com/v3/verified_senders', {
+        headers: {
+          'Authorization': `Bearer ${this.sendGridApiKey}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`SendGrid verified senders API error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      return result.results?.map((sender: unknown) => sender.from_email) || [];
     } catch (error) {
-      console.error('AWS SES list verified emails error:', error);
+      console.error('SendGrid list verified emails error:', error);
       throw error;
     }
   }

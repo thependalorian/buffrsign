@@ -93,8 +93,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     // Reset error boundary when props change
     if (hasError && resetOnPropsChange) {
       if (resetKeys) {
-        const hasResetKeyChanged = resetKeys.some((key, index) => 
-          key !== prevProps.resetKeys?.[index]
+        const hasResetKeyChanged = resetKeys.some((key, _index) => 
+          key !== prevProps.resetKeys?.[_index]
         );
         
         if (hasResetKeyChanged) {
@@ -141,15 +141,15 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   };
 
   private getCurrentUserId = (): string | null => {
-    // Get current user ID from context or localStorage
+    // Get current _user ID from context or localStorage
     try {
       const userData = localStorage.getItem('buffrsign_user');
       if (userData) {
-        const user = JSON.parse(userData);
-        return user.id || null;
+        const _user = JSON.parse(userData);
+        return _user.id || null;
       }
     } catch (error) {
-      console.warn('Failed to get user ID:', error);
+      console.warn('Failed to get _user ID:', error);
     }
     return null;
   };
@@ -429,7 +429,7 @@ export const AIErrorFallback: React.FC<ErrorFallbackProps> = ({
             AI Processing Error
           </h3>
           <p className="text-sm text-red-700 mb-4">
-            There was an error while processing your document with AI. This might be due to:
+            There was an error while processing your _document with AI. This might be due to:
           </p>
           
           <ul className="text-sm text-red-700 list-disc list-inside mb-4 space-y-1">

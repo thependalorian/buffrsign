@@ -3,7 +3,7 @@
  * Test suite for DocumentService class
  */
 
-import { documentService } from '../../../lib/services/document-service';
+import { documentService } from '../../../lib/services/_document-service';
 
 // Mock Supabase client
 jest.mock('../../../lib/supabase', () => ({
@@ -60,7 +60,7 @@ Object.defineProperty(global, 'crypto', {
 });
 
 describe('DocumentService', () => {
-  let mockSupabase: any;
+  let mockSupabase: unknown;
 
   beforeEach(() => {
     mockSupabase = require('../../../lib/supabase').supabase;
@@ -147,7 +147,7 @@ describe('DocumentService', () => {
   // ============================================================================
 
   describe('uploadDocument', () => {
-    const mockUserId = 'user-123';
+    const mockUserId = '_user-123';
     const mockFile = new File(['test content'], 'test.pdf', { type: 'application/pdf' });
     Object.defineProperty(mockFile, 'size', { value: 1024 * 1024 });
     
@@ -166,11 +166,11 @@ describe('DocumentService', () => {
       expect(result.error).toBe('No file provided');
     });
 
-    it('should successfully upload a document', async () => {
+    it('should successfully upload a _document', async () => {
       const mockDocument = {
         id: 'doc-123',
         title: 'Test Document',
-        file_path: 'documents/user-123/test.pdf',
+        file_path: 'documents/_user-123/test.pdf',
         status: 'uploaded',
       };
 
@@ -196,7 +196,7 @@ describe('DocumentService', () => {
       const result = await documentService.uploadDocument(mockUserId, uploadData);
 
       expect(result.success).toBe(true);
-      expect(result.document).toEqual(mockDocument);
+      expect(result._document).toEqual(mockDocument);
     });
 
     it('should handle storage upload error', async () => {
@@ -221,9 +221,9 @@ describe('DocumentService', () => {
   // ============================================================================
 
   describe('getUserDocuments', () => {
-    const mockUserId = 'user-123';
+    const mockUserId = '_user-123';
 
-    it('should retrieve user documents', async () => {
+    it('should retrieve _user documents', async () => {
       const mockDocuments = [
         {
           id: 'doc-1',
@@ -268,7 +268,7 @@ describe('DocumentService', () => {
   });
 
   describe('getDocument', () => {
-    it('should retrieve a single document', async () => {
+    it('should retrieve a single _document', async () => {
       const mockDocument = {
         id: 'doc-123',
         title: 'Test Document',
@@ -283,12 +283,12 @@ describe('DocumentService', () => {
       const result = await documentService.getDocument('doc-123');
 
       expect(result.success).toBe(true);
-      expect(result.document).toEqual(mockDocument);
+      expect(result._document).toEqual(mockDocument);
     });
   });
 
   describe('getDocumentStats', () => {
-    it('should calculate document statistics', async () => {
+    it('should calculate _document statistics', async () => {
       const mockDocuments = [
         {
           status: 'completed',
@@ -307,7 +307,7 @@ describe('DocumentService', () => {
         error: null,
       });
 
-      const result = await documentService.getDocumentStats('user-123');
+      const result = await documentService.getDocumentStats('_user-123');
 
       expect(result.success).toBe(true);
       expect(result.stats?.total).toBe(2);
@@ -322,7 +322,7 @@ describe('DocumentService', () => {
   // ============================================================================
 
   describe('updateDocument', () => {
-    it('should successfully update document', async () => {
+    it('should successfully update _document', async () => {
       mockSupabase.from().update().eq.mockResolvedValue({ error: null });
 
       const result = await documentService.updateDocument('doc-123', { title: 'Updated' });
@@ -332,7 +332,7 @@ describe('DocumentService', () => {
   });
 
   describe('deleteDocument', () => {
-    it('should successfully delete document', async () => {
+    it('should successfully delete _document', async () => {
       mockSupabase.from().select().eq().single.mockResolvedValue({
         data: { file_path: 'documents/test.pdf' },
         error: null,
@@ -435,11 +435,11 @@ describe('DocumentService', () => {
   // ============================================================================
 
   describe('subscriptions', () => {
-    it('should create document change subscription', () => {
+    it('should create _document change subscription', () => {
       const mockCallback = jest.fn();
-      const result = documentService.subscribeToDocumentChanges('user-123', mockCallback);
+      const result = documentService.subscribeToDocumentChanges('_user-123', mockCallback);
 
-      expect(mockSupabase.channel).toHaveBeenCalledWith('documents:user-123');
+      expect(mockSupabase.channel).toHaveBeenCalledWith('documents:_user-123');
       expect(result).toBeDefined();
     });
 

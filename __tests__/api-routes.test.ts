@@ -79,7 +79,7 @@ describe('API Routes', () => {
   });
 
   describe('Field Extraction API Route', () => {
-    test('should extract document fields successfully', async () => {
+    test('should extract _document fields successfully', async () => {
       const mockResult = {
         fields: {
           name: 'John Doe',
@@ -299,7 +299,7 @@ describe('API Routes', () => {
   });
 
   describe('Workflow API Routes', () => {
-    test('should execute document processing workflow', async () => {
+    test('should execute _document processing workflow', async () => {
       const mockResult = {
         workflowId: 'wf123',
         status: 'completed',
@@ -308,7 +308,7 @@ describe('API Routes', () => {
 
       mockAIIntegration.executeDocumentProcessingWorkflow.mockResolvedValue(mockResult);
 
-      const request = new NextRequest('http://localhost:3000/api/ai/workflows/document-processing', {
+      const request = new NextRequest('http://localhost:3000/api/ai/workflows/_document-processing', {
         method: 'POST',
         body: JSON.stringify({ documentId: 'doc123' })
       });
@@ -339,7 +339,7 @@ describe('API Routes', () => {
       const request = new NextRequest('http://localhost:3000/api/ai/workflows/kyc', {
         method: 'POST',
         body: JSON.stringify({
-          userId: 'user123',
+          userId: '_user123',
           documentId: 'doc123'
         })
       });
@@ -355,7 +355,7 @@ describe('API Routes', () => {
 
       expect(response.status).toBe(200);
       expect(data).toEqual(mockResult);
-      expect(mockAIIntegration.executeKYCWorkflow).toHaveBeenCalledWith('user123', 'doc123');
+      expect(mockAIIntegration.executeKYCWorkflow).toHaveBeenCalledWith('_user123', 'doc123');
     });
   });
 

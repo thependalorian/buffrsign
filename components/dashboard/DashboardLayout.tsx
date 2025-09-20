@@ -37,7 +37,7 @@ export default function DashboardLayout({
   showBreadcrumbs = true,
   breadcrumbs = []
 }: DashboardLayoutProps) {
-  const { user, loading } = useAuth();
+  const { _user, loading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -84,12 +84,12 @@ export default function DashboardLayout({
   // USER NOT AUTHENTICATED
   // ============================================================================
 
-  if (!user) {
+  if (!_user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
-          <p className="text-gray-600">Please sign in to access the dashboard.</p>
+          <p className="text-muted-foreground">Please sign in to access the dashboard.</p>
         </div>
       </div>
     );
@@ -114,20 +114,20 @@ export default function DashboardLayout({
         <MobileSidebar
           isOpen={sidebarOpen}
           onClose={closeSidebar}
-          user={user}
+          _user={_user}
         />
       )}
 
       {/* Desktop Sidebar */}
       {!isMobile && (
-        <Sidebar user={user} />
+        <Sidebar _user={_user} />
       )}
 
       {/* Main Content Area */}
       <div className={`${!isMobile ? 'lg:ml-64' : ''} transition-all duration-300`}>
         {/* Top Navigation */}
         <TopNavigation
-          user={user}
+          _user={_user}
           onMenuClick={toggleSidebar}
           showMobileMenu={isMobile}
         />
@@ -154,8 +154,8 @@ export default function DashboardLayout({
           {showBreadcrumbs && breadcrumbs.length > 0 && (
             <div className="text-sm breadcrumbs mb-6">
               <ul>
-                {breadcrumbs.map((crumb, index) => (
-                  <li key={index}>
+                {breadcrumbs.map((crumb, _index) => (
+                  <li key={_index}>
                     {crumb.href && !crumb.active ? (
                       <a href={crumb.href} className="text-primary hover:text-primary-focus">
                         {crumb.label}
@@ -307,8 +307,8 @@ interface DashboardStatsProps {
 export function DashboardStats({ stats, className = '' }: DashboardStatsProps) {
   return (
     <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ${className}`}>
-      {stats.map((stat, index) => (
-        <DashboardCard key={index} className="text-center">
+      {stats.map((stat, _index) => (
+        <DashboardCard key={_index} className="text-center">
           {/* Icon */}
           {stat.icon && (
             <div className="flex justify-center mb-2">

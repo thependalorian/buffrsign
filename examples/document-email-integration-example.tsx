@@ -2,7 +2,7 @@
  * Document Email Integration Example
  * 
  * Complete example showing how to integrate email notifications
- * with document workflows in BuffrSign
+ * with _document workflows in BuffrSign
  */
 
 import React, { useState, useEffect } from 'react';
@@ -37,7 +37,7 @@ export const DocumentCreationExample: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create document');
+        throw new Error('Failed to create _document');
       }
 
       const result = await response.json();
@@ -61,8 +61,8 @@ export const DocumentCreationExample: React.FC = () => {
 
       alert('Document created and email notifications sent!');
     } catch (error) {
-      console.error('Error creating document:', error);
-      alert('Failed to create document');
+      console.error('Error creating _document:', error);
+      alert('Failed to create _document');
     } finally {
       setLoading(false);
     }
@@ -75,19 +75,19 @@ export const DocumentCreationExample: React.FC = () => {
     }));
   };
 
-  const updateRecipient = (index: number, field: string, value: string) => {
+  const updateRecipient = (_index: number, field: string, value: string) => {
     setDocumentData(prev => ({
       ...prev,
       recipients: prev.recipients.map((r, i) => 
-        i === index ? { ...r, [field]: value } : r
+        i === _index ? { ...r, [field]: value } : r
       )
     }));
   };
 
-  const removeRecipient = (index: number) => {
+  const removeRecipient = (_index: number) => {
     setDocumentData(prev => ({
       ...prev,
-      recipients: prev.recipients.filter((_, i) => i !== index)
+      recipients: prev.recipients.filter((_, i) => i !== _index)
     }));
   };
 
@@ -108,7 +108,7 @@ export const DocumentCreationExample: React.FC = () => {
               className="input input-bordered"
               value={documentData.title}
               onChange={(e) => setDocumentData(prev => ({ ...prev, title: e.target.value }))}
-              placeholder="Enter document title"
+              placeholder="Enter _document title"
             />
           </div>
 
@@ -120,7 +120,7 @@ export const DocumentCreationExample: React.FC = () => {
               className="textarea textarea-bordered"
               value={documentData.description}
               onChange={(e) => setDocumentData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="Enter document description"
+              placeholder="Enter _document description"
               rows={3}
             />
           </div>
@@ -136,26 +136,26 @@ export const DocumentCreationExample: React.FC = () => {
               Add Recipient
             </button>
             
-            {documentData.recipients.map((recipient, index) => (
-              <div key={index} className="flex gap-2 mb-2">
+            {documentData.recipients.map((recipient, _index) => (
+              <div key={_index} className="flex gap-2 mb-2">
                 <input
                   type="text"
                   className="input input-bordered input-sm flex-1"
                   placeholder="Name"
                   value={recipient.name}
-                  onChange={(e) => updateRecipient(index, 'name', e.target.value)}
+                  onChange={(e) => updateRecipient(_index, 'name', e.target.value)}
                 />
                 <input
                   type="email"
                   className="input input-bordered input-sm flex-1"
                   placeholder="Email"
                   value={recipient.email}
-                  onChange={(e) => updateRecipient(index, 'email', e.target.value)}
+                  onChange={(e) => updateRecipient(_index, 'email', e.target.value)}
                 />
                 <select
                   className="select select-bordered select-sm"
                   value={recipient.role}
-                  onChange={(e) => updateRecipient(index, 'role', e.target.value)}
+                  onChange={(e) => updateRecipient(_index, 'role', e.target.value)}
                 >
                   <option value="signer">Signer</option>
                   <option value="witness">Witness</option>
@@ -163,7 +163,7 @@ export const DocumentCreationExample: React.FC = () => {
                   <option value="viewer">Viewer</option>
                 </select>
                 <button
-                  onClick={() => removeRecipient(index)}
+                  onClick={() => removeRecipient(_index)}
                   className="btn btn-error btn-sm"
                 >
                   Remove

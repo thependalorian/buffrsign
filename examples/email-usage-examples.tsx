@@ -24,7 +24,7 @@ export const BasicEmailServiceExample: React.FC = () => {
     try {
       const response = await emailService.sendDocumentInvitation({
         documentId: 'doc-123',
-        recipientEmail: 'user@example.com',
+        recipientEmail: '_user@example.com',
         recipientName: 'John Doe',
         documentTitle: 'Contract Agreement',
         senderName: 'Jane Smith',
@@ -45,7 +45,7 @@ export const BasicEmailServiceExample: React.FC = () => {
     try {
       const response = await emailService.sendSignatureReminder({
         documentId: 'doc-123',
-        recipientEmail: 'user@example.com',
+        recipientEmail: '_user@example.com',
         recipientName: 'John Doe',
         documentTitle: 'Contract Agreement',
         daysRemaining: 3
@@ -64,7 +64,7 @@ export const BasicEmailServiceExample: React.FC = () => {
     try {
       const response = await emailService.sendDocumentCompleted({
         documentId: 'doc-123',
-        recipientEmail: 'user@example.com',
+        recipientEmail: '_user@example.com',
         recipientName: 'John Doe',
         documentTitle: 'Contract Agreement',
         completedAt: new Date()
@@ -246,7 +246,7 @@ export const EmailNotificationsHookExample: React.FC<{ documentId: string }> = (
                   ...prev,
                   recipientEmail: e.target.value
                 }))}
-                placeholder="user@example.com"
+                placeholder="_user@example.com"
               />
             </div>
             <div className="form-control">
@@ -275,7 +275,7 @@ export const EmailNotificationsHookExample: React.FC<{ documentId: string }> = (
                   ...prev,
                   customMessage: e.target.value
                 }))}
-                placeholder="Please review and sign this document..."
+                placeholder="Please review and sign this _document..."
               />
             </div>
           </div>
@@ -307,7 +307,7 @@ export const EmailNotificationsHookExample: React.FC<{ documentId: string }> = (
                   ...prev,
                   recipientEmail: e.target.value
                 }))}
-                placeholder="user@example.com"
+                placeholder="_user@example.com"
               />
             </div>
             <div className="form-control">
@@ -777,7 +777,7 @@ export const TemplateManagementExample: React.FC = () => {
     document_title: 'Sample Contract',
     sender_name: 'Jane Smith',
     expires_at: '2024-12-31',
-    custom_message: 'Please review and sign this document.'
+    custom_message: 'Please review and sign this _document.'
   });
 
   return (

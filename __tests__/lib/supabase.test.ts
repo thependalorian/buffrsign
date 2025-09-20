@@ -32,27 +32,27 @@ describe('Supabase Auth Functions', () => {
   });
 
   describe('signIn', () => {
-    it('should sign in user successfully', async () => {
+    it('should sign in _user successfully', async () => {
       const mockUser = {
-        id: 'user-123',
+        id: '_user-123',
         email: 'test@example.com'
       };
       const mockSession = {
         access_token: 'token-123',
-        user: mockUser
+        _user: mockUser
       };
 
        const { supabase } = require('../../lib/supabase');
        supabase.auth.signInWithPassword.mockResolvedValue({
-        data: { user: mockUser, session: mockSession },
+        data: { _user: mockUser, session: mockSession },
         error: null
       });
 
        // Mock profile query
        supabase.from().select().eq().single.mockResolvedValue({
         data: {
-          id: 'user-123',
-          role: 'user',
+          id: '_user-123',
+          role: '_user',
           first_name: 'John',
           last_name: 'Doe',
           company_name: 'Test Company'
@@ -62,10 +62,10 @@ describe('Supabase Auth Functions', () => {
 
       // Mock the actual signIn function
       signIn.mockResolvedValue({
-        user: {
-          id: 'user-123',
+        _user: {
+          id: '_user-123',
           email: 'test@example.com',
-          role: 'user',
+          role: '_user',
           plan: 'free',
           first_name: 'John',
           last_name: 'Doe',
@@ -76,33 +76,33 @@ describe('Supabase Auth Functions', () => {
 
       const result = await signIn('test@example.com', 'password');
 
-      expect(result.user).toBeDefined();
-      expect(result.user.email).toBe('test@example.com');
+      expect(result._user).toBeDefined();
+      expect(result._user.email).toBe('test@example.com');
       expect(result.session).toBeDefined();
       expect(result.error).toBeUndefined();
     });
 
     it('should handle sign in errors', async () => {
       signIn.mockResolvedValue({
-        user: null,
+        _user: null,
         session: null,
         error: 'Invalid credentials'
       });
 
       const result = await signIn('test@example.com', 'wrongpassword');
 
-      expect(result.user).toBeNull();
+      expect(result._user).toBeNull();
       expect(result.session).toBeNull();
       expect(result.error).toBe('Invalid credentials');
     });
   });
 
   describe('signUp', () => {
-    it('should sign up user successfully', async () => {
+    it('should sign up _user successfully', async () => {
       const mockUser = {
-        id: 'user-123',
+        id: '_user-123',
         email: 'test@example.com',
-        role: 'user',
+        role: '_user',
         plan: 'free',
         first_name: 'John',
         last_name: 'Doe',
@@ -110,7 +110,7 @@ describe('Supabase Auth Functions', () => {
       };
 
       signUp.mockResolvedValue({
-        user: mockUser,
+        _user: mockUser,
         session: null
       });
 
@@ -120,13 +120,13 @@ describe('Supabase Auth Functions', () => {
         company: 'Test Company'
       });
 
-      expect(result.user).toEqual(mockUser);
+      expect(result._user).toEqual(mockUser);
       expect(result.error).toBeUndefined();
     });
 
     it('should handle sign up errors', async () => {
       signUp.mockResolvedValue({
-        user: null,
+        _user: null,
         session: null,
         error: 'Email already registered'
       });
@@ -136,13 +136,13 @@ describe('Supabase Auth Functions', () => {
         last_name: 'Doe'
       });
 
-      expect(result.user).toBeNull();
+      expect(result._user).toBeNull();
       expect(result.error).toBe('Email already registered');
     });
   });
 
   describe('signOut', () => {
-    it('should sign out user successfully', async () => {
+    it('should sign out _user successfully', async () => {
       signOut.mockResolvedValue({});
 
       const result = await signOut();
@@ -165,31 +165,31 @@ describe('Supabase Auth Functions', () => {
     it('should get current session successfully', async () => {
       const mockSession = {
         access_token: 'token-123',
-        user: { id: 'user-123', email: 'test@example.com' }
+        _user: { id: '_user-123', email: 'test@example.com' }
       };
 
       getCurrentSession.mockResolvedValue({
         session: mockSession,
-        user: { id: 'user-123', email: 'test@example.com', role: 'user', plan: 'free' }
+        _user: { id: '_user-123', email: 'test@example.com', role: '_user', plan: 'free' }
       });
 
       const result = await getCurrentSession();
 
       expect(result.session).toEqual(mockSession);
-      expect(result.user).toBeDefined();
+      expect(result._user).toBeDefined();
       expect(result.error).toBeUndefined();
     });
 
     it('should handle no current session', async () => {
       getCurrentSession.mockResolvedValue({
         session: null,
-        user: null
+        _user: null
       });
 
       const result = await getCurrentSession();
 
       expect(result.session).toBeNull();
-      expect(result.user).toBeNull();
+      expect(result._user).toBeNull();
       expect(result.error).toBeUndefined();
     });
   });

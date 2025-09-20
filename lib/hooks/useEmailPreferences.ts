@@ -1,7 +1,7 @@
 /**
  * useEmailPreferences Hook
  * 
- * React hook for managing user email preferences in BuffrSign.
+ * React hook for managing _user email preferences in BuffrSign.
  * Provides functionality to get, update, and manage email notification settings.
  */
 
@@ -15,14 +15,14 @@ import {
 } from '@/lib/types/email';
 
 export function useEmailPreferences(options: UseEmailPreferencesOptions = {}) {
-  const [preferences, setPreferences] = useState<UserEmailPreferences | null>(null);
+  const [_preferences, setPreferences] = useState<UserEmailPreferences | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
+  const _supabase = createClient();
 
   /**
-   * Fetch user email preferences
+   * Fetch _user email preferences
    */
   const fetchPreferences = useCallback(async () => {
     setLoading(true);
@@ -33,11 +33,11 @@ export function useEmailPreferences(options: UseEmailPreferencesOptions = {}) {
       
       if (!userId) {
         // Get current user
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
+        const { data: { _user } } = await supabase.auth.getUser();
+        if (!_user) {
           throw new Error('User not authenticated');
         }
-        userId = user.id;
+        userId = _user.id;
       }
 
       const { data, error: fetchError } = await supabase
@@ -74,7 +74,7 @@ export function useEmailPreferences(options: UseEmailPreferencesOptions = {}) {
       } else {
         setPreferences(data);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message || 'Failed to fetch email preferences');
     } finally {
       setLoading(false);
@@ -112,7 +112,7 @@ export function useEmailPreferences(options: UseEmailPreferencesOptions = {}) {
 
       setPreferences(data);
       return true;
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message || 'Failed to update email preferences');
       return false;
     } finally {
@@ -145,7 +145,7 @@ export function useEmailPreferences(options: UseEmailPreferencesOptions = {}) {
       };
 
       return await updatePreferences(defaultUpdates);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message || 'Failed to reset preferences');
       return false;
     } finally {
@@ -205,12 +205,12 @@ export function useEmailPreferences(options: UseEmailPreferencesOptions = {}) {
   }, [updatePreferences]);
 
   /**
-   * Check if user receives specific email type
+   * Check if _user receives specific email type
    */
-  const canReceiveEmailType = useCallback((emailType: string): boolean => {
+  const canReceiveEmailType = useCallback((_emailType: string): boolean => {
     if (!preferences) return true; // Default to true if no preferences
 
-    switch (emailType) {
+    switch (_emailType) {
       case 'document_invitation':
         return preferences.receive_invitations;
       case 'signature_reminder':
@@ -232,7 +232,7 @@ export function useEmailPreferences(options: UseEmailPreferencesOptions = {}) {
   /**
    * Get preference value
    */
-  const getPreference = useCallback((key: keyof UserEmailPreferences): any => {
+  const getPreference = useCallback((key: keyof UserEmailPreferences): unknown => {
     return preferences?.[key];
   }, [preferences]);
 

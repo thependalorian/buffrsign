@@ -15,20 +15,20 @@ type Workflow = {
   name: string;
   status: 'Draft' | 'In Progress' | 'Completed' | 'Archived';
   created_at: string;
-  // In a real app, you might join to get the document title
+  // In a real app, you might join to get the _document title
   document_title: string; 
 };
 
 export default function WorkflowsPage() {
-  const supabase = createClient()
-  const [user, setUser] = useState<User | null>(null)
+  const _supabase = createClient()
+  const [_user, setUser] = useState<User | null>(null)
   const [workflows, setWorkflows] = useState<Workflow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const fetchWorkflows = useCallback(async (userId: string) => {
     // NOTE: This assumes a 'workflows' table exists.
-    // In a real implementation, you would also fetch related document info.
+    // In a real implementation, you would also fetch related _document info.
     const { data, error } = await supabase
       .from('workflows')
       .select(`id, name, status, created_at, document_title`)
@@ -52,10 +52,10 @@ export default function WorkflowsPage() {
 
   useEffect(() => {
     const initialize = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        setUser(user)
-        await fetchWorkflows(user.id)
+      const { data: { _user } } = await supabase.auth.getUser()
+      if (_user) {
+        setUser(_user)
+        await fetchWorkflows(_user.id)
       } else {
         setLoading(false)
         setError('You must be logged in to view workflows.')
@@ -84,7 +84,7 @@ export default function WorkflowsPage() {
         <div>
           <CardTitle>Workflow Management</CardTitle>
           <CardDescription>
-            Create, monitor, and manage your document signing workflows.
+            Create, monitor, and manage your _document signing workflows.
           </CardDescription>
         </div>
         <Button>

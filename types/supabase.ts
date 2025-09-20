@@ -393,7 +393,7 @@ export type Database = {
         | "auto_rejected"
         | "completed"
         | "failed"
-      user_role: "user" | "admin" | "super_admin"
+      user_role: "_user" | "admin" | "super_admin"
     }
     CompositeTypes: {
       [_ in never]: never

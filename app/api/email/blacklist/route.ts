@@ -7,17 +7,17 @@ const addToBlacklistSchema = z.object({
   reason: z.enum(['Bounced email', 'Spam complaint', 'Manual addition', 'Invalid email'])
 });
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const supabase = createClient();
+    const _supabase = createClient();
     const { searchParams } = new URL(request.url);
     
     const limit = parseInt(searchParams.get('limit') || '100');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    // Check if user is authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    // Check if _user is authenticated
+    const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !_user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
         total: blacklistItems?.length || 0
       }
     });
-  } catch (error) {
+  } catch {
     console.error('Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -73,15 +73,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const _supabase = createClient();
     const body = await request.json();
 
     // Validate request body
     const validatedData = addToBlacklistSchema.parse(body);
 
-    // Check if user is authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    // Check if _user is authenticated
+    const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !_user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
       .insert({
         email_address: validatedData.email_address,
         reason: validatedData.reason,
-        created_by: user.id
+        created_by: _user.id
       })
       .select()
       .single();
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
       success: true,
       blacklistItem
     }, { status: 201 });
-  } catch (error) {
+  } catch {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation error', details: error.errors },

@@ -1,5 +1,5 @@
 // BuffrSign Platform - Sidebar Navigation Component
-// Provides navigation menu with role-based access control and user profile
+// Provides navigation menu with role-based access control and _user profile
 
 'use client';
 
@@ -14,7 +14,7 @@ import { UserRole } from '../../lib/types';
 // ============================================================================
 
 interface SidebarProps {
-  user: UserProfile;
+  _user: UserProfile;
 }
 
 // ============================================================================
@@ -35,7 +35,7 @@ interface NavItem {
 // SIDEBAR COMPONENT
 // ============================================================================
 
-export default function Sidebar({ user }: SidebarProps) {
+export default function Sidebar({ _user }: SidebarProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
@@ -190,7 +190,7 @@ export default function Sidebar({ user }: SidebarProps) {
     },
 
     // Admin Section (Role-based)
-    ...(user.role === 'admin' || user.role === 'super_admin' ? [{
+    ...(_user.role === 'admin' || _user.role === 'super_admin' ? [{
       label: 'Admin',
       href: '/protected/admin',
       icon: (
@@ -220,7 +220,7 @@ export default function Sidebar({ user }: SidebarProps) {
           )
         },
         // Super Admin only features
-        ...(user.role === 'super_admin' ? [
+        ...(_user.role === 'super_admin' ? [
           {
             label: 'Admin Management',
             href: '/protected/admin/admins',
@@ -292,7 +292,7 @@ export default function Sidebar({ user }: SidebarProps) {
   };
 
   const canAccess = (item: NavItem): boolean => {
-    if (item.roles && !item.roles.includes(user.role as UserRole)) {
+    if (item.roles && !item.roles.includes(_user.role as UserRole)) {
       return false;
     }
     return true;
@@ -373,20 +373,20 @@ export default function Sidebar({ user }: SidebarProps) {
           <div className="avatar placeholder">
             <div className="bg-primary text-primary-content rounded-full w-10">
               <span className="text-sm font-medium">
-                {user.first_name?.[0]}{user.last_name?.[0]}
+                {_user.first_name?.[0]}{_user.last_name?.[0]}
               </span>
             </div>
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-base-content truncate">
-              {user.first_name} {user.last_name}
+              {_user.first_name} {_user.last_name}
             </p>
             <p className="text-xs text-base-content/70 truncate">
-              {user.email}
+              {_user.email}
             </p>
             <div className="flex items-center mt-1">
               <span className="badge badge-sm badge-outline">
-                {user.role}
+                {_user.role}
               </span>
             </div>
           </div>

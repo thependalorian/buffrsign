@@ -1,7 +1,7 @@
 /**
  * Document Email Integration API Routes
  * 
- * Handles email notifications for document lifecycle events
+ * Handles email notifications for _document lifecycle events
  * GET /api/documents/[id]/email - Get email notifications for a document
  * POST /api/documents/[id]/email - Send email notifications for a document
  */
@@ -61,10 +61,10 @@ export async function GET(
       notifications: notifications || []
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Document email GET error:', error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
+      { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }
@@ -90,21 +90,21 @@ export async function POST(
       );
     }
 
-    // Verify user has access to the document
-    const { data: document, error: docError } = await supabase
+    // Verify _user has access to the document
+    const { data: _document, error: docError } = await supabase
       .from('documents')
       .select('id, owner_id, title')
       .eq('id', documentId)
       .single();
 
-    if (docError || !document) {
+    if (docError || !_document) {
       return NextResponse.json(
         { error: 'Document not found' },
         { status: 404 }
       );
     }
 
-    if (document.owner_id !== user.id) {
+    if (_document.owner_id !== _user.id) {
       return NextResponse.json(
         { error: 'Access denied' },
         { status: 403 }
@@ -185,10 +185,10 @@ export async function POST(
       result
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Document email POST error:', error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
+      { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }

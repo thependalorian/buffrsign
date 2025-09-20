@@ -37,7 +37,7 @@ interface UsageStats {
 }
 
 export default function UsageStatisticsPage() {
-  const { user, getSupabaseClient } = useAuth();
+  const { _user, getSupabaseClient } = useAuth();
   const [usageStats, setUsageStats] = useState<UsageStats>({
     totalDocuments: 0,
     signedDocuments: 0,
@@ -50,18 +50,18 @@ export default function UsageStatisticsPage() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchUsageStats = useCallback(async () => {
-    if (!user?.id) return;
+    if (!_user?.id) return;
     
     try {
       setLoading(true);
       setError(null);
 
-      // Fetch document statistics
-      const supabase = getSupabaseClient();
+      // Fetch _document statistics
+      const _supabase = getSupabaseClient();
       const { data: documents, error: documentsError } = await supabase
         .from('documents')
         .select('status, created_at, updated_at')
-        .eq('created_by', user.id);
+        .eq('created_by', _user.id);
 
       if (documentsError) {
         throw documentsError;
@@ -71,7 +71,7 @@ export default function UsageStatisticsPage() {
       const { data: signatures, error: signaturesError } = await supabase
         .from('signatures')
         .select('id, created_at')
-        .eq('signer_id', user.id);
+        .eq('signer_id', _user.id);
 
       if (signaturesError) {
         throw signaturesError;
@@ -104,13 +104,13 @@ export default function UsageStatisticsPage() {
     } finally {
       setLoading(false);
     }
-  }, [user?.id, getSupabaseClient]);
+  }, [_user?.id, getSupabaseClient]);
 
   useEffect(() => {
-    if (user) {
+    if (_user) {
       fetchUsageStats();
     }
-  }, [user, fetchUsageStats]);
+  }, [_user, fetchUsageStats]);
 
 
   const monthlyStats = [
@@ -168,7 +168,7 @@ export default function UsageStatisticsPage() {
           Usage Statistics
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Track your document signing activity and performance
+          Track your _document signing activity and performance
         </p>
       </div>
 

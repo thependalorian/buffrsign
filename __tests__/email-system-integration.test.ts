@@ -15,7 +15,7 @@ process.env.FROM_EMAIL = 'test@buffrsign.ai';
 process.env.NEXT_PUBLIC_APP_URL = 'https://test.buffrsign.ai';
 
 describe('Email System Integration', () => {
-  let supabase: any;
+  let supabase: unknown;
 
   beforeAll(() => {
     // Initialize Supabase client for testing

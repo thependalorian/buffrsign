@@ -9,7 +9,7 @@ import { BuffrSignAIIntegration } from '@/lib/ai/ai-integration';
 import { verifyJWT } from '@/lib/middleware/jwt-middleware';
 import type { UserTier } from '@/lib/ai/ai-types';
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     // Verify JWT token and get user information
     const authResult = await verifyJWT(request);
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { user } = authResult;
+    // User authenticated successfully
     const body = await request.json();
     
     const {
@@ -51,11 +51,52 @@ export async function POST(request: NextRequest) {
     
     // If document_content is provided, use Groq for analysis
     if (document_content) {
-      const response = await aiIntegration.analyzeDocumentWithGroq({
-        documentContent: document_content,
-        userTier: userTier as UserTier,
-        analysisType: analysis_type === 'comprehensive' ? 'comprehensive' : 'basic',
-        context: context.analysis_context
+      try {
+        const response = await aiIntegration.analyzeDocumentWithGroq({
+          documentContent: document_content,
+          userTier: userTier as UserTier,
+          analysisType: analysis_type === 'comprehensive' ? 'comprehensive' : 'basic',
+          context: context.analysis_context
+        });
+
+        if (!response.success) {
+          return NextResponse.json(
+            { error: response.error || 'Document analysis failed' },
+            { status: 500 }
+          );
+        }
+
+        const modelInfo = aiIntegration.getGroqModelInfo(userTier as UserTier);
+        return NextResponse.json({
+          success: true,
+          data: {
+            document_id,
+            analysis_type,
+            user_tier: userTier,
+            model: modelInfo?.model || 'unknown',
+            analysis_result: response.data?.content || 'No analysis result',
+            usage: response.data?.usage,
+            timestamp: new Date().toISOString()
+          }
+        }) as NextResponse;
+      } catch (groqError) {
+        console.error('Groq analysis error:', groqError);
+        return NextResponse.json(
+          { error: 'Groq analysis failed', message: groqError instanceof Error ? groqError.message : 'Unknown error' },
+          { status: 500 }
+        );
+      }
+    }
+
+    // If only document_id is provided, use LlamaIndex for analysis
+    try {
+      const response = await aiIntegration.processDocument(document_id, {
+        enableAnalysis: true,
+        enableCompliance: true,
+        enableRiskAssessment: analysis_type === 'comprehensive',
+        enableWorkflow: false,
+        enableOCR: false,
+        enableComputerVision: false
       });
 
       if (!response.success) {
@@ -71,43 +112,19 @@ export async function POST(request: NextRequest) {
           document_id,
           analysis_type,
           user_tier: userTier,
-          model: aiIntegration.getGroqModelInfo(userTier as UserTier).model,
-          analysis_result: response.data?.content || 'No analysis result',
-          usage: response.data?.usage,
+          analysis_result: response.results,
           timestamp: new Date().toISOString()
         }
-      });
-    }
-
-    // If only document_id is provided, use LlamaIndex for analysis
-    const response = await aiIntegration.processDocument(document_id, {
-      enableAnalysis: true,
-      enableCompliance: true,
-      enableRiskAssessment: analysis_type === 'comprehensive',
-      enableWorkflow: false,
-      enableOCR: false,
-      enableComputerVision: false
-    });
-
-    if (!response.success) {
+      }) as NextResponse;
+    } catch (llamaindexError) {
+      console.error('LlamaIndex analysis error:', llamaindexError);
       return NextResponse.json(
-        { error: response.error || 'Document analysis failed' },
+        { error: 'LlamaIndex analysis failed', message: llamaindexError instanceof Error ? llamaindexError.message : 'Unknown error' },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        document_id,
-        analysis_type,
-        user_tier: userTier,
-        analysis_result: response.results,
-        timestamp: new Date().toISOString()
-      }
-    });
-
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('AI Analyze API Error:', error);
     
     return NextResponse.json(

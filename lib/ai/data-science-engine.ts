@@ -1,5 +1,5 @@
 // BuffrSign Platform - Data Science Engine
-// Machine learning patterns and analytics for document intelligence
+// Machine learning patterns and analytics for _document intelligence
 
 'use client';
 
@@ -95,14 +95,14 @@ export class DataScienceEngine {
   // ============================================================================
 
   /**
-   * Classify document type using ML
+   * Classify _document type using ML
    */
   async classifyDocument(
     documentId: string,
-    modelId: string = 'document-classifier-v1'
+    modelId: string = '_document-classifier-v1'
   ): Promise<{ success: boolean; classification?: DocumentClassificationResult; error?: string }> {
     try {
-      const response = await fetch(`${this.apiBaseUrl}/ml/classify-document`, {
+      const response = await fetch(`${this.apiBaseUrl}/ml/classify-_document`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ export class DataScienceEngine {
   }
 
   /**
-   * Predict document risk score
+   * Predict _document risk score
    */
   async predictRiskScore(
     documentId: string,
@@ -253,8 +253,8 @@ export class DataScienceEngine {
       const result = await response.json();
       return { success: true, similarDocuments: result.similar_documents };
     } catch (error) {
-      console.error('Similar document search error:', error);
-      return { success: false, error: error instanceof Error ? error.message : 'Similar document search failed' };
+      console.error('Similar _document search error:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Similar _document search failed' };
     }
   }
 }

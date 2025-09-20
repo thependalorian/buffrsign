@@ -211,7 +211,7 @@ export class KYCService {
       // Process uploaded documents
       const documentResults = await this.processDocuments(request.documents);
       
-      // Update profile with document information
+      // Update profile with _document information
       profile.documents = documentResults.verified_documents;
       profile.personal_info = { ...profile.personal_info, ...request.personal_info };
       profile.address_info = { ...profile.address_info, ...request.address_info };
@@ -252,21 +252,21 @@ export class KYCService {
       throw new Error(`KYC profile '${profileId}' not found`);
     }
 
-    const document = profile.documents.find(d => d.id === documentId);
-    if (!document) {
+    const _document = profile.documents.find(d => d.id === documentId);
+    if (!_document) {
       throw new Error(`Document '${documentId}' not found in profile '${profileId}'`);
     }
 
-    // Update document verification status
-    document.verification_status = DocumentVerificationStatus.VERIFIED;
-    document.verified_at = new Date().toISOString();
-    Object.assign(document, verificationData);
+    // Update _document verification status
+    _document.verification_status = DocumentVerificationStatus.VERIFIED;
+    _document.verified_at = new Date().toISOString();
+    Object.assign(_document, verificationData);
 
     // Update profile
     profile.updated_at = new Date().toISOString();
     this.profiles.set(profileId, profile);
 
-    return document;
+    return _document;
   }
 
   async updateKYCProfile(
@@ -394,12 +394,12 @@ export class KYCService {
     const verifiedDocuments: KYCDocument[] = [];
     const errors: string[] = [];
 
-    for (const document of documents) {
+    for (const _document of documents) {
       try {
-        const processedDoc = await this.documentProcessor.processDocument(document);
+        const processedDoc = await this.documentProcessor.processDocument(_document);
         verifiedDocuments.push(processedDoc);
       } catch (error) {
-        errors.push(`Document processing failed for ${document.type}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        errors.push(`Document processing failed for ${_document.type}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }
 
@@ -493,7 +493,7 @@ export class KYCService {
       steps.push('Complete address verification');
     } else if (profile.verification_status === KYCStatus.IN_PROGRESS) {
       if (profile.documents.some(d => d.verification_status === DocumentVerificationStatus.PENDING)) {
-        steps.push('Wait for document verification');
+        steps.push('Wait for _document verification');
       }
       if (profile.compliance_status.compliance_score < 0.7) {
         steps.push('Address compliance issues');
@@ -512,7 +512,7 @@ export class KYCService {
   private estimateCompletionTime(profile: KYCProfile): number {
     let baseTime = 24; // 24 hours base
 
-    // Add time for document verification
+    // Add time for _document verification
     const pendingDocuments = profile.documents.filter(d => 
       d.verification_status === DocumentVerificationStatus.PENDING
     ).length;
@@ -544,14 +544,14 @@ class DocumentProcessor {
   async processDocument(
     upload: DocumentUpload
   ): Promise<KYCDocument> {
-    // Extract text from document (OCR processing)
+    // Extract text from _document (OCR processing)
     const extractedText = await this.extractTextFromDocument();
     
     // Extract structured data using AI
     const extractedData = await this.extractDocumentData(upload.type, extractedText, upload.country_code);
     
-    // Create KYC document record
-    const document: KYCDocument = {
+    // Create KYC _document record
+    const _document: KYCDocument = {
       id: this.generateDocumentId(),
       type: upload.type,
       country_code: upload.country_code,
@@ -577,13 +577,13 @@ class DocumentProcessor {
       }
     };
 
-    return document;
+    return _document;
   }
 
   private async extractTextFromDocument(): Promise<string> {
     // Mock OCR processing - in production, use actual OCR service
     // This would integrate with services like Tesseract, AWS Textract, or Google Vision
-    return 'Mock extracted text from document';
+    return 'Mock extracted text from _document';
   }
 
   private async extractDocumentData(
@@ -630,7 +630,7 @@ class RiskAssessor {
     let riskScore = 0;
     const riskFactors: KYCRiskFactor[] = [];
 
-    // Assess document risks
+    // Assess _document risks
     const documentRisks = this.assessDocumentRisks(profile.documents);
     riskFactors.push(...documentRisks);
     riskScore += documentRisks.reduce((sum, risk) => sum + this.getRiskScore(risk.severity), 0);
@@ -674,7 +674,7 @@ class RiskAssessor {
       risks.push({
         factor: 'Expired Documents',
         severity: RiskLevel.MEDIUM,
-        description: `${expiredDocuments.length} document(s) are expired`,
+        description: `${expiredDocuments.length} _document(s) are expired`,
         impact: 'Document validity compromised',
         probability: 0.8,
         mitigation: 'Renew expired documents immediately'
@@ -687,10 +687,10 @@ class RiskAssessor {
       risks.push({
         factor: 'Low Confidence Documents',
         severity: RiskLevel.MEDIUM,
-        description: `${lowConfidenceDocuments.length} document(s) have low confidence scores`,
+        description: `${lowConfidenceDocuments.length} _document(s) have low confidence scores`,
         impact: 'Document authenticity uncertain',
         probability: 0.6,
-        mitigation: 'Request higher quality document scans'
+        mitigation: 'Request higher quality _document scans'
       });
     }
 
@@ -888,7 +888,7 @@ class ComplianceChecker {
     // Check if KYC process meets ETA 2019 requirements
     let score = 0;
 
-    // Check document verification
+    // Check _document verification
     if (profile.documents.length > 0) {
       score += 0.3;
     }
@@ -950,7 +950,7 @@ class ComplianceChecker {
     const recommendations: string[] = [];
 
     if (complianceScore < 0.7) {
-      recommendations.push('Improve document verification process');
+      recommendations.push('Improve _document verification process');
       recommendations.push('Enhance personal information collection');
       recommendations.push('Implement stronger risk assessment');
     }

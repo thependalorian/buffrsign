@@ -38,7 +38,7 @@ interface CompletedSignature {
 }
 
 export default function CompletedSignaturesPage() {
-  const { user, getSupabaseClient } = useAuth();
+  const { _user, getSupabaseClient } = useAuth();
   const [completedSignatures, setCompletedSignatures] = useState<CompletedSignature[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +48,7 @@ export default function CompletedSignaturesPage() {
       setLoading(true);
       setError(null);
 
-      const supabase = getSupabaseClient();
+      const _supabase = getSupabaseClient();
       const { data: documents, error: documentsError } = await supabase
         .from('documents')
         .select(`
@@ -87,10 +87,10 @@ export default function CompletedSignaturesPage() {
   }, [getSupabaseClient]);
 
   useEffect(() => {
-    if (user) {
+    if (_user) {
       fetchCompletedSignatures();
     }
-  }, [user, fetchCompletedSignatures]);
+  }, [_user, fetchCompletedSignatures]);
 
   const getTypeColor = (type: string) => {
     switch (type) {

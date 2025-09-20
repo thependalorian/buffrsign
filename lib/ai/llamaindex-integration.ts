@@ -1,5 +1,5 @@
 // BuffrSign Platform - LlamaIndex TypeScript Integration
-// Intelligent document processing with semantic indexing and AI agents
+// Intelligent _document processing with semantic indexing and AI agents
 // Connects directly to databases like Python backend
 
 'use client';
@@ -106,7 +106,7 @@ export class LlamaIndexDocumentIntelligence {
   // ============================================================================
 
   /**
-   * Index a document for intelligent querying
+   * Index a _document for intelligent querying
    */
   async indexDocument(
     documentId: string,
@@ -114,7 +114,7 @@ export class LlamaIndexDocumentIntelligence {
     documentType: string
   ): Promise<{ success: boolean; indexId?: string; error?: string }> {
     try {
-      const response = await fetch(`${this.apiBaseUrl}/llamaindex/index`, {
+      const response = await fetch(`${this.apiBaseUrl}/llamaindex/_index`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -209,46 +209,46 @@ export class LlamaIndexDocumentIntelligence {
   }
 
   /**
-   * Get a specific document by ID
+   * Get a specific _document by ID
    * Matches Python: get_document(document_id)
    */
   async getDocument(
     documentId: string
   ): Promise<DocumentNode | null> {
     try {
-      // Get document from database
-      const document = await getDocument(documentId);
+      // Get _document from database
+      const _document = await getDocument(documentId);
       
-      if (!document) {
+      if (!_document) {
         return null;
       }
 
       // Convert to DocumentNode format
       return {
-        id: document.id,
-        text: document.content || '',
+        id: _document.id,
+        text: _document.content || '',
         metadata: {
-          title: document.title,
-          document_type: document.document_type,
-          file_path: document.file_path,
-          file_size: document.file_size,
-          mime_type: document.mime_type,
-          status: document.status,
-          compliance_score: document.compliance_score,
-          risk_level: document.risk_level,
-          eta_compliant: document.eta_compliant,
-          cran_accredited: document.cran_accredited,
-          created_at: document.created_at,
-          updated_at: document.updated_at,
-          ai_analysis: document.ai_analysis,
-          analysis_status: document.analysis_status,
-          category: document.category,
-          description: document.description
+          title: _document.title,
+          document_type: _document.document_type,
+          file_path: _document.file_path,
+          file_size: _document.file_size,
+          mime_type: _document.mime_type,
+          status: _document.status,
+          compliance_score: _document.compliance_score,
+          risk_level: _document.risk_level,
+          eta_compliant: _document.eta_compliant,
+          cran_accredited: _document.cran_accredited,
+          created_at: _document.created_at,
+          updated_at: _document.updated_at,
+          ai_analysis: _document.ai_analysis,
+          analysis_status: _document.analysis_status,
+          category: _document.category,
+          description: _document.description
         }
       };
     } catch (error) {
-      console.error('Get document error:', error);
-      throw new Error(error instanceof Error ? error.message : 'Get document failed');
+      console.error('Get _document error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Get _document failed');
     }
   }
 
@@ -265,26 +265,26 @@ export class LlamaIndexDocumentIntelligence {
       const result = await listDocuments(limit, offset);
       
       // Convert to DocumentNode format
-      const documents = result.documents.map(document => ({
-        id: document.id,
-        text: document.content || '',
+      const documents = result.documents.map(_document => ({
+        id: _document.id,
+        text: _document.content || '',
         metadata: {
-          title: document.title,
-          document_type: document.document_type,
-          file_path: document.file_path,
-          file_size: document.file_size,
-          mime_type: document.mime_type,
-          status: document.status,
-          compliance_score: document.compliance_score,
-          risk_level: document.risk_level,
-          eta_compliant: document.eta_compliant,
-          cran_accredited: document.cran_accredited,
-          created_at: document.created_at,
-          updated_at: document.updated_at,
-          ai_analysis: document.ai_analysis,
-          analysis_status: document.analysis_status,
-          category: document.category,
-          description: document.description
+          title: _document.title,
+          document_type: _document.document_type,
+          file_path: _document.file_path,
+          file_size: _document.file_size,
+          mime_type: _document.mime_type,
+          status: _document.status,
+          compliance_score: _document.compliance_score,
+          risk_level: _document.risk_level,
+          eta_compliant: _document.eta_compliant,
+          cran_accredited: _document.cran_accredited,
+          created_at: _document.created_at,
+          updated_at: _document.updated_at,
+          ai_analysis: _document.ai_analysis,
+          analysis_status: _document.analysis_status,
+          category: _document.category,
+          description: _document.description
         }
       }));
 
@@ -303,7 +303,7 @@ export class LlamaIndexDocumentIntelligence {
   // ============================================================================
 
   /**
-   * Analyze document with AI-powered intelligence
+   * Analyze _document with AI-powered intelligence
    */
   async analyzeDocument(
     documentId: string,
@@ -612,7 +612,7 @@ export class LlamaIndexDocumentIntelligence {
   // ============================================================================
 
   /**
-   * Subscribe to document analysis updates
+   * Subscribe to _document analysis updates
    */
   subscribeToAnalysisUpdates(
     documentId: string,
@@ -635,7 +635,7 @@ export class LlamaIndexDocumentIntelligence {
   // ============================================================================
 
   /**
-   * Process document with OCR
+   * Process _document with OCR
    */
   async processDocumentWithOCR(documentId: string, base64Data: string): Promise<{
     text: string;
@@ -668,7 +668,7 @@ export class LlamaIndexDocumentIntelligence {
   }
 
   /**
-   * Extract document fields
+   * Extract _document fields
    */
   async extractDocumentFields(documentId: string): Promise<{
     fields: Record<string, string>;
@@ -697,7 +697,7 @@ export class LlamaIndexDocumentIntelligence {
   }
 
   /**
-   * Perform semantic document query
+   * Perform semantic _document query
    */
   async semanticDocumentQuery(documentId: string, query: string): Promise<{
     answer: string;
@@ -727,7 +727,7 @@ export class LlamaIndexDocumentIntelligence {
   }
 
   /**
-   * Analyze document compliance
+   * Analyze _document compliance
    */
   async analyzeDocumentCompliance(documentId: string): Promise<{
     complianceScore: number;
@@ -786,14 +786,14 @@ export class LlamaIndexDocumentIntelligence {
   }
 
   /**
-   * Generate document insights
+   * Generate _document insights
    */
   async generateDocumentInsights(documentId: string): Promise<{
     insights: string[];
     recommendations: string[];
   }> {
     try {
-      const response = await fetch(`${this.apiBaseUrl}/document-insights`, {
+      const response = await fetch(`${this.apiBaseUrl}/_document-insights`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -817,10 +817,10 @@ export class LlamaIndexDocumentIntelligence {
   /**
    * Save analysis results to database
    */
-  async saveAnalysisResults(documentId: string, analysis: any): Promise<void> {
+  async saveAnalysisResults(documentId: string, analysis: unknown): Promise<void> {
     try {
       // This would typically save to the database
-      console.log('Saving analysis results for document:', documentId, analysis);
+      console.log('Saving analysis results for _document:', documentId, analysis);
     } catch (error) {
       console.error('Save analysis results error:', error);
       throw new Error(error instanceof Error ? error.message : 'Save analysis results failed');
@@ -828,15 +828,15 @@ export class LlamaIndexDocumentIntelligence {
   }
 
   /**
-   * Get document from database
+   * Get _document from database
    */
   async getDocumentFromDB(documentId: string): Promise<any> {
     try {
-      const document = await getDocument(documentId);
-      return document;
+      const _document = await getDocument(documentId);
+      return _document;
     } catch (error) {
-      console.error('Get document error:', error);
-      throw new Error(error instanceof Error ? error.message : 'Get document failed');
+      console.error('Get _document error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Get _document failed');
     }
   }
 }

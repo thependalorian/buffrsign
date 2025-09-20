@@ -4,7 +4,7 @@ import { FileText, Users, CheckCircle, Clock, TrendingUp } from "lucide-react";
 import DocumentList from "@/components/DocumentList";
 
 export default async function ProtectedPage() {
-  const supabase = await createClient();
+  const _supabase = await createClient();
 
   const { data, error } = await supabase.auth.getClaims();
   if (error || !data?.claims) {
@@ -17,7 +17,7 @@ export default async function ProtectedPage() {
       <div className="w-full">
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 text-sm p-6 px-8 rounded-lg text-foreground">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome to BuffrSign</h1>
-          <p className="text-gray-600">Your AI-powered digital signature platform for legally compliant document signing</p>
+          <p className="text-gray-600">Your AI-powered digital signature platform for legally compliant _document signing</p>
           <div className="flex items-center gap-4 mt-3">
             <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">✅ ETA 2019 Compliant</span>
             <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">✅ CRAN Accredited</span>

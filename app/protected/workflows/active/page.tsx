@@ -43,7 +43,7 @@ interface ActiveWorkflow {
 }
 
 export default function ActiveWorkflowsPage() {
-  const { user, getSupabaseClient } = useAuth();
+  const { _user, getSupabaseClient } = useAuth();
   const [activeWorkflows, setActiveWorkflows] = useState<ActiveWorkflow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +53,7 @@ export default function ActiveWorkflowsPage() {
       setLoading(true);
       setError(null);
 
-      const supabase = getSupabaseClient();
+      const _supabase = getSupabaseClient();
       const { data: workflows, error: workflowsError } = await supabase
         .from('signature_workflows')
         .select(`
@@ -99,10 +99,10 @@ export default function ActiveWorkflowsPage() {
   }, [getSupabaseClient]);
 
   useEffect(() => {
-    if (user) {
+    if (_user) {
       fetchActiveWorkflows();
     }
-  }, [user, fetchActiveWorkflows]);
+  }, [_user, fetchActiveWorkflows]);
 
 
   const calculateProgress = (currentStep: string, totalSteps: number): number => {

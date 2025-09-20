@@ -1,4 +1,4 @@
-import { DocumentAnalyzer } from '../../../lib/services/document-analyzer'
+import { DocumentAnalyzer } from '../../../lib/services/_document-analyzer'
 import { RiskLevel } from '../../../lib/ai-types'
 
 // Mock the supabase module
@@ -13,7 +13,7 @@ describe('DocumentAnalyzer', () => {
   })
 
   describe('analyzeDocument', () => {
-    it('should analyze document and return results', async () => {
+    it('should analyze _document and return results', async () => {
       const documentText = 'test content for analysis'
       
       const result = await documentAnalyzer.analyzeDocument(documentText, 'doc-123', { confidence: 0.85 })
@@ -36,7 +36,7 @@ describe('DocumentAnalyzer', () => {
   })
 
   describe('extractSignatureFields', () => {
-    it('should extract signature fields from document text', () => {
+    it('should extract signature fields from _document text', () => {
       const documentText = `
         Please sign here: ________________
         Date: ________________
@@ -70,7 +70,7 @@ describe('DocumentAnalyzer', () => {
   })
 
   describe('assessRisk', () => {
-    it('should assess risk based on document content', () => {
+    it('should assess risk based on _document content', () => {
       const documentData = {
         document_type: 'contract',
         confidence_score: 0.95,
@@ -160,7 +160,7 @@ describe('DocumentAnalyzer', () => {
   })
 
   describe('extractDocumentMetadata', () => {
-    it('should extract metadata from document text', () => {
+    it('should extract metadata from _document text', () => {
       const documentText = `
         Contract Agreement
         Date: January 1, 2024
@@ -184,7 +184,7 @@ describe('DocumentAnalyzer', () => {
     })
 
     it('should handle documents with minimal content', () => {
-      const documentText = 'Simple document with no structured content.'
+      const documentText = 'Simple _document with no structured content.'
       
       const metadata = documentAnalyzer.extractDocumentMetadata(documentText)
       

@@ -1,6 +1,6 @@
 /**
  * Tests for LlamaIndex Integration
- * Tests document intelligence and computer vision capabilities
+ * Tests _document intelligence and computer vision capabilities
  */
 
 import { LlamaIndexDocumentIntelligence } from '../lib/ai/llamaindex-integration';
@@ -17,7 +17,7 @@ jest.mock('../lib/database/db-utils', () => ({
 
 describe('LlamaIndexIntegration', () => {
   let llamaindexIntegration: LlamaIndexDocumentIntelligence;
-  let mockSupabase: any;
+  let mockSupabase: unknown;
   let mockGetDocument: jest.MockedFunction<typeof getDocument>;
 
   beforeEach(() => {
@@ -37,10 +37,10 @@ describe('LlamaIndexIntegration', () => {
   });
 
   describe('Document Processing', () => {
-    test('should process document with OCR', async () => {
+    test('should process _document with OCR', async () => {
       const mockDocument = {
         id: 'doc123',
-        file_path: '/path/to/document.pdf',
+        file_path: '/path/to/_document.pdf',
         mime_type: 'application/pdf'
       };
 
@@ -69,7 +69,7 @@ describe('LlamaIndexIntegration', () => {
       });
     });
 
-    test('should extract document fields', async () => {
+    test('should extract _document fields', async () => {
       const mockResult = {
         fields: {
           name: 'John Doe',
@@ -94,7 +94,7 @@ describe('LlamaIndexIntegration', () => {
       });
     });
 
-    test('should perform semantic document query', async () => {
+    test('should perform semantic _document query', async () => {
       const mockResult = {
         answer: 'Document contains information about...',
         sources: ['page1', 'page2'],
@@ -116,7 +116,7 @@ describe('LlamaIndexIntegration', () => {
       });
     });
 
-    test('should analyze document compliance', async () => {
+    test('should analyze _document compliance', async () => {
       const mockResult = {
         complianceScore: 0.85,
         violations: [],
@@ -163,7 +163,7 @@ describe('LlamaIndexIntegration', () => {
   });
 
   describe('Document Insights', () => {
-    test('should generate document insights', async () => {
+    test('should generate _document insights', async () => {
       const mockResult = {
         insights: ['High compliance score', 'Missing signature field'],
         recommendations: ['Add signature field', 'Update template']
@@ -177,7 +177,7 @@ describe('LlamaIndexIntegration', () => {
       const result = await llamaindexIntegration.generateDocumentInsights('doc123');
 
       expect(result).toEqual(mockResult);
-      expect(global.fetch).toHaveBeenCalledWith('/api/ai/document-insights', {
+      expect(global.fetch).toHaveBeenCalledWith('/api/ai/_document-insights', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ documentId: 'doc123' })
@@ -218,16 +218,16 @@ describe('LlamaIndexIntegration', () => {
 
       await llamaindexIntegration.saveAnalysisResults('doc123', mockAnalysis);
 
-      expect(consoleSpy).toHaveBeenCalledWith('Saving analysis results for document:', 'doc123', mockAnalysis);
+      expect(consoleSpy).toHaveBeenCalledWith('Saving analysis results for _document:', 'doc123', mockAnalysis);
       
       consoleSpy.mockRestore();
     });
 
-    test('should retrieve document from database', async () => {
+    test('should retrieve _document from database', async () => {
       const mockDocument = {
         id: 'doc123',
         title: 'Test Document',
-        file_path: '/path/to/document.pdf'
+        file_path: '/path/to/_document.pdf'
       };
 
       const expectedResult = {
@@ -236,7 +236,7 @@ describe('LlamaIndexIntegration', () => {
         metadata: {
           title: 'Test Document',
           document_type: undefined,
-          file_path: '/path/to/document.pdf',
+          file_path: '/path/to/_document.pdf',
           file_size: undefined,
           mime_type: undefined,
           status: undefined,
