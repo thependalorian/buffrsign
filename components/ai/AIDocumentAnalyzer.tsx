@@ -4,32 +4,19 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { 
-  Brain, 
-  FileText, 
-  Shield, 
-  TrendingUp, 
-  Eye, 
-  CheckCircle, 
-  Loader2,
-  Download,
-  Share2,
-  Settings,
-  BarChart3,
-  Zap,
-  AlertTriangle
-} from 'lucide-react';
+import { Brain, FileText, Shield, TrendingUp, Eye, CheckCircle, Loader2, Download, Share2, Settings, BarChart3, Zap, AlertTriangle } from 'lucide-react';
+import Button from '../ui/button';
 // Mock hooks for AI integration - these would be implemented in a real app
-const useCompleteDocumentAnalysis = (documentId: string) => ({
+const useCompleteDocumentAnalysis = () => ({
   refetch: async () => ({ data: null }),
   loading: false
 });
 
-const useDocumentProcessing = (documentId: string, options: unknown) => ({
+const useDocumentProcessing = () => ({
   loading: false
 });
 
-const useIntelligentAnalysis = (documentId: string) => ({
+const useIntelligentAnalysis = () => ({
   loading: false
 });
 
@@ -149,9 +136,9 @@ export default function AIDocumentAnalyzer({
   // AI HOOKS
   // ============================================================================
   
-  const { refetch: performCompleteAnalysis, loading: analysisLoading } = useCompleteDocumentAnalysis('mock-document-id');
-  const { loading: processingLoading } = useDocumentProcessing('mock-document-id', {});
-  const { loading: intelligentLoading } = useIntelligentAnalysis('mock-document-id');
+  const { refetch: performCompleteAnalysis, loading: analysisLoading } = useCompleteDocumentAnalysis();
+  const { loading: processingLoading } = useDocumentProcessing();
+  const { loading: intelligentLoading } = useIntelligentAnalysis();
 
   // ============================================================================
   // ANALYSIS FUNCTIONS
@@ -297,9 +284,9 @@ export default function AIDocumentAnalyzer({
     <div className="space-y-6">
       {/* Analysis Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-lg border">
+        <div className="bg-card p-4 rounded-lg border border-border">
           <div className="flex items-center space-x-2">
-            <FileText className="h-5 w-5 text-primary" />
+            <FileText className="h-5 w-5 text-chart-1" />
             <span className="font-medium">Document Type</span>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
@@ -310,7 +297,7 @@ export default function AIDocumentAnalyzer({
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border">
+        <div className="bg-card p-4 rounded-lg border border-border">
           <div className="flex items-center space-x-2">
             <Shield className="h-5 w-5 text-chart-2" />
             <span className="font-medium">Compliance Score</span>
@@ -323,9 +310,9 @@ export default function AIDocumentAnalyzer({
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border">
+        <div className="bg-card p-4 rounded-lg border border-border">
           <div className="flex items-center space-x-2">
-            <TrendingUp className="h-5 w-5 text-orange-600" />
+            <TrendingUp className="h-5 w-5 text-chart-3" />
             <span className="font-medium">Risk Level</span>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
@@ -339,9 +326,9 @@ export default function AIDocumentAnalyzer({
 
       {/* Key Findings */}
       {results?.insights && (
-        <div className="bg-white p-6 rounded-lg border">
+        <div className="bg-card p-6 rounded-lg border border-border">
           <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-            <Brain className="h-5 w-5 text-purple-600" />
+            <Brain className="h-5 w-5 text-chart-4" />
             <span>AI Insights</span>
           </h3>
           <div className="space-y-4">
@@ -655,13 +642,13 @@ export default function AIDocumentAnalyzer({
   // ============================================================================
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm border ${className}`}>
+    <div className={`bg-card rounded-lg shadow-sm border border-border ${className}`}>
       {/* Header */}
       <div className="p-6 border-b">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold text-foreground flex items-center space-x-2">
-              <Brain className="h-6 w-6 text-purple-600" />
+              <Brain className="h-6 w-6 text-chart-4" />
               <span>AI Document Analysis</span>
             </h2>
             <p className="text-sm text-muted-foreground mt-1">{documentName}</p>
@@ -669,19 +656,19 @@ export default function AIDocumentAnalyzer({
           <div className="flex items-center space-x-2">
             {results && (
               <>
-                <button className="btn btn-outline btn-sm">
+                <Button variant="outline" size="sm">
                   <Download className="h-4 w-4 mr-1" />
                   Export
-                </button>
-                <button className="btn btn-outline btn-sm">
+                </Button>
+                <Button variant="outline" size="sm">
                   <Share2 className="h-4 w-4 mr-1" />
                   Share
-                </button>
+                </Button>
               </>
             )}
-            <button className="btn btn-outline btn-sm">
+            <Button variant="outline" size="sm">
               <Settings className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -726,10 +713,11 @@ export default function AIDocumentAnalyzer({
       {/* Action Buttons */}
       {!isAnalyzing && !results && (
         <div className="p-6 border-b">
-          <button
+          <Button
             onClick={startAnalysis}
             disabled={analysisLoading || processingLoading || intelligentLoading}
-            className="btn btn-primary"
+            variant="primary"
+            size="md"
           >
             {(analysisLoading || processingLoading || intelligentLoading) ? (
               <>
@@ -742,7 +730,7 @@ export default function AIDocumentAnalyzer({
                 Start AI Analysis
               </>
             )}
-          </button>
+          </Button>
         </div>
       )}
 

@@ -1,0 +1,49 @@
+name: Docker Build Test
+
+on:
+  workflow_call:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Build Frontend container
+      run: |
+        docker build --no-cache --tag buffrsign-frontend:ci-test .
+        echo "✅ Frontend container built successfully"
+        
+    - name: Build Backend container
+      run: |
+        cd backend
+        docker build --no-cache --tag buffrsign-backend:ci-test .
+        echo "✅ Backend container built successfully"
+        
+    - name: Verify container images
+      run: |
+        echo "Verifying container images were created..."
+        if ! docker image inspect buffrsign-frontend:ci-test >/dev/null 2>&1; then
+          echo "❌ Frontend image not found!"
+          exit 1
+        fi
+        if ! docker image inspect buffrsign-backend:ci-test >/dev/null 2>&1; then
+          echo "❌ Backend image not found!"
+          exit 1
+        fi
+        echo "✅ All container images built and verified successfully"
+        
+    - name: Cleanup
+      if: always()
+      run: |
+        docker system prune -f

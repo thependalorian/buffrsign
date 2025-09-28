@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { createClient } from '@/lib/supabase/client';
+
 import {
   EmailAnalytics,
   EmailType,
@@ -19,7 +19,7 @@ export function useEmailAnalytics(options: UseEmailAnalyticsOptions) {
   const [summary, setSummary] = useState<EmailAnalyticsResponse['summary'] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const _supabase = createClient();
+  
 
   /**
    * Fetch email analytics

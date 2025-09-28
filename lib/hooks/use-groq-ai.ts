@@ -62,7 +62,7 @@ export function useGroqAI(options: UseGroqAIOptions): UseGroqAIResult {
   const lastSystemPromptRef = useRef<string>('');
 
   // Initialize AI integration
-  const _aiIntegration = useRef(new BuffrSignAIIntegration()).current;
+  const aiIntegration = useRef(new BuffrSignAIIntegration()).current;
 
   // Send a regular message
   const sendMessage = useCallback(async (content: string, systemPrompt?: string) => {
@@ -109,8 +109,8 @@ export function useGroqAI(options: UseGroqAIOptions): UseGroqAIResult {
       
       // Update token usage
       if (response.data?.usage) {
-        setTotalTokensUsed(prev => prev + response.data.usage.total_tokens);
-        onTokenUsage?.(response.data.usage);
+        setTotalTokensUsed(prev => prev + response.data!.usage.total_tokens);
+        onTokenUsage?.(response.data!.usage);
       }
 
     } catch (err) {
@@ -120,7 +120,7 @@ export function useGroqAI(options: UseGroqAIOptions): UseGroqAIResult {
     } finally {
       setIsLoading(false);
     }
-  }, [messages, userTier, makeAPICall, onError, onTokenUsage]);
+  }, [messages, userTier, onError, onTokenUsage]);
 
   // Send a streaming message
   const sendStreamingMessage = useCallback(async (
@@ -244,12 +244,12 @@ export function useGroqAI(options: UseGroqAIOptions): UseGroqAIResult {
       });
 
       // Update token usage
-      if (response.data.usage) {
-        setTotalTokensUsed(prev => prev + response.data.usage.total_tokens);
-        onTokenUsage?.(response.data.usage);
+      if (response.data?.usage) {
+        setTotalTokensUsed(prev => prev + response.data!.usage.total_tokens);
+        onTokenUsage?.(response.data!.usage);
       }
 
-      return response.data;
+      return response.data!;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(errorMessage);
@@ -258,7 +258,7 @@ export function useGroqAI(options: UseGroqAIOptions): UseGroqAIResult {
     } finally {
       setIsLoading(false);
     }
-  }, [userTier, makeAPICall, onError, onTokenUsage]);
+  }, [userTier, onError, onTokenUsage]);
 
   // Explain legal terms
   const explainLegalTerms = useCallback(async (
@@ -276,12 +276,12 @@ export function useGroqAI(options: UseGroqAIOptions): UseGroqAIResult {
       });
 
       // Update token usage
-      if (response.data.usage) {
-        setTotalTokensUsed(prev => prev + response.data.usage.total_tokens);
-        onTokenUsage?.(response.data.usage);
+      if (response.data?.usage) {
+        setTotalTokensUsed(prev => prev + response.data!.usage.total_tokens);
+        onTokenUsage?.(response.data!.usage);
       }
 
-      return response.data;
+      return response.data!;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(errorMessage);
@@ -290,7 +290,7 @@ export function useGroqAI(options: UseGroqAIOptions): UseGroqAIResult {
     } finally {
       setIsLoading(false);
     }
-  }, [userTier, makeAPICall, onError, onTokenUsage]);
+  }, [userTier, onError, onTokenUsage]);
 
   // Check compliance
   const checkCompliance = useCallback(async (
@@ -308,12 +308,12 @@ export function useGroqAI(options: UseGroqAIOptions): UseGroqAIResult {
       });
 
       // Update token usage
-      if (response.data.usage) {
-        setTotalTokensUsed(prev => prev + response.data.usage.total_tokens);
-        onTokenUsage?.(response.data.usage);
+      if (response.data?.usage) {
+        setTotalTokensUsed(prev => prev + response.data!.usage.total_tokens);
+        onTokenUsage?.(response.data!.usage);
       }
 
-      return response.data;
+      return response.data!;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(errorMessage);
@@ -322,7 +322,7 @@ export function useGroqAI(options: UseGroqAIOptions): UseGroqAIResult {
     } finally {
       setIsLoading(false);
     }
-  }, [userTier, makeAPICall, onError, onTokenUsage]);
+  }, [userTier, onError, onTokenUsage]);
 
   // Clear messages
   const clearMessages = useCallback(() => {

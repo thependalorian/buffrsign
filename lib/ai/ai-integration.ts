@@ -8,11 +8,11 @@ import { LangGraphWorkflowOrchestrator } from './langgraph-workflows';
 import { DataScienceEngine } from './data-science-engine';
 import { OCRService } from './ocr-service';
 import { ComputerVisionService } from './computer-vision-service';
-import { AlignedModels } from './aligned-models';
+import { langfuseService, DocumentAnalysisTrace, AIProviderMetrics } from '../services/langfuse-service';
+
 import type {
   DocumentProcessingResults,
   UserTier,
-  GroqResponse,
   GroqMessage,
   GroqAnalysisRequest,
   GroqComplianceRequest,
@@ -31,6 +31,7 @@ export class BuffrSignAIIntegration {
   private dataScience: DataScienceEngine;
   private ocr: OCRService;
   private computerVision: ComputerVisionService;
+  private langfuse: typeof langfuseService;
 
   constructor(
     apiBaseUrl: string = '/api/ai', 
@@ -52,6 +53,38 @@ export class BuffrSignAIIntegration {
     this.dataScience = services?.dataScience || new DataScienceEngine(apiBaseUrl, apiKey);
     this.ocr = services?.ocr || new OCRService(apiBaseUrl, apiKey);
     this.computerVision = services?.computerVision || new ComputerVisionService(apiBaseUrl, apiKey);
+    this.langfuse = langfuseService;
+  }
+
+  // ============================================================================
+  // LANGFUSE TRACKING METHODS
+  // ============================================================================
+
+  /**
+   * Track document analysis with Langfuse
+   */
+  private async trackDocumentAnalysis(trace: DocumentAnalysisTrace): Promise<void> {
+    try {
+      await this.langfuse.trackDocumentAnalysis(trace);
+    } catch (error) {
+      console.error('Failed to track document analysis:', error);
+    }
+  }
+
+  /**
+   * Track AI provider metrics
+   */
+  private async trackAIProviderMetrics(
+    serviceName: string,
+    input: any,
+    output: any,
+    metrics: AIProviderMetrics
+  ): Promise<void> {
+    try {
+      await this.langfuse.trackAIServiceCall(serviceName, input, output, metrics);
+    } catch (error) {
+      console.error(`Failed to track AI provider metrics for ${serviceName}:`, error);
+    }
   }
 
   // ============================================================================
@@ -77,7 +110,34 @@ export class BuffrSignAIIntegration {
    * Analyze document with Groq AI based on user tier
    */
   async analyzeDocumentWithGroq(request: GroqAnalysisRequest) {
-    return this.groqAI.analyzeDocument(request);
+    const startTime = Date.now();
+    
+    try {
+      const result = await this.groqAI.analyzeDocument(request);
+      
+      // Track successful analysis
+      await this.trackDocumentAnalysis({
+        documentId: 'unknown', // GroqAnalysisRequest doesn't have documentId
+        documentType: request.analysisType || 'unknown',
+        confidence: 0.8, // Default confidence since GroqResponse doesn't have this
+        complianceScore: 0.7, // Default compliance score
+        processingTime: Date.now() - startTime,
+        aiServices: ['groq'],
+        riskLevel: 'medium', // Default risk level
+        signatureFieldsDetected: 0, // Default since GroqResponse doesn't have this
+      });
+
+      return result;
+    } catch (error) {
+      // Track error
+      await this.langfuse.trackError('groq-document-analysis', error as Error, {
+        documentId: 'unknown', // GroqAnalysisRequest doesn't have documentId
+        documentType: request.analysisType || 'unknown',
+        processingTime: Date.now() - startTime,
+      });
+      
+      throw error;
+    }
   }
 
   /**

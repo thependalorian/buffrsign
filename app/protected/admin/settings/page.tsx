@@ -1,3 +1,7 @@
+"use client";
+
+import { Bot } from "lucide-react";
+
 /**
  * Admin Settings Page
  * 
@@ -468,7 +472,7 @@ export default function ProtectedAdminSettingsPage() {
 
         {/* AI Configuration */}
         <div className="bg-white rounded-lg shadow-sm p-8">
-          <h2 className="text-xl font-semibold mb-6">🤖 AI Configuration</h2>
+          <h2 className="text-xl font-semibold mb-6"><Bot className="w-5 h-5 inline-block mr-2" /> AI Configuration</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <h3 className="text-lg font-medium mb-4">AI Service Settings</h3>

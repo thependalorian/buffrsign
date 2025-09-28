@@ -1,11 +1,10 @@
-'use client'
+'use client';
 
-import { useCallback, useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { type User } from '@supabase/supabase-js'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { PlusCircle, FileText } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { PlusCircle, FileText } from 'lucide-react';
 
 // Assuming a template type based on the database schema
 type Template = {
@@ -17,13 +16,13 @@ type Template = {
 
 export default function TemplatesPage() {
   const _supabase = createClient()
-  const [_user, setUser] = useState<User | null>(null)
+  
   const [templates, setTemplates] = useState<Template[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const fetchTemplates = useCallback(async (userId: string) => {
-    const { data, error } = await supabase
+    const { data, error } = await _supabase
       .from('templates')
       .select('id, name, description, created_at')
       .eq('user_id', userId)
@@ -41,13 +40,12 @@ export default function TemplatesPage() {
       setTemplates(data as Template[])
     }
     setLoading(false)
-  }, [supabase])
+  }, [_supabase])
 
   useEffect(() => {
     const initialize = async () => {
-      const { data: { _user } } = await supabase.auth.getUser()
+      const { data: { _user } } = await _supabase.auth.getUser()
       if (_user) {
-        setUser(_user)
         await fetchTemplates(_user.id)
       } else {
         setLoading(false)
@@ -55,7 +53,7 @@ export default function TemplatesPage() {
       }
     }
     initialize()
-  }, [supabase, fetchTemplates])
+  }, [_supabase, fetchTemplates])
 
   return (
     <div className="space-y-6">

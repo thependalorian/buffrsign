@@ -13,19 +13,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { ETAComplianceValidator } from '@/components/compliance/ETAComplianceValidator';
-import { ComplianceDashboard } from '@/components/compliance/ComplianceDashboard';
-import { ComplianceStatusIndicator } from '@/components/compliance/ComplianceStatusIndicator';
-import DocumentUpload from '@/components/DocumentUpload';
-import DocumentAnalysis from '@/components/ui/DocumentAnalysis';
-import SignatureField from '@/components/ui/SignatureField';
-import EmailNotificationList from '@/components/email/EmailNotificationList';
-import EmailAnalyticsChart from '@/components/email/EmailAnalyticsChart';
-import LoadingStates from '@/components/LoadingStates';
-import PricingCalculator from '@/components/business/PricingCalculator';
-// import { designTokens } from '@/lib/design-system';
+import { Button } from '../../../components/ui/button';
+import { Card } from '../../../components/ui/card';
+import { ETAComplianceValidator } from '../../../components/compliance/ETAComplianceValidator';
+import { ComplianceDashboard } from '../../../components/compliance/ComplianceDashboard';
+import { ComplianceStatusIndicator } from '../../../components/compliance/ComplianceStatusIndicator';
+import DocumentAnalysis from '../../../components/ui/DocumentAnalysis';
+import SignatureField from '../../../components/ui/SignatureField';
+import EmailNotificationList from '../../../components/email/EmailNotificationList';
+import EmailAnalyticsChart from '../../../components/email/EmailAnalyticsChart';
+import PricingCalculator from '../../../components/business/PricingCalculator';
+import { Shield, FileText, PenTool, Mail, BarChart3, Construction, CheckCircle, AlertTriangle, XCircle, Bot, Keyboard, Folder } from 'lucide-react';
+// import { designTokens } from '../../lib/design-system';
 
 // Mock data for demonstration
 const mockDocumentData = {
@@ -134,26 +133,7 @@ const mockComplianceResult = {
   }
 };
 
-const _unusedMockEmailData = [
-  {
-    id: 'email-001',
-    to: 'john@example.com',
-    subject: 'Document Signature Required: Sample Contract',
-    status: 'sent',
-    sent_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    opened_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-    clicked_at: null
-  },
-  {
-    id: 'email-002',
-    to: 'jane@example.com',
-    subject: 'Document Signature Required: Sample Contract',
-    status: 'delivered',
-    sent_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
-    opened_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    clicked_at: new Date(Date.now() - 1.5 * 60 * 60 * 1000).toISOString()
-  }
-];
+
 
 const mockAnalyticsData = [
   { 
@@ -194,28 +174,23 @@ const mockAnalyticsData = [
 
 export default function DemoPage() {
   const [activeTab, setActiveTab] = useState('compliance');
-  const [isLoading, setIsLoading] = useState(false);
+  
   const [complianceResult, setComplianceResult] = useState(mockComplianceResult);
 
   const tabs = [
-    { id: 'compliance', label: 'ETA 2019 Compliance', icon: '🛡️' },
-    { id: 'documents', label: 'Document Analysis', icon: '📄' },
-    { id: 'signatures', label: 'Signature Creation', icon: '✍️' },
-    { id: 'email', label: 'Email Management', icon: '📧' },
-    { id: 'analytics', label: 'Analytics & Pricing', icon: '📊' },
-    { id: 'infrastructure', label: 'Infrastructure', icon: '🏗️' }
+    { id: 'compliance', label: 'ETA 2019 Compliance', icon: <Shield className="w-5 h-5" /> },
+    { id: 'documents', label: 'Document Analysis', icon: <FileText className="w-5 h-5" /> },
+    { id: 'signatures', label: 'Signature Creation', icon: <PenTool className="w-5 h-5" /> },
+    { id: 'email', label: 'Email Management', icon: <Mail className="w-5 h-5" /> },
+    { id: 'analytics', label: 'Analytics & Pricing', icon: <BarChart3 className="w-5 h-5" /> },
+    { id: 'infrastructure', label: 'Infrastructure', icon: <Construction className="w-5 h-5" /> }
   ];
 
   const handleComplianceChange = (result: typeof mockComplianceResult) => {
     setComplianceResult(result);
   };
 
-  const handleDocumentUpload = (documentId: string) => {
-    console.log('Document uploaded:', documentId);
-    setIsLoading(true);
-    // Simulate processing
-    setTimeout(() => setIsLoading(false), 2000);
-  };
+  
 
   const handleSignatureCreate = (signature: unknown) => {
     console.log('Signature created:', signature);
@@ -259,7 +234,7 @@ export default function DemoPage() {
               <Card className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-success rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm">✓</span>
+                    <CheckCircle className="text-white w-5 h-5" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-buffr-purple">Issues Found</h3>
@@ -271,7 +246,7 @@ export default function DemoPage() {
               <Card className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-warning rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm">!</span>
+                    <AlertTriangle className="text-white w-5 h-5" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-buffr-indigo">Recommendations</h3>
@@ -289,12 +264,7 @@ export default function DemoPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="p-6">
                 <h3 className="text-lg font-semibold text-buffr-blue mb-4">Document Upload & Analysis</h3>
-                <DocumentUpload
-                  userId="demo-user-001"
-                  onUploadSuccess={handleDocumentUpload}
-                  className="mb-4"
-                />
-                {isLoading && <LoadingStates.DocumentProcessing documentName="demo.pdf" processingStage="analysis" progress={75} />}
+                <p className="text-muted-foreground">Document upload component will be implemented here.</p>
               </Card>
               
               <Card className="p-6">
@@ -348,7 +318,7 @@ export default function DemoPage() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 p-3 bg-base-200 rounded-lg">
                     <div className="w-8 h-8 bg-buffr-blue rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm">✍️</span>
+                      <PenTool className="text-white w-5 h-5" />
                     </div>
                     <div>
                       <h4 className="font-semibold">Draw Signature</h4>
@@ -358,7 +328,7 @@ export default function DemoPage() {
                   
                   <div className="flex items-center gap-3 p-3 bg-base-200 rounded-lg">
                     <div className="w-8 h-8 bg-buffr-purple rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm">⌨️</span>
+                      <Keyboard className="text-white w-5 h-5" />
                     </div>
                     <div>
                       <h4 className="font-semibold">Type Signature</h4>
@@ -368,7 +338,7 @@ export default function DemoPage() {
                   
                   <div className="flex items-center gap-3 p-3 bg-base-200 rounded-lg">
                     <div className="w-8 h-8 bg-buffr-indigo rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm">📁</span>
+                      <Folder className="text-white w-5 h-5" />
                     </div>
                     <div>
                       <h4 className="font-semibold">Upload Signature</h4>

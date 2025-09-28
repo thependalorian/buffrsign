@@ -107,6 +107,11 @@ export interface GroqLegalExplanationRequest {
   context?: string;
 }
 
+export interface ChatRequest {
+  message: string;
+  context?: Record<string, unknown>;
+}
+
 // ============================================================================
 // PYDANTIC AI TYPES
 // ============================================================================

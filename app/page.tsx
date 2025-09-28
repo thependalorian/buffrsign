@@ -18,84 +18,18 @@ import {
   X,
   Smartphone,
   BadgeCheck,
-  Settings
+  Download,
+  Settings,
+  TrendingUp
 } from 'lucide-react';
-import BuffrSignKnowledgeGraph from '@/components/buffrsign-knowledge-graph';
-
-// Helper Components
-const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
-  <a href={href} className="text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium">
-    {children}
-  </a>
-);
-
-const CTAButton = ({ children, primary = false, className = '', onClick }: { 
-  children: React.ReactNode; 
-  primary?: boolean; 
-  className?: string; 
-  onClick?: () => void; 
-}) => (
-  <button 
-    onClick={onClick}
-    className={`btn btn-lg rounded-full shadow-lg transition-transform duration-300 hover:scale-105 ${primary ? 'btn-primary' : 'btn-outline'} ${className}`}
-  >
-    {children}
-  </button>
-);
-
-const FeatureCard = ({ icon: Icon, title, description, color = "primary" }: { 
-  icon: React.ComponentType<{ className?: string }>; 
-  title: string; 
-  description: string; 
-  color?: string;
-}) => (
-  <div className="feature-card p-8 rounded-2xl">
-    <div className={`w-16 h-16 bg-${color}/10 rounded-2xl flex items-center justify-center mb-6`}>
-      <Icon className={`w-8 h-8 text-${color}`} />
-    </div>
-    <h3 className="text-2xl font-bold mb-4 text-foreground">{title}</h3>
-    <p className="text-muted-foreground leading-relaxed">{description}</p>
-  </div>
-);
-
-const PricingCard = ({ title, price, period, features, popular = false, ctaText, ctaAction }: {
-  title: string;
-  price: string;
-  period: string;
-  features: string[];
-  popular?: boolean;
-  ctaText: string;
-  ctaAction: () => void;
-}) => (
-  <div className={`_document-card p-8 relative ${popular ? 'ring-2 ring-primary' : ''}`}>
-    {popular && (
-      <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-        <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
-          Most Popular
-        </span>
-      </div>
-    )}
-    <h3 className="text-2xl font-bold mb-2 text-foreground">{title}</h3>
-    <div className="mb-6">
-      <span className="text-4xl font-bold text-foreground">{price}</span>
-      <span className="text-muted-foreground">/{period}</span>
-    </div>
-    <ul className="space-y-3 mb-8">
-      {features.map((feature, _index) => (
-        <li key={_index} className="flex items-center">
-          <CheckCircle className="w-5 h-5 text-primary mr-3" />
-          <span className="text-muted-foreground">{feature}</span>
-        </li>
-      ))}
-    </ul>
-    <button 
-      onClick={ctaAction}
-      className={`btn w-full ${popular ? 'btn-primary' : 'btn-outline'}`}
-    >
-      {ctaText}
-    </button>
-  </div>
-);
+import BuffrSignKnowledgeGraph from '../components/buffrsign-knowledge-graph';
+import ThemeToggle from '../components/ui/ThemeToggle';
+import NavLink from '../components/landing/NavLink';
+import CTAButton from '../components/landing/CTAButton';
+import FeatureCard from '../components/landing/FeatureCard';
+import PricingCard from '../components/landing/PricingCard';
+import Button from '../components/ui/button';
+import { useRouter } from 'next/navigation';
 
 export default function BuffrSignLandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -103,6 +37,7 @@ export default function BuffrSignLandingPage() {
   const [showDemoModal, setShowDemoModal] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -128,19 +63,20 @@ export default function BuffrSignLandingPage() {
             </div>
             <div className="hidden md:flex items-center space-x-10">
               <NavLink href="#features">Features</NavLink>
-              <NavLink href="#live-demo">Live Demo</NavLink>
               <NavLink href="#legal-framework">Legal Framework</NavLink>
               <NavLink href="#pricing">Pricing</NavLink>
               <NavLink href="#security">Security</NavLink>
             </div>
             <div className="hidden md:flex items-center space-x-4">
-              <button className="btn btn-ghost">Sign In</button>
-              <button 
-                className="btn btn-primary rounded-full"
-                onClick={() => setShowDemoModal(true)}
+              <ThemeToggle />
+              <Button variant="ghost" size="md" onClick={() => router.push('/auth/login')}>Sign In</Button>
+              <Button 
+                variant="primary"
+                size="md"
+                onClick={() => router.push('/auth/signup')}
               >
                 Try Free
-              </button>
+              </Button>
             </div>
             <div className="md:hidden">
               <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-foreground">
@@ -151,18 +87,22 @@ export default function BuffrSignLandingPage() {
           {isMenuOpen && (
             <div className="md:hidden mt-4 bg-card rounded-lg shadow-lg p-4 border border-border">
               <a href="#features" className="block py-2 text-lg">Features</a>
-              <a href="#live-demo" className="block py-2 text-lg">Live Demo</a>
               <a href="#legal-framework" className="block py-2 text-lg">Legal Framework</a>
               <a href="#pricing" className="block py-2 text-lg">Pricing</a>
               <a href="#security" className="block py-2 text-lg">Security</a>
               <div className="pt-4 mt-4 border-t border-border space-y-3">
-                <button className="btn btn-ghost w-full">Sign In</button>
-                <button 
-                  className="btn btn-primary w-full rounded-full"
-                  onClick={() => setShowDemoModal(true)}
+                <div className="flex justify-center">
+                  <ThemeToggle />
+                </div>
+                <Button variant="ghost" size="md" className="w-full" onClick={() => router.push('/auth/login')}>Sign In</Button>
+                <Button 
+                  variant="primary"
+                  size="md"
+                  className="w-full"
+                  onClick={() => router.push('/auth/signup')}
                 >
                   Try Free
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -186,13 +126,13 @@ export default function BuffrSignLandingPage() {
             
             <p className="max-w-3xl mx-auto text-xl text-muted-foreground mb-10">
               The first AI-powered digital signature platform built for Namibian businesses. 
-              Upload any _document, our AI finds signature spots, and get legally binding results instantly.
+              Upload any document, our AI finds signature spots, and get legally binding results instantly.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <CTAButton 
                 primary
-                onClick={() => setShowDemoModal(true)}
+                onClick={() => router.push('/auth/signup')}
               >
                 Start Signing Free <ArrowRight className="w-5 h-5 ml-2" />
               </CTAButton>
@@ -222,224 +162,313 @@ export default function BuffrSignLandingPage() {
         <section className="py-24 md:py-32 bg-muted/30">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 bg-chart-4/10 text-chart-4 px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <Cpu className="w-4 h-4" />
+                Real BuffrSign Interface
+              </div>
               <h2 className="text-4xl md:text-5xl font-bold mb-6">BuffrSign Workspace</h2>
-              <p className="max-w-3xl mx-auto text-xl text-muted-foreground">
-                AI-Powered Document Analysis with Real-time Processing
+              <p className="max-w-3xl mx-auto text-xl text-muted-foreground mb-8">
+                This is exactly what you&apos;ll see when using BuffrSign. Our AI-powered document analysis, 
+                signature fields, and compliance checking in action.
               </p>
+              
             </div>
             
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="space-y-8">
-                <div className="_document-card p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-3 h-3 bg-chart-2 rounded-full animate-pulse"></div>
-                    <span className="text-sm font-medium text-chart-2">Active</span>
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">Contract Analysis Complete</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Employment agreement between Namibian Digital Solutions (Pty) Ltd and John Katamba
-                  </p>
-                  <div className="grid grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">Pages:</span>
-                      <span className="font-medium ml-1">12 pages</span>
+            {/* Real BuffrSign Interface */}
+            <div className="max-w-7xl mx-auto">
+              {/* Dashboard Layout Simulation */}
+              <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-2xl">
+                {/* Top Navigation */}
+                <div className="bg-muted/50 px-6 py-4 border-b border-border">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-chart-1 rounded-lg flex items-center justify-center">
+                        <FileSignature className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Signatures:</span>
-                      <span className="font-medium ml-1">3 signature fields</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Compliance:</span>
-                      <span className="font-medium ml-1 text-chart-2">ETA compliant</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="_document-card p-6">
-                  <h4 className="font-bold mb-3">Key Terms Identified</h4>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-primary" />
-                      Probation period: 3 months
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-primary" />
-                      Salary: N$45,000 per month
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-primary" />
-                      Notice period: 30 days
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="_document-card p-6">
-                  <h4 className="font-bold mb-3">AI Recommendations</h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Consider adding intellectual property clause (Section 8.3)
-                  </p>
-                  <button className="btn btn-primary btn-sm">View suggestion →</button>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                <div className="_document-card p-6">
-                  <h3 className="font-bold mb-4">Document Preview</h3>
-                  <div className="bg-muted rounded-lg p-4 text-center">
-                    <FileText className="w-12 h-12 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-sm font-medium">Employment_Contract_2024.pdf</p>
-                    <p className="text-xs text-muted-foreground">Ready for signature</p>
-                  </div>
-                  <div className="flex gap-2 mt-4">
-                    <button className="btn btn-outline btn-sm flex-1">Preview</button>
-                    <button className="btn btn-outline btn-sm flex-1">Download</button>
-                  </div>
-                </div>
-
-                <div className="_document-card p-6">
-                  <h4 className="font-bold mb-3">Ask me anything about this contract...</h4>
-                  <div className="space-y-3">
-                    <div className="bg-primary/10 p-3 rounded-lg">
-                      <p className="text-sm">&quot;What exactly does the &apos;3-month probation period&apos; mean under Namibian law?&quot;</p>
-                    </div>
-                    <div className="bg-muted p-3 rounded-lg">
-                      <p className="text-sm text-muted-foreground">
-                        Regarding the probation period, as stipulated in Clause 3.1 of your agreement, 
-                        this is governed by the Labour Act (No. 11 of 2007). The Act specifies that a 
-                        probationary period should be for a reasonable duration to assess the employee&apos;s suitability.
-                      </p>
-                    </div>
-                    <button className="btn btn-primary btn-sm w-full">Yes, Let&apos;s Sign</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Live Demo Section */}
-        <section id="live-demo" className="py-24 md:py-32">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">Live Demo</h2>
-              <p className="max-w-3xl mx-auto text-xl text-muted-foreground">
-                See how our AI analyzes contracts, explains legal terms, and guides you through the signing process. 
-                Our assistant has deep knowledge of contract law and the Namibian constitution.
-              </p>
-            </div>
-
-            <div className="max-w-4xl mx-auto">
-              <div className="_document-card p-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-3 h-3 bg-chart-2 rounded-full animate-pulse"></div>
-                  <span className="font-bold">BuffrSign AI Assistant</span>
-                  <span className="text-sm text-muted-foreground">Live chat session</span>
-                </div>
-                
-                {/* Chat Interface */}
-                <div className="space-y-4 max-h-96 overflow-y-auto">
-                  {/* User Message */}
-                  <div className="flex justify-end">
-                    <div className="bg-primary text-primary-foreground p-4 rounded-lg max-w-xs">
-                      <p className="text-sm">
-                        I just uploaded an employment contract. Can you help me understand the key terms?
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {/* AI Response */}
-                  <div className="flex justify-start">
-                    <div className="bg-muted p-4 rounded-lg max-w-lg">
-                        <p className="text-sm mb-3">
-                         I&apos;ve analyzed your employment contract. Here are the key terms I found:
-                        </p>
-                      <ul className="space-y-1 text-sm">
-                        <li>• <strong>Probation period:</strong> 3 months</li>
-                        <li>• <strong>Salary:</strong> N$45,000 per month</li>
-                        <li>• <strong>Notice period:</strong> 30 days</li>
-                        <li>• <strong>Signatures Required:</strong> 2 (employer & employee)</li>
-                      </ul>
-                    </div>
-                  </div>
-                  
-                  {/* User Message */}
-                  <div className="flex justify-end">
-                    <div className="bg-primary text-primary-foreground p-4 rounded-lg max-w-xs">
-                      <p className="text-sm">
-                        What does the 3-month probation period mean under Namibian law?
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {/* AI Response */}
-                  <div className="flex justify-start">
-                    <div className="bg-muted p-4 rounded-lg max-w-lg">
-                        <p className="text-sm">
-                          Under the Labour Act (No. 11 of 2007), a probationary period is a trial period to assess 
-                         the employee&apos;s suitability for the position. During probation:
-                        </p>
-                      <ul className="space-y-1 text-sm mt-2">
-                        <li>• Either party can terminate with shorter notice</li>
-                        <li>• Performance standards should be clearly communicated</li>
-                        <li>• Regular feedback and evaluation are recommended</li>
-                      </ul>
-                      <p className="text-sm mt-2">
-                        Your contract is compliant with Namibian law. Would you like me to proceed with signature placement?
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {/* User Message */}
-                  <div className="flex justify-end">
-                    <div className="bg-primary text-primary-foreground p-4 rounded-lg max-w-xs">
-                        <p className="text-sm">
-                         Yes, let&apos;s sign it! Is this legally binding?
-                        </p>
-                    </div>
-                  </div>
-                  
-                  {/* AI Response */}
-                  <div className="flex justify-start">
-                    <div className="bg-muted p-4 rounded-lg max-w-lg">
-                        <p className="text-sm">
-                          Absolutely! Your digital signature will be legally binding under the Electronic Transactions Act (No. 4 of 2019). 
-                         I&apos;ve placed signature fields in the appropriate locations. 
-                        </p>
-                      <div className="mt-3 p-3 bg-chart-2/10 rounded-lg">
-                        <p className="text-sm text-chart-2 font-medium">
-                          ✅ ETA 2019 Compliant • ✅ Legally Binding • ✅ Audit Trail Created
-                        </p>
+                        <h3 className="font-bold text-foreground">BuffrSign Dashboard</h3>
+                        <p className="text-sm text-muted-foreground">Document Analysis & Signing</p>
                       </div>
                     </div>
-                  </div>
-                  
-                  {/* Typing Indicator */}
-                  <div className="flex justify-start">
-                    <div className="bg-muted p-4 rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
-                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-chart-2 rounded-full animate-pulse"></div>
+                        <span className="text-sm text-chart-2 font-medium">AI Active</span>
+                      </div>
+                      <div className="avatar placeholder">
+                        <div className="bg-chart-1 text-white rounded-full w-8">
+                          <span className="text-xs">JD</span>
                         </div>
-                        <span className="text-xs text-muted-foreground">BuffrSign AI is typing...</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid lg:grid-cols-3 gap-0">
+                  {/* Left Sidebar - Navigation */}
+                  <div className="bg-muted/30 p-4 border-r border-border">
+                    <nav className="space-y-2">
+                      <div className="flex items-center gap-3 p-3 bg-chart-1/10 rounded-lg border border-chart-1/20">
+                        <FileText className="w-5 h-5 text-chart-1" />
+                        <span className="font-medium text-chart-1">Documents</span>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 text-muted-foreground hover:text-foreground cursor-pointer">
+                        <ShieldCheck className="w-5 h-5" />
+                        <span>Compliance</span>
+                </div>
+                      <div className="flex items-center gap-3 p-3 text-muted-foreground hover:text-foreground cursor-pointer">
+                        <Users className="w-5 h-5" />
+                        <span>Team</span>
+                </div>
+                      <div className="flex items-center gap-3 p-3 text-muted-foreground hover:text-foreground cursor-pointer">
+                        <Settings className="w-5 h-5" />
+                        <span>Settings</span>
+              </div>
+                    </nav>
+                    
+                    {/* Recent Documents */}
+                    <div className="mt-6">
+                      <h4 className="font-semibold mb-3 text-foreground">Recent Documents</h4>
+                      <div className="space-y-2">
+                        <div className="bg-card p-3 rounded-lg border border-border cursor-pointer hover:border-chart-1 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <FileText className="w-4 h-4 text-chart-1" />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">Employment_Contract.pdf</p>
+                              <p className="text-xs text-muted-foreground">Ready to sign</p>
+                  </div>
+                            <div className="w-2 h-2 bg-chart-2 rounded-full"></div>
+                  </div>
+                </div>
+                        <div className="bg-card p-3 rounded-lg border border-border opacity-60">
+                          <div className="flex items-center gap-3">
+                            <FileText className="w-4 h-4 text-muted-foreground" />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">Service_Agreement.pdf</p>
+                              <p className="text-xs text-muted-foreground">Completed</p>
+                    </div>
+                            <CheckCircle className="w-4 h-4 text-chart-2" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+                  {/* Center - AI Document Analysis */}
+                  <div className="p-6">
+                    <div className="space-y-6">
+                      {/* AI Analysis Header */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Cpu className="w-6 h-6 text-chart-4" />
+                          <h3 className="text-xl font-bold text-foreground">AI Document Analysis</h3>
+            </div>
+                        <div className="flex items-center gap-2">
+                          <Button variant="outline" size="sm">
+                            <Download className="w-4 h-4 mr-1" />
+                            Export
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Settings className="w-4 h-4" />
+                          </Button>
+                    </div>
+                  </div>
+                  
+                      {/* Analysis Progress */}
+                      <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <div className="loading loading-spinner loading-sm text-primary"></div>
+                            <span className="font-medium text-primary">Compliance Check</span>
+                          </div>
+                          <span className="text-sm text-primary">85%</span>
+                        </div>
+                        <div className="w-full bg-primary/20 rounded-full h-2">
+                          <div className="bg-primary h-2 rounded-full transition-all duration-300" style={{ width: '85%' }} />
+                        </div>
+                        <div className="text-sm text-primary mt-2">
+                          Validating ETA 2019 compliance...
+                    </div>
+                  </div>
+                  
+                      {/* Analysis Results */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-card p-4 rounded-lg border border-border">
+                          <div className="flex items-center space-x-2">
+                            <FileText className="h-5 w-5 text-chart-1" />
+                            <span className="font-medium">Document Type</span>
+                    </div>
+                          <p className="text-sm text-muted-foreground mt-1">Employment Contract</p>
+                          <p className="text-xs text-muted-foreground">Confidence: 95%</p>
+                  </div>
+                  
+                        <div className="bg-card p-4 rounded-lg border border-border">
+                          <div className="flex items-center space-x-2">
+                            <ShieldCheck className="h-5 w-5 text-chart-2" />
+                            <span className="font-medium">Compliance Score</span>
+                    </div>
+                          <p className="text-sm text-muted-foreground mt-1">95%</p>
+                          <p className="text-xs text-muted-foreground">ETA 2019 Compliant</p>
+                  </div>
+                  
+                        <div className="bg-card p-4 rounded-lg border border-border">
+                          <div className="flex items-center space-x-2">
+                            <TrendingUp className="h-5 w-5 text-chart-3" />
+                            <span className="font-medium">Risk Level</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">Low</p>
+                          <p className="text-xs text-muted-foreground">Score: 20/100</p>
+                    </div>
+                  </div>
+                  
+                      {/* AI Insights */}
+                      <div className="bg-card p-6 rounded-lg border border-border">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
+                          <Cpu className="h-5 w-5 text-chart-4" />
+                          <span>AI Insights</span>
+                        </h3>
+                        <div className="space-y-4">
+                          <div>
+                            <h4 className="font-medium text-foreground">Summary</h4>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              This employment contract is well-structured and compliant with Namibian labour laws. 
+                              All key terms are clearly defined and legally sound.
+                            </p>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-foreground">Key Findings</h4>
+                            <ul className="list-disc list-inside text-sm text-muted-foreground mt-1 space-y-1">
+                              <li>Probation period: 3 months (Labour Act compliant)</li>
+                              <li>Salary: N$45,000/month with performance bonus</li>
+                              <li>Notice period: 30 days (standard practice)</li>
+                              <li>3 signature fields identified and validated</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Right Panel - Signature Fields */}
+                  <div className="bg-muted/30 p-4 border-l border-border">
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5 text-chart-1" />
+                        <h4 className="font-semibold text-foreground">Signature Fields</h4>
+                      </div>
+                      
+                      {/* Signature Field 1 */}
+                      <div className="bg-card rounded-lg p-4 border border-border">
+                        <div className="flex items-center justify-between mb-3">
+                          <div>
+                            <p className="font-medium">Employee Signature</p>
+                            <p className="text-sm text-muted-foreground">Page 1 • Required</p>
+                          </div>
+                          <span className="px-2 py-1 text-xs bg-chart-5/20 text-chart-5 rounded">Required</span>
+                        </div>
+                        <div className="bg-muted rounded-lg p-4 border-2 border-dashed border-border">
+                          <div className="text-center">
+                            <div className="w-24 h-12 mx-auto bg-white rounded border border-border mb-2"></div>
+                            <p className="text-xs text-muted-foreground">Signature Field</p>
+                          </div>
+                        </div>
+                        <Button variant="primary" size="sm" className="w-full mt-3">
+                          Sign Here
+                        </Button>
+                      </div>
+
+                      {/* Signature Field 2 */}
+                      <div className="bg-card rounded-lg p-4 border border-border">
+                        <div className="flex items-center justify-between mb-3">
+                          <div>
+                            <p className="font-medium">Employer Signature</p>
+                            <p className="text-sm text-muted-foreground">Page 1 • Required</p>
+                          </div>
+                          <span className="px-2 py-1 text-xs bg-chart-5/20 text-chart-5 rounded">Required</span>
+                        </div>
+                        <div className="bg-muted rounded-lg p-4 border-2 border-dashed border-border">
+                          <div className="text-center">
+                            <div className="w-24 h-12 mx-auto bg-white rounded border border-border mb-2"></div>
+                            <p className="text-xs text-muted-foreground">Signature Field</p>
+                          </div>
+                        </div>
+                        <Button variant="outline" size="sm" className="w-full mt-3">
+                          Pending
+                        </Button>
+                      </div>
+
+                      {/* Signature Field 3 */}
+                      <div className="bg-card rounded-lg p-4 border border-border">
+                        <div className="flex items-center justify-between mb-3">
+                          <div>
+                            <p className="font-medium">Witness Signature</p>
+                            <p className="text-sm text-muted-foreground">Page 2 • Optional</p>
+                          </div>
+                          <span className="px-2 py-1 text-xs bg-chart-2/20 text-chart-2 rounded">Optional</span>
+                        </div>
+                        <div className="bg-muted rounded-lg p-4 border-2 border-dashed border-border">
+                          <div className="text-center">
+                            <div className="w-24 h-12 mx-auto bg-white rounded border border-border mb-2"></div>
+                            <p className="text-xs text-muted-foreground">Signature Field</p>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm" className="w-full mt-3">
+                          Skip
+                        </Button>
+                      </div>
+
+                      {/* Compliance Status */}
+                      <div className="bg-chart-2/10 p-4 rounded-lg border border-chart-2/20">
+                        <div className="flex items-center gap-2 mb-2">
+                          <ShieldCheck className="w-5 h-5 text-chart-2" />
+                          <span className="text-sm font-medium text-chart-2">ETA 2019 Compliance</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          <CheckCircle className="w-4 h-4 text-chart-2" /> Section 17: Electronic Signatures<br/>
+                          <CheckCircle className="w-4 h-4 text-chart-2" /> Section 20: Data Integrity<br/>
+                          <CheckCircle className="w-4 h-4 text-chart-2" /> Section 21: Authentication<br/>
+                          <CheckCircle className="w-4 h-4 text-chart-2" /> Audit Trail Created
+                        </div>
+                      </div>
                       </div>
                     </div>
                   </div>
                 </div>
                 
-                <div className="text-center mt-6">
-                  <button 
-                    className="btn btn-primary"
-                    onClick={() => setShowDemoModal(true)}
-                  >
-                    Try This Live Demo <ArrowRight className="w-4 h-4 ml-2" />
-                  </button>
+              {/* Feature Highlights */}
+              <div className="mt-16 grid md:grid-cols-3 gap-8">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-chart-1/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Cpu className="w-8 h-8 text-chart-1" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">Real AI Analysis</h3>
+                  <p className="text-muted-foreground">
+                    Our actual AI components analyze documents with OCR, computer vision, and compliance checking.
+                  </p>
+                </div>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-chart-2/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <ShieldCheck className="w-8 h-8 text-chart-2" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">Live Compliance</h3>
+                  <p className="text-muted-foreground">
+                    Real-time ETA 2019 validation using our actual compliance checking components.
+                  </p>
+                </div>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-chart-4/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle className="w-8 h-8 text-chart-4" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">Interactive Signing</h3>
+                  <p className="text-muted-foreground">
+                    Our actual signature field components with drawing, typing, and upload options.
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </section>
+
 
         {/* Legal Knowledge Graph Section */}
         <section id="legal-framework" className="py-24 md:py-32 bg-muted/30">
@@ -466,47 +495,47 @@ export default function BuffrSignLandingPage() {
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold mb-6">Why Choose BuffrSign?</h2>
               <p className="max-w-3xl mx-auto text-xl text-muted-foreground">
-                The most intelligent and _user-friendly digital signature platform designed 
+                The most intelligent and user-friendly digital signature platform designed 
                 specifically for Namibian businesses and individuals.
               </p>
             </div>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <FeatureCard 
-                icon={Cpu}
+              <FeatureCard
+                icon={<Cpu className="w-8 h-8" />}
                 title="AI-Powered Intelligence"
                 description="Our AI analyzes documents in real-time, detecting signature fields and ensuring legal compliance automatically. Powered by deep knowledge of contract law and the Namibian constitution."
-                color="chart-1"
+                color="primary"
               />
-              <FeatureCard 
-                icon={Smartphone}
+              <FeatureCard
+                icon={<Smartphone className="w-8 h-8" />}
                 title="Mobile-First Design"
                 description="Sign documents on any device with our touch-optimized interface. Works perfectly on phones, tablets, and computers. Seamless experience across all platforms."
-                color="chart-2"
+                color="accent"
               />
-              <FeatureCard 
-                icon={Users}
+              <FeatureCard
+                icon={<Users className="w-8 h-8" />}
                 title="Multi-Party Agreements"
                 description="Manage complex agreements with multiple signers. Set signing orders and track progress in real-time with ease. Perfect for business contracts and legal documents."
-                color="chart-3"
+                color="warning"
               />
-              <FeatureCard 
-                icon={ShieldCheck}
+              <FeatureCard
+                icon={<ShieldCheck className="w-8 h-8" />}
                 title="Legal Compliance"
                 description="ETA 2019 Sections 17, 20, 21, 24 compliant with automated compliance monitoring. Namibian Labour Act and Consumer Protection standards. Real-time compliance scoring and violation detection."
-                color="chart-4"
+                color="secondary"
               />
-              <FeatureCard 
-                icon={Settings}
+              <FeatureCard
+                icon={<Settings className="w-8 h-8" />}
                 title="Advanced Workflows"
                 description="Document Analysis → AI Extraction → Compliance Check → Signature Placement → Notifications. Automated workflows with conditional logic, retry policies, and real-time tracking."
-                color="chart-5"
+                color="error"
               />
-              <FeatureCard 
-                icon={Lock}
+              <FeatureCard
+                icon={<Lock className="w-8 h-8" />}
                 title="Professional Security"
-                description="256-bit Encryption, Multi-Factor Auth, Audit Trails. JWT tokens with HS256 encryption, _document access tokens, signature session tokens, and token blacklisting."
-                color="chart-1"
+                description="256-bit Encryption, Multi-Factor Auth, Audit Trails. JWT tokens with HS256 encryption, document access tokens, signature session tokens, and token blacklisting."
+                color="primary"
               />
             </div>
           </div>
@@ -516,55 +545,49 @@ export default function BuffrSignLandingPage() {
         <section id="pricing" className="py-24 md:py-32 bg-muted/30">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 bg-chart-2/10 text-chart-2 px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <span className="w-2 h-2 bg-chart-2 rounded-full animate-pulse"></span>
+                Trusted by 500+ Namibian businesses
+              </div>
               <h2 className="text-4xl md:text-5xl font-bold mb-6">Simple, Transparent Pricing</h2>
-              <p className="max-w-3xl mx-auto text-xl text-muted-foreground">
-                Start signing documents today with our free plan, or upgrade for advanced features.
+              <p className="max-w-3xl mx-auto text-xl text-muted-foreground mb-8">
+                Start signing documents today with our FREE standard plan until October 2025.
+                No hidden fees, no surprises.
               </p>
+              
+              {/* Limited Time Offer */}
+              <div className="flex items-center justify-center gap-4 mb-12">
+                <div className="bg-chart-2/10 text-chart-2 px-4 py-2 rounded-full text-sm font-medium">
+                  <span className="w-2 h-2 bg-chart-2 rounded-full animate-pulse mr-2 inline-block"></span>
+                  Limited Time Offer
+                </div>
+              </div>
             </div>
             
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="flex justify-center max-w-2xl mx-auto">
+              {/* BuffrSign Beta - FREE until October 2025 */}
               <PricingCard
-                title="Standard"
-                price="N$25"
-                period="_document"
+                title="BuffrSign Beta"
+                price="FREE"
+                period="until Oct 2025"
+                popular={true}
                 features={[
-                  "Pay per use",
-                  "3 free signatures + 500 AI tokens",
-                  "N$25 per _document signed",
+                  "10 free signatures + 2000 AI tokens",
+                  "FREE document signing until October 2025",
                   "BuffrSign AI analysis (token-based)",
                   "ETA 2019 compliance checking",
                   "Legal term explanations",
-                  "Priority support"
-                ]}
-                ctaText="Start with Free Pack"
-                ctaAction={() => setShowPricingModal(true)}
-              />
-              
-              <PricingCard
-                title="Pro"
-                price="N$199"
-                period="month"
-                popular={true}
-                features={[
-                  "Unlimited documents",
-                  "Unlimited signatures + 10,000 AI tokens",
-                  "Unlimited _document signing",
-                  "Advanced BuffrSign AI (10,000 tokens/month)",
-                  "Team collaboration",
                   "Priority support",
-                  "Custom workflows",
-                  "Advanced compliance monitoring"
+                  "Advanced templates",
+                  "Mobile & desktop access"
                 ]}
-                ctaText="Start Pro Trial"
+                ctaText="Start Free Now"
                 ctaAction={() => setShowPricingModal(true)}
+                className="border-2 border-chart-1"
               />
             </div>
 
-            <div className="text-center mt-8">
-              <p className="text-muted-foreground">
-                AI Token Pricing: N$2 per 100 tokens • Min top-up N$50
-              </p>
-            </div>
+
           </div>
         </section>
 
@@ -579,7 +602,7 @@ export default function BuffrSignLandingPage() {
               <CTAButton 
                 primary 
                 className="w-full sm:w-auto"
-                onClick={() => setShowDemoModal(true)}
+                onClick={() => router.push('/auth/signup')}
               >
                 Start Free Trial <ArrowRight className="w-5 h-5 ml-2" />
               </CTAButton>
@@ -604,7 +627,7 @@ export default function BuffrSignLandingPage() {
               </div>
               <p className="text-muted-foreground max-w-md">
                 The AI-powered digital signature platform built for Namibia. 
-                Secure, compliant, and intelligent _document workflows.
+                Secure, compliant, and intelligent document workflows.
               </p>
             </div>
             
@@ -654,14 +677,14 @@ export default function BuffrSignLandingPage() {
               <input 
                 type="email" 
                 placeholder="Your email address" 
-                className="form-input w-full"
+                className="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
               />
               <input 
                 type="text" 
                 placeholder="Your company name" 
-                className="form-input w-full"
+                className="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
               />
-              <select className="form-input w-full">
+              <select className="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground">
                 <option>Select industry</option>
                 <option>Legal</option>
                 <option>Real Estate</option>
@@ -670,18 +693,24 @@ export default function BuffrSignLandingPage() {
                 <option>Other</option>
               </select>
               <div className="flex gap-3">
-                <button 
-                  className="form-button flex-1"
-                  onClick={() => setShowDemoModal(false)}
+                <Button 
+                  variant="primary"
+                  size="md"
+                  className="flex-1"
+                  onClick={() => {
+                    setShowDemoModal(false);
+                    router.push('/auth/signup');
+                  }}
                 >
                   Start Free Trial
-                </button>
-                <button 
-                  className="btn btn-ghost"
+                </Button>
+                <Button 
+                  variant="ghost"
+                  size="md"
                   onClick={() => setShowDemoModal(false)}
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -693,12 +722,13 @@ export default function BuffrSignLandingPage() {
           <div className="bg-card rounded-2xl p-8 max-w-4xl w-full border border-border">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-2xl font-bold text-foreground">BuffrSign Demo Video</h3>
-              <button 
+              <Button 
+                variant="ghost"
+                size="sm"
                 onClick={() => setShowVideoModal(false)}
-                className="btn btn-ghost btn-sm"
               >
                 <X className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
             <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
               <p className="text-muted-foreground">Video placeholder - Demo video would be embedded here</p>
@@ -715,24 +745,30 @@ export default function BuffrSignLandingPage() {
               Select the plan that best fits your needs.
             </p>
             <div className="space-y-4">
-              <button 
-                className="btn btn-outline w-full"
+              <Button 
+                variant="outline"
+                size="md"
+                className="w-full"
                 onClick={() => setShowPricingModal(false)}
               >
                 Standard Plan - N$25/document
-              </button>
-              <button 
-                className="btn btn-primary w-full"
+              </Button>
+              <Button 
+                variant="primary"
+                size="md"
+                className="w-full"
                 onClick={() => setShowPricingModal(false)}
               >
                 Pro Plan - N$199/month
-              </button>
-              <button 
-                className="btn btn-ghost w-full"
+              </Button>
+              <Button 
+                variant="ghost"
+                size="md"
+                className="w-full"
                 onClick={() => setShowPricingModal(false)}
               >
                 Cancel
-              </button>
+              </Button>
             </div>
         </div>
       </div>

@@ -15,19 +15,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  Play, 
-  Pause, 
-  Square, 
-  Clock,
-  Users,
-  FileText,
-  CheckCircle2,
-  AlertCircle,
-  MoreHorizontal,
-  Loader2
-} from 'lucide-react';
+import { Play, Pause, Square, Clock, Users, FileText, CheckCircle2, AlertCircle, MoreHorizontal, Loader2 } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import { WorkflowStatus } from '@/lib/types';
 
 interface ActiveWorkflow {
@@ -43,7 +33,7 @@ interface ActiveWorkflow {
 }
 
 export default function ActiveWorkflowsPage() {
-  const { _user, getSupabaseClient } = useAuth();
+  const { user: _user } = useAuth();
   const [activeWorkflows, setActiveWorkflows] = useState<ActiveWorkflow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +43,8 @@ export default function ActiveWorkflowsPage() {
       setLoading(true);
       setError(null);
 
-      const _supabase = getSupabaseClient();
+      
+      const supabase = createClient();
       const { data: workflows, error: workflowsError } = await supabase
         .from('signature_workflows')
         .select(`
@@ -77,14 +68,14 @@ export default function ActiveWorkflowsPage() {
         const stepsData = (workflow.steps as unknown[]) || [];
         
         return {
-          id: workflow.id,
-          name: `Workflow ${workflow.id.slice(0, 8)}`, // Generate name from ID
+          id: workflow.id as string,
+          name: `Workflow ${(workflow.id as string).slice(0, 8)}`, // Generate name from ID
           description: 'Document signing workflow',
           status: workflow.status as WorkflowStatus,
-          progress: calculateProgress(workflow.current_step, stepsData.length),
+          progress: calculateProgress((workflow.current_step as number).toString(), stepsData.length),
           participants: participantsData.length,
           documents: 1, // Each workflow has one document
-          startedDate: workflow.created_at ? new Date(workflow.created_at).toLocaleDateString() : 'Unknown',
+          startedDate: workflow.created_at ? new Date(workflow.created_at as string).toLocaleDateString() : 'Unknown',
           estimatedCompletion: 'Not set' // This field doesn't exist in the schema
         };
       }) || [];
@@ -96,7 +87,7 @@ export default function ActiveWorkflowsPage() {
     } finally {
       setLoading(false);
     }
-  }, [getSupabaseClient]);
+  }, [_user]);
 
   useEffect(() => {
     if (_user) {

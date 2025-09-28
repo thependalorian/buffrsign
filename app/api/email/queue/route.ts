@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const _supabase = createClient();
+    const supabase = await createClient();
     const { searchParams } = new URL(request.url);
     
     const filter = searchParams.get('filter') || 'all';
@@ -40,14 +40,14 @@ export async function GET() {
     }
 
     // Get queue statistics
-    const { data: stats, error: statsError } = await supabase
+    const { data: stats } = await supabase
       .from('email_queue')
       .select('status')
       .then(({ data }) => {
         if (!data) return { data: null, error: null };
         
         const stats = data.reduce((acc, item) => {
-          acc[item.status] = (acc[item.status] || 0) + 1;
+          acc[item.status as string] = (acc[item.status as string] || 0) + 1;
           return acc;
         }, {} as Record<string, number>);
         
@@ -63,7 +63,7 @@ export async function GET() {
         total: queueItems?.length || 0
       }
     });
-  } catch {
+  } catch (error) {
     console.error('Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -74,7 +74,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const _supabase = createClient();
+    const supabase = await createClient();
     const body = await request.json();
 
     // Check if _user is authenticated
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       success: true,
       queueItem
     }, { status: 201 });
-  } catch {
+  } catch (error) {
     console.error('Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

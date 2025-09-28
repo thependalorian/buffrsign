@@ -408,36 +408,33 @@ export class ETAComplianceService {
   /**
    * Validate Chapter 4 - Consumer Protection
    */
-  private async validateChapter4(
-    signatureData: SignatureData,
-    documentData: DocumentData
-  ): Promise<ComplianceSection> {
+  private async validateChapter4(): Promise<ComplianceSection> {
     const requirements: ComplianceRequirement[] = [
       {
         id: "eta_ch4_1",
         description: "Fair and transparent terms and conditions",
-        met: this.hasTransparentTerms(documentData),
+        met: this.hasTransparentTerms(),
         evidence: "Terms and conditions present in _document",
         critical: false
       },
       {
         id: "eta_ch4_2",
         description: "Clear disclosure of electronic signature requirements",
-        met: this.hasSignatureDisclosure(documentData),
+        met: this.hasSignatureDisclosure(),
         evidence: "Electronic signature requirements disclosed",
         critical: false
       },
       {
         id: "eta_ch4_3",
         description: "Right to withdraw consent",
-        met: this.hasWithdrawalRights(documentData),
+        met: this.hasWithdrawalRights(),
         evidence: "Withdrawal rights included",
         critical: false
       },
       {
         id: "eta_ch4_4",
         description: "Data protection and privacy rights",
-        met: this.hasDataProtection(documentData),
+        met: this.hasDataProtection(),
         evidence: "Data protection measures in place",
         critical: true
       }
@@ -524,25 +521,25 @@ export class ETAComplianceService {
     );
   }
 
-  private hasTransparentTerms(documentData: DocumentData): boolean {
+  private hasTransparentTerms(): boolean {
     // Check if _document contains terms and conditions
     const content = documentData.content.toLowerCase();
     return content.includes('terms') || content.includes('conditions') || content.includes('agreement');
   }
 
-  private hasSignatureDisclosure(documentData: DocumentData): boolean {
+  private hasSignatureDisclosure(): boolean {
     // Check if _document discloses electronic signature requirements
     const content = documentData.content.toLowerCase();
     return content.includes('electronic signature') || content.includes('digital signature');
   }
 
-  private hasWithdrawalRights(documentData: DocumentData): boolean {
+  private hasWithdrawalRights(): boolean {
     // Check if _document includes withdrawal rights
     const content = documentData.content.toLowerCase();
     return content.includes('withdraw') || content.includes('cancel') || content.includes('terminate');
   }
 
-  private hasDataProtection(documentData: DocumentData): boolean {
+  private hasDataProtection(): boolean {
     // Check if _document includes data protection measures
     const content = documentData.content.toLowerCase();
     return content.includes('privacy') || content.includes('data protection') || content.includes('gdpr');

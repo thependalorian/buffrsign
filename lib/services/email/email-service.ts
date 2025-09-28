@@ -14,12 +14,8 @@ import {
   EmailSendResult,
   EmailQueueData,
   TemplateContext,
-  ProcessedTemplate,
   UserEmailPreferences,
-  EmailNotification,
-  ScheduledReminder,
   EmailAnalytics,
-  EmailBlacklist,
   SendEmailRequest,
   SendEmailResponse,
   EmailWebhookEvent,
@@ -28,10 +24,17 @@ import {
   EMAIL_RETRY_ATTEMPTS,
 } from '@/lib/types/email';
 
+interface EmailProviderInstance {
+  sendEmail(emailData: EmailQueueData): Promise<EmailSendResult>;
+  testConnection(): Promise<boolean>;
+  verifyWebhookSignature?(body: any, signature: string, timestamp: string): boolean;
+  parseWebhookEvent?(event: any): EmailWebhookEvent | null;
+}
+
 export class EmailService {
   private supabase = createClient();
   private templateEngine = new EmailTemplateEngine();
-  private providers: Map<EmailProvider, any> = new Map();
+  private providers: Map<EmailProvider, EmailProviderInstance> = new Map();
   private isInitialized = false;
 
   constructor() {
@@ -56,7 +59,7 @@ export class EmailService {
    */
   private async loadProviderConfigurations(): Promise<void> {
     try {
-      const { data: configs, error } = await this.supabase
+      const { data: configs } = await this.supabase
         .from('email_system_config')
         .select('*')
         .eq('is_active', true);
@@ -481,7 +484,6 @@ export class EmailService {
    * Handle webhook events
    */
   async handleWebhookEvent(
-    provider: EmailProvider,
     event: EmailWebhookEvent
   ): Promise<void> {
     try {
@@ -489,25 +491,25 @@ export class EmailService {
       const { error } = await this.supabase
         .from('email_notifications')
         .update({
-          status: this.mapWebhookEventToStatus(event.event),
-          delivered_at: event.event === 'delivered' ? new Date(event.timestamp).toISOString() : undefined,
-          opened_at: event.event === 'opened' ? new Date(event.timestamp).toISOString() : undefined,
-          clicked_at: event.event === 'clicked' ? new Date(event.timestamp).toISOString() : undefined,
-          error_message: event.reason,
+          status: this.mapWebhookEventToStatus(webhookEvent.event),
+          delivered_at: webhookEvent.event === 'delivered' ? new Date(webhookEvent.timestamp).toISOString() : undefined,
+          opened_at: webhookEvent.event === 'opened' ? new Date(webhookEvent.timestamp).toISOString() : undefined,
+          clicked_at: webhookEvent.event === 'clicked' ? new Date(webhookEvent.timestamp).toISOString() : undefined,
+          error_message: webhookEvent.reason,
         })
-        .eq('external_message_id', event.messageId);
+        .eq('external_message_id', webhookEvent.messageId);
 
       if (error) {
         console.error('Failed to update email notification:', error);
       }
 
       // Handle bounces and complaints
-      if (event.event === 'bounced' || event.event === 'complained') {
-        await this.addToBlacklist(event.email, event.event as any, event.reason);
+      if (webhookEvent.event === 'bounced' || webhookEvent.event === 'complained') {
+        await this.addToBlacklist(webhookEvent.email, webhookEvent.event as 'bounced' | 'complained', webhookEvent.reason);
       }
 
       // Update analytics
-      await this.updateEmailAnalytics(event);
+      await this.updateEmailAnalytics(webhookEvent);
     } catch (error) {
       console.error('Webhook event handling error:', error);
     }
@@ -728,6 +730,139 @@ export class EmailService {
       return await this.sendEmail(emailData);
     } catch (error) {
       console.error('Error sending signature declined notification:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Send document invitation
+   */
+  async sendDocumentInvitation(data: {
+    documentId: string;
+    recipientEmail: string;
+    recipientName: string;
+    documentTitle: string;
+    senderName: string;
+    senderEmail: string;
+    expiresAt?: Date;
+    customMessage?: string;
+  }): Promise<EmailResponse> {
+    try {
+      const template = await this.templateEngine.getTemplate('document_invitation', 'en-US');
+      
+      const emailData = {
+        to: data.recipientEmail,
+        subject: `Document Invitation: ${data.documentTitle}`,
+        html: this.templateEngine.renderTemplate(template, {
+          recipient_name: data.recipientName,
+          document_title: data.documentTitle,
+          sender_name: data.senderName,
+          sender_email: data.senderEmail,
+          expires_at: data.expiresAt ? data.expiresAt.toLocaleDateString() : 'No expiration',
+          document_url: `${this.config.appUrl}/documents/${data.documentId}`,
+          custom_message: data.customMessage || ''
+        }),
+        text: this.templateEngine.renderTextTemplate(template, {
+          recipient_name: data.recipientName,
+          document_title: data.documentTitle,
+          sender_name: data.senderName,
+          sender_email: data.senderEmail,
+          expires_at: data.expiresAt ? data.expiresAt.toLocaleDateString() : 'No expiration',
+          document_url: `${this.config.appUrl}/documents/${data.documentId}`,
+          custom_message: data.customMessage || ''
+        })
+      };
+
+      return await this.sendEmail(emailData);
+    } catch (error) {
+      console.error('Error sending document invitation:', error);
+      throw error;
+    }
+  }
+
+  async sendSignatureReminder(data: {
+    documentId: string;
+    recipientEmail: string;
+    recipientName: string;
+    documentTitle: string;
+    senderName: string;
+    senderEmail: string;
+    expiresAt?: Date;
+    customMessage?: string;
+    daysRemaining?: number;
+  }): Promise<EmailResponse> {
+    try {
+      const template = await this.templateEngine.getTemplate('signature_reminder', 'en-US');
+      
+      const emailData = {
+        to: data.recipientEmail,
+        subject: `Reminder: Please Sign ${data.documentTitle}`,
+        html: this.templateEngine.renderTemplate(template, {
+          recipient_name: data.recipientName,
+          document_title: data.documentTitle,
+          sender_name: data.senderName,
+          sender_email: data.senderEmail,
+          expires_at: data.expiresAt ? data.expiresAt.toLocaleDateString() : 'No expiration',
+          document_url: `${this.config.appUrl}/documents/${data.documentId}`,
+          custom_message: data.customMessage || ''
+        }),
+        text: this.templateEngine.renderTextTemplate(template, {
+          recipient_name: data.recipientName,
+          document_title: data.documentTitle,
+          sender_name: data.senderName,
+          sender_email: data.senderEmail,
+          expires_at: data.expiresAt ? data.expiresAt.toLocaleDateString() : 'No expiration',
+          document_url: `${this.config.appUrl}/documents/${data.documentId}`,
+          custom_message: data.customMessage || ''
+        })
+      };
+
+      return await this.sendEmail(emailData);
+    } catch (error) {
+      console.error('Error sending signature reminder:', error);
+      throw error;
+    }
+  }
+
+  async sendDocumentCompleted(data: {
+    documentId: string;
+    recipientEmail: string;
+    recipientName: string;
+    documentTitle: string;
+    senderName: string;
+    senderEmail: string;
+    completedAt?: Date;
+    customMessage?: string;
+  }): Promise<EmailResponse> {
+    try {
+      const template = await this.templateEngine.getTemplate('document_completed', 'en-US');
+      
+      const emailData = {
+        to: data.recipientEmail,
+        subject: `Document Completed: ${data.documentTitle}`,
+        html: this.templateEngine.renderTemplate(template, {
+          recipient_name: data.recipientName,
+          document_title: data.documentTitle,
+          sender_name: data.senderName,
+          sender_email: data.senderEmail,
+          completed_at: data.completedAt ? data.completedAt.toLocaleDateString() : new Date().toLocaleDateString(),
+          document_url: `${this.config.appUrl}/documents/${data.documentId}`,
+          custom_message: data.customMessage || ''
+        }),
+        text: this.templateEngine.renderTextTemplate(template, {
+          recipient_name: data.recipientName,
+          document_title: data.documentTitle,
+          sender_name: data.senderName,
+          sender_email: data.senderEmail,
+          completed_at: data.completedAt ? data.completedAt.toLocaleDateString() : new Date().toLocaleDateString(),
+          document_url: `${this.config.appUrl}/documents/${data.documentId}`,
+          custom_message: data.customMessage || ''
+        })
+      };
+
+      return await this.sendEmail(emailData);
+    } catch (error) {
+      console.error('Error sending document completed notification:', error);
       throw error;
     }
   }

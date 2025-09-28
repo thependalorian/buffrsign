@@ -3,8 +3,8 @@
  * Tests complete _user journeys and system workflows
  */
 
-import { DocumentService } from '../../lib/services/_document-service';
-import { DocumentAnalyzer } from '../../lib/services/_document-analyzer';
+import { DocumentService } from '../../lib/services/document-service';
+import { DocumentAnalyzer } from '../../lib/services/document-analyzer';
 import { WorkflowEngine } from '../../lib/services/workflow-engine';
 import { WorkflowOrchestrator, WorkflowStepType } from '../../lib/ai/workflow-orchestrator';
 import { kycService } from '../../lib/services/kyc';

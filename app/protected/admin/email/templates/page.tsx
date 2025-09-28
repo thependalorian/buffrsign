@@ -23,7 +23,21 @@ export default function AdminEmailTemplatesPage() {
             <p>Template for _document signature invitations</p>
             <div className="card-actions justify-end">
               <EmailTemplateEditor 
-                templateType="document_invitation"
+                 template={{
+                   id: 'mock-id',
+                   name: 'Document Invitation',
+                   template_type: "document_invitation",
+                   subject_template: 'Document Invitation: {{document_title}}',
+                   html_template: '<p>Hello {{recipient_name}}, please sign {{document_title}}</p>',
+                   text_template: 'Hello {{recipient_name}}, please sign {{document_title}}',
+                   variables: ['document_title', 'recipient_name'],
+                   branding_options: {},
+                   locale: 'en-US',
+                   is_active: true,
+                   is_default: false,
+                   created_at: new Date().toISOString(),
+                   updated_at: new Date().toISOString(),
+                 }}
                 onSave={(template) => console.log('Template saved:', template)}
                 onDelete={(templateId) => console.log('Template deleted:', templateId)}
               />
@@ -37,7 +51,21 @@ export default function AdminEmailTemplatesPage() {
             <p>Template for signature reminder emails</p>
             <div className="card-actions justify-end">
               <EmailTemplateEditor 
-                templateType="signature_reminder"
+                template={{
+                   id: 'mock-id-2',
+                   name: 'Signature Reminder',
+                   template_type: "signature_reminder",
+                   subject_template: 'Reminder: Please Sign {{document_title}}',
+                   html_template: '<p>Hello {{recipient_name}}, this is a reminder to sign {{document_title}}</p>',
+                   text_template: 'Hello {{recipient_name}}, this is a reminder to sign {{document_title}}',
+                   variables: ['document_title', 'recipient_name'],
+                   branding_options: {},
+                   locale: 'en-US',
+                   is_active: true,
+                   is_default: false,
+                   created_at: new Date().toISOString(),
+                   updated_at: new Date().toISOString(),
+                 }}
                 onSave={(template) => console.log('Template saved:', template)}
                 onDelete={(templateId) => console.log('Template deleted:', templateId)}
               />
@@ -51,7 +79,21 @@ export default function AdminEmailTemplatesPage() {
             <p>Template for _document completion notifications</p>
             <div className="card-actions justify-end">
               <EmailTemplateEditor 
-                templateType="document_completed"
+                template={{
+                   id: 'mock-id-3',
+                   name: 'Document Completed',
+                   template_type: "document_completed",
+                   subject_template: 'Document Completed: {{document_title}}',
+                   html_template: '<p>Hello {{recipient_name}}, {{document_title}} has been completed</p>',
+                   text_template: 'Hello {{recipient_name}}, {{document_title}} has been completed',
+                   variables: ['document_title', 'recipient_name'],
+                   branding_options: {},
+                   locale: 'en-US',
+                   is_active: true,
+                   is_default: false,
+                   created_at: new Date().toISOString(),
+                   updated_at: new Date().toISOString(),
+                 }}
                 onSave={(template) => console.log('Template saved:', template)}
                 onDelete={(templateId) => console.log('Template deleted:', templateId)}
               />
@@ -65,7 +107,21 @@ export default function AdminEmailTemplatesPage() {
             <p>Template for _document expiration notifications</p>
             <div className="card-actions justify-end">
               <EmailTemplateEditor 
-                templateType="document_expired"
+                template={{
+                   id: 'mock-id-4',
+                   name: 'Document Expired',
+                   template_type: "document_expired",
+                   subject_template: 'Document Expired: {{document_title}}',
+                   html_template: '<p>Hello {{recipient_name}}, {{document_title}} has expired</p>',
+                   text_template: 'Hello {{recipient_name}}, {{document_title}} has expired',
+                   variables: ['document_title', 'recipient_name'],
+                   branding_options: {},
+                   locale: 'en-US',
+                   is_active: true,
+                   is_default: false,
+                   created_at: new Date().toISOString(),
+                   updated_at: new Date().toISOString(),
+                 }}
                 onSave={(template) => console.log('Template saved:', template)}
                 onDelete={(templateId) => console.log('Template deleted:', templateId)}
               />

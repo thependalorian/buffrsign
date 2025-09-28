@@ -30,6 +30,26 @@ export type EmailStatus =
 
 export type EmailProvider = 'sendgrid' | 'resend' | 'ses';
 
+// Email Provider Configuration
+export interface EmailProviderConfig {
+  id: string;
+  provider_name: EmailProvider;
+  is_active: boolean;
+  configuration: {
+    api_key?: string;
+    from_email: string;
+    from_name: string;
+    smtp_host?: string;
+    smtp_port?: number;
+    smtp_username?: string;
+    access_key_id?: string;
+    secret_access_key?: string;
+    region?: string;
+  };
+  created_at: string;
+  updated_at: string;
+}
+
 export type ReminderType = 
   | 'signature_reminder'
   | 'expiration_warning'
@@ -91,7 +111,7 @@ export interface EmailTemplate {
   html_template: string;
   text_template: string;
   variables: string[];
-  branding_options: Record<string, any>;
+  branding_options: Record<string, unknown>;
   locale: string;
   is_active: boolean;
   is_default: boolean;
@@ -182,13 +202,13 @@ export interface EmailQueueData {
   document_id?: string;
   recipient_id?: string;
   provider?: EmailProvider;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface EmailSystemConfig {
   id: string;
   config_key: string;
-  config_value: Record<string, any>;
+  config_value: Record<string, unknown>;
   description?: string;
   is_active: boolean;
   created_at: string;
@@ -263,7 +283,7 @@ export interface EmailProviderConfig {
 
 export interface SendGridConfig extends EmailProviderConfig {
   templateId?: string;
-  dynamicTemplateData?: Record<string, any>;
+  dynamicTemplateData?: Record<string, unknown>;
 }
 
 export interface ResendConfig extends EmailProviderConfig {
@@ -331,7 +351,7 @@ export interface TemplateContext {
     website?: string;
     support_email?: string;
   };
-  custom?: Record<string, any>;
+  custom?: Record<string, unknown>;
 }
 
 export interface ProcessedTemplate {
@@ -350,7 +370,7 @@ export interface SendEmailRequest {
   email_type: EmailType;
   document_id?: string;
   recipient_id?: string;
-  template_variables?: Record<string, any>;
+  template_variables?: Record<string, unknown>;
   priority?: number;
   scheduled_for?: string;
   provider?: EmailProvider;
@@ -393,6 +413,105 @@ export interface EmailAnalyticsResponse {
   };
 }
 
+export interface EmailSystemStatus {
+  provider: string;
+  fromEmail: string;
+  fromName: string;
+  appUrl: string;
+  queueEnabled: boolean;
+  retryAttempts: number;
+  retryDelay: number;
+  batchSize: number;
+  rateLimit: number;
+  health: {
+    database: 'unknown' | 'error' | 'connected';
+    provider: 'unknown' | 'error' | 'configured' | 'not_configured';
+    queue: {
+      status: 'unknown' | 'error' | 'active';
+      pendingCount: number;
+      enabled: boolean;
+    };
+    overall: 'healthy' | 'degraded';
+  };
+  queue: {
+    status: 'unknown' | 'error' | 'active';
+    pendingCount: number;
+    enabled: boolean;
+  };
+  recentStats: {
+    totalSent: number;
+    totalDelivered: number;
+    totalOpened: number;
+    totalClicked: number;
+    totalBounced: number;
+  } | null;
+  lastChecked: string;
+}
+
+export interface ResendWebhookEventData {
+  type: string;
+  created_at: string;
+  data?: {
+    email_id?: string;
+    id?: string;
+    to?: string;
+    email?: string;
+    reason?: string;
+    url?: string;
+    user_agent?: string;
+    ip?: string;
+  };
+}
+
+export interface ResendDeliveryStats {
+  delivered: number;
+  opened: number;
+  clicked: number;
+  bounced: number;
+  blocked: number;
+  spam_reports: number;
+  invalid_emails: number;
+}
+
+export interface ResendEmailStatus {
+  id: string;
+  to: string[];
+  from: string;
+  subject: string;
+  html: string;
+  text: string;
+  created_at: string;
+  last_event: string;
+  status: string;
+}
+
+export interface SendGridDeliveryStats {
+  delivered: number;
+  opened: number;
+  clicked: number;
+  bounced: number;
+  blocked: number;
+  spam_reports: number;
+  invalid_emails: number;
+}
+
+export interface SendGridSendingQuota {
+  for_free: number;
+  for_paid: number;
+  from_api_calls: number;
+  from_emails: number;
+  max_for_free: number;
+  max_for_paid: number;
+  max_for_api_calls: number;
+  max_for_emails: number;
+}
+
+export interface SendGridVerifiedSender {
+  from_email: string;
+  status: string;
+  id: number;
+}
+
 // ===================================================================
 // Hook Types
 // ===================================================================
@@ -423,6 +542,7 @@ export interface EmailPreferencesFormProps {
   userId?: string;
   onSave?: (preferences: UserEmailPreferences) => void;
   onCancel?: () => void;
+  onError?: (error: unknown) => void;
 }
 
 export interface EmailAnalyticsChartProps {
@@ -435,12 +555,14 @@ export interface EmailTemplateEditorProps {
   template?: EmailTemplate;
   onSave?: (template: EmailTemplate) => void;
   onCancel?: () => void;
+  onDelete?: (templateId: string) => void;
 }
 
 export interface EmailNotificationListProps {
   documentId?: string;
   _emailType?: EmailType;
   limit?: number;
+  showUserSpecific?: boolean;
   showFilters?: boolean;
 }
 
@@ -451,7 +573,7 @@ export interface EmailNotificationListProps {
 export interface EmailError {
   code: string;
   message: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   timestamp: string;
 }
 
@@ -620,7 +742,7 @@ export interface AdminEmailActivity {
   id: string;
   admin_id: string;
   action: string;
-  details: Record<string, any>;
+  details: Record<string, unknown>;
   created_at: string;
 }
 
@@ -800,6 +922,7 @@ export interface AdminEmailControlsDashboardProps {
   onEmailSent?: (request: ManualEmailRequest) => void;
   onEmailApproved?: (request: ManualEmailRequest) => void;
   onEmailRejected?: (request: ManualEmailRequest) => void;
+  onViewDetails?: (request: ManualEmailRequest) => void;
 }
 
 export interface ManualEmailFormProps {

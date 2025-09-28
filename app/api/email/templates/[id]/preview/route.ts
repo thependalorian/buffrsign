@@ -16,11 +16,11 @@ const previewSchema = z.object({
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const _supabase = createClient();
-    const { id } = params;
+    const supabase = await createClient();
+    const { id } = await params;
     const body = await request.json();
 
     // Validate request body
@@ -50,19 +50,48 @@ export async function POST(
     // Render template with preview data
     const templateEngine = new EmailTemplateEngine();
     
+    // Transform previewData to match TemplateContext structure
+    const templateContext = {
+      _document: {
+        id: 'preview-doc-123',
+        title: previewData.document_title || 'Sample Document',
+        status: 'pending',
+        created_at: new Date().toISOString(),
+        expires_at: previewData.expires_at || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        sender_name: previewData.sender_name || 'John Doe',
+        sender_email: 'john@example.com'
+      },
+      recipient: {
+        id: 'preview-recipient-123',
+        name: previewData.recipient_name || 'Jane Smith',
+        email: 'jane@example.com',
+        role: 'signer'
+      },
+      _user: {
+        id: 'preview-user-123',
+        name: previewData.sender_name || 'John Doe',
+        email: 'john@example.com',
+        role: 'sender'
+      },
+      custom_message: previewData.custom_message,
+      days_remaining: previewData.days_remaining || 7,
+      completed_at: previewData.completed_at,
+      document_url: previewData.document_url || 'https://example.com/document'
+    };
+    
     try {
-      const renderedSubject = await templateEngine.renderTemplate(
+      const renderedSubject = await templateEngine.processTemplate(
         template.subject,
-        previewData
+        templateContext
       );
       
-      const renderedHtml = await templateEngine.renderTemplate(
+      const renderedHtml = await templateEngine.processTemplate(
         template.html_content,
-        previewData
+        templateContext
       );
       
       const renderedText = template.text_content 
-        ? await templateEngine.renderTemplate(template.text_content, previewData)
+        ? await templateEngine.processTemplate(template.text_content, templateContext)
         : null;
 
       return NextResponse.json({
@@ -80,11 +109,11 @@ export async function POST(
     } catch (renderError) {
       console.error('Error rendering template:', renderError);
       return NextResponse.json(
-        { error: 'Failed to render template', details: renderError.message },
+        { error: 'Failed to render template', details: renderError instanceof Error ? renderError.message : 'Unknown error' },
         { status: 500 }
       );
     }
-  } catch {
+  } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation error', details: error.errors },

@@ -6,7 +6,9 @@
  * Features: Drag & drop upload, AI analysis, compliance checking
  */
 
-import { Upload, FileText, Shield, Zap, CheckCircle, AlertCircle, Users } from "lucide-react";
+"use client";
+
+import { Upload, FileText, Shield, Zap, CheckCircle, AlertCircle, Users, Bot } from "lucide-react";
 
 export default function DocumentUploadPage() {
   return (
@@ -225,7 +227,7 @@ export default function DocumentUploadPage() {
 
         {/* AI Template Suggestions */}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-4">🤖 AI Template Suggestions</h2>
+          <h2 className="text-lg font-semibold mb-4"><Bot className="w-5 h-5 inline-block mr-2" /> AI Template Suggestions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors cursor-pointer">
               <div className="flex items-center space-x-3 mb-2">

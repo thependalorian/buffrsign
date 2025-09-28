@@ -5,8 +5,10 @@
  * Provides functionality to get, update, and manage email notification settings.
  */
 
+"use client";
+
 import { useState, useEffect, useCallback } from 'react';
-import { createClient } from '@/lib/supabase/client';
+
 import {
   UserEmailPreferences,
   EmailPreferencesRequest,
@@ -15,11 +17,10 @@ import {
 } from '@/lib/types/email';
 
 export function useEmailPreferences(options: UseEmailPreferencesOptions = {}) {
-  const [_preferences, setPreferences] = useState<UserEmailPreferences | null>(null);
+  const [preferences, setPreferences] = useState<UserEmailPreferences | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const _supabase = createClient();
 
   /**
    * Fetch _user email preferences
@@ -79,7 +80,7 @@ export function useEmailPreferences(options: UseEmailPreferencesOptions = {}) {
     } finally {
       setLoading(false);
     }
-  }, [options.userId, supabase]);
+  }, [options.userId]);
 
   /**
    * Update email preferences
@@ -118,7 +119,7 @@ export function useEmailPreferences(options: UseEmailPreferencesOptions = {}) {
     } finally {
       setSaving(false);
     }
-  }, [preferences, supabase]);
+  }, [preferences]);
 
   /**
    * Reset preferences to defaults

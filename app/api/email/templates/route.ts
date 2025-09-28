@@ -13,11 +13,11 @@ const createTemplateSchema = z.object({
   is_active: z.boolean().default(true)
 });
 
-const _updateTemplateSchema = createTemplateSchema.partial();
 
-export async function GET() {
+
+export async function GET(request: NextRequest) {
   try {
-    const _supabase = createClient();
+    const supabase = await createClient();
     const { searchParams } = new URL(request.url);
     
     const type = searchParams.get('type');
@@ -48,7 +48,7 @@ export async function GET() {
     }
 
     return NextResponse.json({ templates });
-  } catch {
+  } catch (error) {
     console.error('Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -59,7 +59,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const _supabase = createClient();
+    const supabase = await createClient();
     const body = await request.json();
 
     // Validate request body
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
       success: true,
       template
     }, { status: 201 });
-  } catch {
+  } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation error', details: error.errors },

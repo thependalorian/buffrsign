@@ -1,14 +1,13 @@
-'use client'
+'use client';
 
-import { useCallback, useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { type User } from '@supabase/supabase-js'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useState, useEffect, useCallback } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 type Profile = {
   id: string
@@ -20,7 +19,7 @@ type Profile = {
 
 export default function TeamPage() {
   const _supabase = createClient()
-  const [_user, setUser] = useState<User | null>(null)
+  
   const [teamMembers, setTeamMembers] = useState<Profile[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -59,7 +58,6 @@ export default function TeamPage() {
     const initialize = async () => {
       const { data: { _user } } = await _supabase.auth.getUser()
       if (_user) {
-        setUser(_user)
         await fetchTeamMembers(_user.id)
       } else {
         setLoading(false)

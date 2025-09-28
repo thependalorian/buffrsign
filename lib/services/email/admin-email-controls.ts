@@ -23,10 +23,7 @@ export interface ManualEmailRequest {
   id: string;
   adminId: string;
   adminName: string;
-  _emailType: 'document_invitation' | 'signature_reminder' | 'document_completed' | 'document_expired' | 'signature_declined' | 'custom';
   recipients: {
-    type: 'signer' | 'document_owner' | 'custom';
-    ids: string[];
     emails: string[];
     documentId?: string;
   };
@@ -146,7 +143,7 @@ export class BuffrSignAdminEmailControlsService {
       };
 
       // Save to database
-      const { data, error } = await this.supabase
+      const { error } = await this.supabase
         .from('manual_email_requests')
         .insert({
           id: manualEmailRequest.id,
@@ -202,7 +199,6 @@ export class BuffrSignAdminEmailControlsService {
 
       // Send emails immediately using appropriate email service method
       for (const email of request.recipients.emails) {
-        let emailResponse;
         
         switch (request._emailType) {
           case 'document_invitation':
@@ -291,7 +287,7 @@ export class BuffrSignAdminEmailControlsService {
    */
   async getPendingManualEmailRequests(): Promise<ManualEmailRequest[]> {
     try {
-      const { data, error } = await this.supabase
+      const { error } = await this.supabase
         .from('manual_email_requests')
         .select('*')
         .eq('status', 'pending')
@@ -321,7 +317,7 @@ export class BuffrSignAdminEmailControlsService {
     automated: number;
   }> {
     try {
-      const { data, error } = await this.supabase
+      const { error } = await this.supabase
         .from('email_queue')
         .select('status, is_manual');
 
@@ -356,7 +352,7 @@ export class BuffrSignAdminEmailControlsService {
 
   // Private helper methods
 
-  private async getRecentEmailsForRecipients(emails: string[], hoursBack: number): Promise<any[]> {
+  private async getRecentEmailsForRecipients(emails: string[], hoursBack: number): Promise<EmailNotification[]> {
     const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);
     
     const { data, error } = await this.supabase
@@ -609,7 +605,7 @@ export class BuffrSignAdminEmailControlsService {
       id: data.id,
       adminId: data.admin_id,
       adminName: data.admin_name,
-      _emailType: data.email_type,
+      emailType: data.email_type,
       recipients: data.recipients,
       subject: data.subject,
       content: data.content,

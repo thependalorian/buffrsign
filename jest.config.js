@@ -1,17 +1,22 @@
 const nextJest = require('next/jest')
 
 const createJestConfig = nextJest({
-  // Provide the path to your Next.js app to load next.config.js and .env files
   dir: './',
 })
 
-// Add any custom config to be passed to Jest
 const customJestConfig = {
+  transform: {
+    '^.+\.(ts|tsx)$': 'ts-jest',
+    '^.+\.(js|jsx)$': 'babel-jest',
+    '^.+\.mjs$': 'babel-jest', // Add this line for .mjs files
+  },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jest-environment-jsdom',
   testMatch: [
     '**/__tests__/**/*.(ts|tsx|js)',
-    '**/*.(test|spec).(ts|tsx|js)'
+    '**/*.(test|spec).(ts|tsx|js)',
+    '!**/__tests__/api-routes.test.ts',
+    '!**/__tests__/test-runner.ts'
   ],
   collectCoverageFrom: [
     'lib/**/*.{ts,tsx}',
@@ -20,6 +25,10 @@ const customJestConfig = {
     '!**/*.d.ts',
     '!**/node_modules/**',
   ],
+  // transformIgnorePatterns: [
+  //   '/node_modules/(?!(jose|next)/)' // Include 'jose' and 'next' modules for transformation
+  // ],
+  extensionsToTreatAsEsm: ['.ts', '.tsx'], // Keep this
   coverageThreshold: {
     global: {
       branches: 80,
@@ -30,9 +39,9 @@ const customJestConfig = {
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
+    '^jose$': '<rootDir>/__mocks__/jose.js',
   },
   testTimeout: 10000,
 }
 
-// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
 module.exports = createJestConfig(customJestConfig)

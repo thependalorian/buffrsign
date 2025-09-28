@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, ComponentType } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -11,7 +11,6 @@ import {
   Gavel,
   MapPin,
   Network,
-  CheckCircle2,
   ZoomIn,
   ZoomOut,
   Brain,
@@ -390,7 +389,7 @@ const BuffrSignKnowledgeGraph = () => {
 
   // Get node icon based on type
   const getNodeIcon = (type: string) => {
-    const iconMap: Record<string, any> = {
+    const iconMap: Record<string, ComponentType<{ className: string }>> = {
       'ai': Brain,
       'legal': Gavel,
       'legal-section': Scale,

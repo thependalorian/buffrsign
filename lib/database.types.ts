@@ -1,6 +1,3 @@
-// BuffrSign Platform - Supabase Database Types
-// Generated types for database schema based on actual Supabase database
-
 export type Json =
   | string
   | number
@@ -9,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
@@ -17,73 +14,596 @@ export interface Database {
   }
   public: {
     Tables: {
-      // ============================================================================
-      // USERS TABLE (Main _user table)
-      // ============================================================================
-      users: {
+      admin_email_activity: {
         Row: {
-          id: string
-          account_type: string | null
-          email: string
-          full_name: string
-          first_name: string
-          last_name: string
-          phone: string | null
-          namibian_id: string | null
-          company_name: string | null
-          is_verified: boolean | null
-          is_active: boolean | null
-          role: string | null
-          password_hash: string | null
-          last_login_at: string | null
+          action: string
+          admin_id: string
           created_at: string | null
-          updated_at: string | null
+          details: Json | null
+          id: string
         }
         Insert: {
-          id?: string
-          account_type?: string | null
-          email: string
-          full_name: string
-          first_name: string
-          last_name: string
-          phone?: string | null
-          namibian_id?: string | null
-          company_name?: string | null
-          is_verified?: boolean | null
-          is_active?: boolean | null
-          role?: string | null
-          password_hash?: string | null
-          last_login_at?: string | null
+          action: string
+          admin_id: string
           created_at?: string | null
-          updated_at?: string | null
+          details?: Json | null
+          id?: string
         }
         Update: {
-          id?: string
-          account_type?: string | null
-          email?: string
-          full_name?: string
-          first_name?: string
-          last_name?: string
-          phone?: string | null
-          namibian_id?: string | null
-          company_name?: string | null
-          is_verified?: boolean | null
-          is_active?: boolean | null
-          role?: string | null
-          password_hash?: string | null
-          last_login_at?: string | null
+          action?: string
+          admin_id?: string
           created_at?: string | null
-          updated_at?: string | null
+          details?: Json | null
+          id?: string
         }
         Relationships: []
       }
-
-      // ============================================================================
-      // PROFILES TABLE (Extended _user profile information)
-      // ============================================================================
+      ai_analysis: {
+        Row: {
+          analysis_metadata: Json | null
+          analysis_type: string
+          compliance_score: number | null
+          confidence_scores: Json | null
+          created_at: string | null
+          document_id: string
+          document_summary: string | null
+          eta_compliance: Json | null
+          extracted_fields: Json | null
+          fallback_methods: Database["public"]["Enums"]["ai_method"][] | null
+          field_confidences: Json | null
+          id: string
+          image_quality_score: number | null
+          key_clauses: Json | null
+          kyc_workflow_id: string | null
+          overall_quality_score: number | null
+          primary_ocr_method: Database["public"]["Enums"]["ai_method"] | null
+          processing_time_ms: number | null
+          recommendations: Json | null
+          risk_assessment: Json | null
+          signature_fields: Json | null
+          text_clarity_score: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          analysis_metadata?: Json | null
+          analysis_type?: string
+          compliance_score?: number | null
+          confidence_scores?: Json | null
+          created_at?: string | null
+          document_id: string
+          document_summary?: string | null
+          eta_compliance?: Json | null
+          extracted_fields?: Json | null
+          fallback_methods?: Database["public"]["Enums"]["ai_method"][] | null
+          field_confidences?: Json | null
+          id?: string
+          image_quality_score?: number | null
+          key_clauses?: Json | null
+          kyc_workflow_id?: string | null
+          overall_quality_score?: number | null
+          primary_ocr_method?: Database["public"]["Enums"]["ai_method"] | null
+          processing_time_ms?: number | null
+          recommendations?: Json | null
+          risk_assessment?: Json | null
+          signature_fields?: Json | null
+          text_clarity_score?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          analysis_metadata?: Json | null
+          analysis_type?: string
+          compliance_score?: number | null
+          confidence_scores?: Json | null
+          created_at?: string | null
+          document_id?: string
+          document_summary?: string | null
+          eta_compliance?: Json | null
+          extracted_fields?: Json | null
+          fallback_methods?: Database["public"]["Enums"]["ai_method"][] | null
+          field_confidences?: Json | null
+          id?: string
+          image_quality_score?: number | null
+          key_clauses?: Json | null
+          kyc_workflow_id?: string | null
+          overall_quality_score?: number | null
+          primary_ocr_method?: Database["public"]["Enums"]["ai_method"] | null
+          processing_time_ms?: number | null
+          recommendations?: Json | null
+          risk_assessment?: Json | null
+          signature_fields?: Json | null
+          text_clarity_score?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_analysis_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_analysis_kyc_workflow_id_fkey"
+            columns: ["kyc_workflow_id"]
+            isOneToOne: false
+            referencedRelation: "kyc_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_insights: {
+        Row: {
+          compliance_gaps: Json | null
+          confidence_scores: Json | null
+          created_at: string | null
+          document_id: string
+          id: string
+          insight_type: string
+          key_points: Json | null
+          optimization_suggestions: Json | null
+          risk_factors: Json | null
+          signature_recommendations: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          compliance_gaps?: Json | null
+          confidence_scores?: Json | null
+          created_at?: string | null
+          document_id: string
+          id?: string
+          insight_type: string
+          key_points?: Json | null
+          optimization_suggestions?: Json | null
+          risk_factors?: Json | null
+          signature_recommendations?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          compliance_gaps?: Json | null
+          confidence_scores?: Json | null
+          created_at?: string | null
+          document_id?: string
+          id?: string
+          insight_type?: string
+          key_points?: Json | null
+          optimization_suggestions?: Json | null
+          risk_factors?: Json | null
+          signature_recommendations?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_insights_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_workflows: {
+        Row: {
+          ai_recommendations: Json | null
+          completed_at: string | null
+          compliance_checklist: Json | null
+          created_at: string | null
+          document_id: string
+          execution_log: Json | null
+          id: string
+          started_at: string | null
+          status: string | null
+          updated_at: string | null
+          user_guidance: Json | null
+          workflow_config: Json | null
+          workflow_type: string
+        }
+        Insert: {
+          ai_recommendations?: Json | null
+          completed_at?: string | null
+          compliance_checklist?: Json | null
+          created_at?: string | null
+          document_id: string
+          execution_log?: Json | null
+          id?: string
+          started_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_guidance?: Json | null
+          workflow_config?: Json | null
+          workflow_type: string
+        }
+        Update: {
+          ai_recommendations?: Json | null
+          completed_at?: string | null
+          compliance_checklist?: Json | null
+          created_at?: string | null
+          document_id?: string
+          execution_log?: Json | null
+          id?: string
+          started_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_guidance?: Json | null
+          workflow_config?: Json | null
+          workflow_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_workflows_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_trail: {
+        Row: {
+          action: string
+          ai_insight_id: string | null
+          ai_related: boolean | null
+          ai_workflow_id: string | null
+          created_at: string | null
+          details: Json | null
+          document_id: string | null
+          id: string
+          ip_address: unknown | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          ai_insight_id?: string | null
+          ai_related?: boolean | null
+          ai_workflow_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          document_id?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          ai_insight_id?: string | null
+          ai_related?: boolean | null
+          ai_workflow_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          document_id?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_trail_ai_insight_id_fkey"
+            columns: ["ai_insight_id"]
+            isOneToOne: false
+            referencedRelation: "ai_insights"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_trail_ai_workflow_id_fkey"
+            columns: ["ai_workflow_id"]
+            isOneToOne: false
+            referencedRelation: "ai_workflows"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_trail_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_trail_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_analysis: {
+        Row: {
+          analysis_metadata: Json | null
+          compliance_analysis: string | null
+          compliance_score: number | null
+          cran_compliance: Json | null
+          created_at: string | null
+          document_id: string
+          eta_sections: Json | null
+          frameworks: Json
+          id: string
+          jurisdiction: string | null
+          recommendations: Json | null
+          remediation_plan: Json | null
+          risk_assessment: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          analysis_metadata?: Json | null
+          compliance_analysis?: string | null
+          compliance_score?: number | null
+          cran_compliance?: Json | null
+          created_at?: string | null
+          document_id: string
+          eta_sections?: Json | null
+          frameworks?: Json
+          id?: string
+          jurisdiction?: string | null
+          recommendations?: Json | null
+          remediation_plan?: Json | null
+          risk_assessment?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          analysis_metadata?: Json | null
+          compliance_analysis?: string | null
+          compliance_score?: number | null
+          cran_compliance?: Json | null
+          created_at?: string | null
+          document_id?: string
+          eta_sections?: Json | null
+          frameworks?: Json
+          id?: string
+          jurisdiction?: string | null
+          recommendations?: Json | null
+          remediation_plan?: Json | null
+          risk_assessment?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_analysis_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          ai_analysis_enabled: boolean | null
+          ai_analysis_id: string | null
+          ai_analysis_status: string | null
+          compliance_analysis_id: string | null
+          created_at: string | null
+          created_by: string | null
+          document_type: string | null
+          expires_at: string | null
+          file_hash: string
+          file_path: string
+          file_size: number
+          id: string
+          industry: string | null
+          is_kyc_document: boolean | null
+          jurisdiction: string | null
+          kyc_document_type: string | null
+          kyc_workflow_id: string | null
+          mime_type: string
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          ai_analysis_enabled?: boolean | null
+          ai_analysis_id?: string | null
+          ai_analysis_status?: string | null
+          compliance_analysis_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          document_type?: string | null
+          expires_at?: string | null
+          file_hash: string
+          file_path: string
+          file_size: number
+          id?: string
+          industry?: string | null
+          is_kyc_document?: boolean | null
+          jurisdiction?: string | null
+          kyc_document_type?: string | null
+          kyc_workflow_id?: string | null
+          mime_type: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          ai_analysis_enabled?: boolean | null
+          ai_analysis_id?: string | null
+          ai_analysis_status?: string | null
+          compliance_analysis_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          document_type?: string | null
+          expires_at?: string | null
+          file_hash?: string
+          file_path?: string
+          file_size?: number
+          id?: string
+          industry?: string | null
+          is_kyc_document?: boolean | null
+          jurisdiction?: string | null
+          kyc_document_type?: string | null
+          kyc_workflow_id?: string | null
+          mime_type?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_ai_analysis_id_fkey"
+            columns: ["ai_analysis_id"]
+            isOneToOne: false
+            referencedRelation: "ai_analysis"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_compliance_analysis_id_fkey"
+            columns: ["compliance_analysis_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_analysis"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_kyc_workflow_id_fkey"
+            columns: ["kyc_workflow_id"]
+            isOneToOne: false
+            referencedRelation: "kyc_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kyc_workflows: {
+        Row: {
+          ai_field_extraction: Json | null
+          audit_trail: Json | null
+          completed_at: string | null
+          compliance_status: Json | null
+          country_confidence: number | null
+          country_detection_method:
+            | Database["public"]["Enums"]["ai_method"]
+            | null
+          created_at: string | null
+          decision_confidence: number | null
+          detected_country: string | null
+          document_id: string | null
+          final_decision: Database["public"]["Enums"]["kyc_decision"] | null
+          id: string
+          ocr_extraction: Json | null
+          processing_time_ms: number | null
+          rejection_reasons: string[] | null
+          sadc_validation: Json | null
+          total_confidence: number | null
+          updated_at: string | null
+          user_id: string
+          workflow_state: Database["public"]["Enums"]["kyc_workflow_state"]
+        }
+        Insert: {
+          ai_field_extraction?: Json | null
+          audit_trail?: Json | null
+          completed_at?: string | null
+          compliance_status?: Json | null
+          country_confidence?: number | null
+          country_detection_method?:
+            | Database["public"]["Enums"]["ai_method"]
+            | null
+          created_at?: string | null
+          decision_confidence?: number | null
+          detected_country?: string | null
+          document_id?: string | null
+          final_decision?: Database["public"]["Enums"]["kyc_decision"] | null
+          id?: string
+          ocr_extraction?: Json | null
+          processing_time_ms?: number | null
+          rejection_reasons?: string[] | null
+          sadc_validation?: Json | null
+          total_confidence?: number | null
+          updated_at?: string | null
+          user_id: string
+          workflow_state?: Database["public"]["Enums"]["kyc_workflow_state"]
+        }
+        Update: {
+          ai_field_extraction?: Json | null
+          audit_trail?: Json | null
+          completed_at?: string | null
+          compliance_status?: Json | null
+          country_confidence?: number | null
+          country_detection_method?:
+            | Database["public"]["Enums"]["ai_method"]
+            | null
+          created_at?: string | null
+          decision_confidence?: number | null
+          detected_country?: string | null
+          document_id?: string | null
+          final_decision?: Database["public"]["Enums"]["kyc_decision"] | null
+          id?: string
+          ocr_extraction?: Json | null
+          processing_time_ms?: number | null
+          rejection_reasons?: string[] | null
+          sadc_validation?: Json | null
+          total_confidence?: number | null
+          updated_at?: string | null
+          user_id?: string
+          workflow_state?: Database["public"]["Enums"]["kyc_workflow_state"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kyc_workflows_detected_country_fkey"
+            columns: ["detected_country"]
+            isOneToOne: false
+            referencedRelation: "sadc_countries"
+            referencedColumns: ["country_code"]
+          },
+          {
+            foreignKeyName: "kyc_workflows_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          data: Json | null
+          id: string
+          is_read: boolean | null
+          message: string
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          read_at?: string | null
+          title: string
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
-          id: string
           account_type: string | null
           avatar_url: string | null
           can_access_admin_panel: boolean | null
@@ -101,6 +621,7 @@ export interface Database {
           email_notifications: boolean | null
           first_name: string
           full_name: string | null
+          id: string
           is_active: boolean | null
           is_verified: boolean | null
           language: string | null
@@ -116,7 +637,6 @@ export interface Database {
           updated_at: string | null
         }
         Insert: {
-          id: string
           account_type?: string | null
           avatar_url?: string | null
           can_access_admin_panel?: boolean | null
@@ -134,6 +654,7 @@ export interface Database {
           email_notifications?: boolean | null
           first_name: string
           full_name?: string | null
+          id: string
           is_active?: boolean | null
           is_verified?: boolean | null
           language?: string | null
@@ -149,7 +670,6 @@ export interface Database {
           updated_at?: string | null
         }
         Update: {
-          id?: string
           account_type?: string | null
           avatar_url?: string | null
           can_access_admin_panel?: boolean | null
@@ -167,6 +687,7 @@ export interface Database {
           email_notifications?: boolean | null
           first_name?: string
           full_name?: string | null
+          id?: string
           is_active?: boolean | null
           is_verified?: boolean | null
           language?: string | null
@@ -183,139 +704,152 @@ export interface Database {
         }
         Relationships: []
       }
-
-      // ============================================================================
-      // DOCUMENTS TABLE
-      // ============================================================================
-      documents: {
+      recipients: {
         Row: {
-          id: string
-          title: string
-          file_path: string
-          file_hash: string
-          file_size: number
-          mime_type: string
-          created_by: string | null
-          expires_at: string | null
-          status: string | null
           created_at: string | null
-          updated_at: string | null
-          ai_analysis_enabled: boolean | null
-          ai_analysis_status: string | null
-          ai_analysis_id: string | null
-          compliance_analysis_id: string | null
-          document_type: string | null
-          industry: string | null
-          jurisdiction: string | null
-          kyc_workflow_id: string | null
-          is_kyc_document: boolean | null
-          kyc_document_type: string | null
+          document_id: string | null
+          email: string
+          full_name: string
+          id: string
+          role: string | null
+          signed_at: string | null
+          signing_order: number | null
+          status: string | null
+          viewed_at: string | null
         }
         Insert: {
-          id?: string
-          title: string
-          file_path: string
-          file_hash: string
-          file_size: number
-          mime_type: string
-          created_by?: string | null
-          expires_at?: string | null
-          status?: string | null
           created_at?: string | null
-          updated_at?: string | null
-          ai_analysis_enabled?: boolean | null
-          ai_analysis_status?: string | null
-          ai_analysis_id?: string | null
-          compliance_analysis_id?: string | null
-          document_type?: string | null
-          industry?: string | null
-          jurisdiction?: string | null
-          kyc_workflow_id?: string | null
-          is_kyc_document?: boolean | null
-          kyc_document_type?: string | null
+          document_id?: string | null
+          email: string
+          full_name: string
+          id?: string
+          role?: string | null
+          signed_at?: string | null
+          signing_order?: number | null
+          status?: string | null
+          viewed_at?: string | null
         }
         Update: {
-          id?: string
-          title?: string
-          file_path?: string
-          file_hash?: string
-          file_size?: number
-          mime_type?: string
-          created_by?: string | null
-          expires_at?: string | null
-          status?: string | null
           created_at?: string | null
-          updated_at?: string | null
-          ai_analysis_enabled?: boolean | null
-          ai_analysis_status?: string | null
-          ai_analysis_id?: string | null
-          compliance_analysis_id?: string | null
-          document_type?: string | null
-          industry?: string | null
-          jurisdiction?: string | null
-          kyc_workflow_id?: string | null
-          is_kyc_document?: boolean | null
-          kyc_document_type?: string | null
+          document_id?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          role?: string | null
+          signed_at?: string | null
+          signing_order?: number | null
+          status?: string | null
+          viewed_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "documents_created_by_fkey"
-            columns: ["created_by"]
+            foreignKeyName: "recipients_document_id_fkey"
+            columns: ["document_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "documents"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
-
-      // ============================================================================
-      // SIGNATURES TABLE
-      // ============================================================================
-      signatures: {
+      sadc_countries: {
         Row: {
+          country_code: string
+          country_name: string
+          created_at: string | null
+          date_format: string
           id: string
-          document_id: string
-          signer_id: string
-          field_name: string
-          signature_data: Json
-          signature_type: string
-          timestamp: string
-          ip_address: string
-          user_agent: string
-          verification_status: string
-          certificate_info: Json | null
-          created_at: string
-          updated_at: string
+          id_format: string
+          id_patterns: string[]
+          is_active: boolean | null
+          keywords: string[]
+          updated_at: string | null
+          validation_rules: Json | null
         }
         Insert: {
+          country_code: string
+          country_name: string
+          created_at?: string | null
+          date_format: string
           id?: string
-          document_id: string
-          signer_id: string
-          field_name: string
-          signature_data: Json
-          signature_type: string
-          timestamp?: string
-          ip_address: string
-          user_agent: string
-          verification_status?: string
-          certificate_info?: Json | null
-          created_at?: string
-          updated_at?: string
+          id_format: string
+          id_patterns: string[]
+          is_active?: boolean | null
+          keywords: string[]
+          updated_at?: string | null
+          validation_rules?: Json | null
         }
         Update: {
+          country_code?: string
+          country_name?: string
+          created_at?: string | null
+          date_format?: string
           id?: string
-          document_id?: string
-          signer_id?: string
-          field_name?: string
-          signature_data?: Json
+          id_format?: string
+          id_patterns?: string[]
+          is_active?: boolean | null
+          keywords?: string[]
+          updated_at?: string | null
+          validation_rules?: Json | null
+        }
+        Relationships: []
+      }
+      signatures: {
+        Row: {
+          ai_analysis_method: Database["public"]["Enums"]["ai_method"] | null
+          ai_confidence_score: number | null
+          ai_detected: boolean | null
+          ai_quality_assessment: Json | null
+          certificate_id: string | null
+          compliance_verified: boolean | null
+          created_at: string | null
+          document_id: string | null
+          eta_compliance_status: string | null
+          id: string
+          ip_address: unknown | null
+          recipient_id: string | null
+          signature_data: string
+          signature_field_id: string | null
+          signature_type: string
+          timestamp_token: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          ai_analysis_method?: Database["public"]["Enums"]["ai_method"] | null
+          ai_confidence_score?: number | null
+          ai_detected?: boolean | null
+          ai_quality_assessment?: Json | null
+          certificate_id?: string | null
+          compliance_verified?: boolean | null
+          created_at?: string | null
+          document_id?: string | null
+          eta_compliance_status?: string | null
+          id?: string
+          ip_address?: unknown | null
+          recipient_id?: string | null
+          signature_data: string
+          signature_field_id?: string | null
+          signature_type: string
+          timestamp_token?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          ai_analysis_method?: Database["public"]["Enums"]["ai_method"] | null
+          ai_confidence_score?: number | null
+          ai_detected?: boolean | null
+          ai_quality_assessment?: Json | null
+          certificate_id?: string | null
+          compliance_verified?: boolean | null
+          created_at?: string | null
+          document_id?: string | null
+          eta_compliance_status?: string | null
+          id?: string
+          ip_address?: unknown | null
+          recipient_id?: string | null
+          signature_data?: string
+          signature_field_id?: string | null
           signature_type?: string
-          timestamp?: string
-          ip_address?: string
-          user_agent?: string
-          verification_status?: string
-          certificate_info?: Json | null
-          created_at?: string
-          updated_at?: string
+          timestamp_token?: string | null
+          user_agent?: string | null
         }
         Relationships: [
           {
@@ -326,499 +860,154 @@ export interface Database {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "signatures_signer_id_fkey"
-            columns: ["signer_id"]
+            foreignKeyName: "signatures_recipient_id_fkey"
+            columns: ["recipient_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          }
-        ]
-      }
-
-      // ============================================================================
-      // SIGNATURE WORKFLOWS TABLE
-      // ============================================================================
-      signature_workflows: {
-        Row: {
-          id: string
-          document_id: string
-          initiator_id: string
-          participants: Json
-          current_step: string
-          status: string
-          steps: Json
-          metadata: Json | null
-          audit_trail: Json | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          document_id: string
-          initiator_id: string
-          participants: Json
-          current_step?: string
-          status?: string
-          steps: Json
-          metadata?: Json | null
-          audit_trail?: Json | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          document_id?: string
-          initiator_id?: string
-          participants?: Json
-          current_step?: string
-          status?: string
-          steps?: Json
-          metadata?: Json | null
-          audit_trail?: Json | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "signature_workflows_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
+            referencedRelation: "recipients"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "signature_workflows_initiator_id_fkey"
-            columns: ["initiator_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          }
         ]
       }
-
-      // ============================================================================
-      // AUDIT EVENTS TABLE
-      // ============================================================================
-      audit_events: {
-        Row: {
-          id: string
-          user_id: string
-          action: string
-          resource_type: string
-          resource_id: string
-          details: Json | null
-          ip_address: string
-          user_agent: string
-          session_id: string
-          severity: string
-          compliance_related: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          action: string
-          resource_type: string
-          resource_id: string
-          details?: Json | null
-          ip_address: string
-          user_agent: string
-          session_id: string
-          severity?: string
-          compliance_related?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          action?: string
-          resource_type?: string
-          resource_id?: string
-          details?: Json | null
-          ip_address?: string
-          user_agent?: string
-          session_id?: string
-          severity?: string
-          compliance_related?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "audit_events_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          }
-        ]
-      }
-
-      // ============================================================================
-      // COMPLIANCE REPORTS TABLE
-      // ============================================================================
-      compliance_reports: {
-        Row: {
-          id: string
-          report_type: string
-          period: string
-          status: string
-          findings: Json | null
-          recommendations: string[] | null
-          generated_by: string
-          reviewed_by: string | null
-          review_date: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          report_type: string
-          period: string
-          status?: string
-          findings?: Json | null
-          recommendations?: string[] | null
-          generated_by: string
-          reviewed_by?: string | null
-          review_date?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          report_type?: string
-          period?: string
-          status?: string
-          findings?: Json | null
-          recommendations?: string[] | null
-          generated_by?: string
-          reviewed_by?: string | null
-          review_date?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "compliance_reports_generated_by_fkey"
-            columns: ["generated_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "compliance_reports_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          }
-        ]
-      }
-
-      // ============================================================================
-      // AI ANALYSIS REQUESTS TABLE
-      // ============================================================================
-      ai_analysis_requests: {
-        Row: {
-          id: string
-          document_id: string
-          analysis_type: string[]
-          priority: string
-          callback_url: string | null
-          metadata: Json | null
-          status: string
-          result: Json | null
-          error: string | null
-          processing_time: number | null
-          confidence_score: number | null
-          created_at: string
-          completed_at: string | null
-        }
-        Insert: {
-          id?: string
-          document_id: string
-          analysis_type: string[]
-          priority?: string
-          callback_url?: string | null
-          metadata?: Json | null
-          status?: string
-          result?: Json | null
-          error?: string | null
-          processing_time?: number | null
-          confidence_score?: number | null
-          created_at?: string
-          completed_at?: string | null
-        }
-        Update: {
-          id?: string
-          document_id?: string
-          analysis_type?: string[]
-          priority?: string
-          callback_url?: string | null
-          metadata?: Json | null
-          status?: string
-          result?: Json | null
-          error?: string | null
-          processing_time?: number | null
-          confidence_score?: number | null
-          created_at?: string
-          completed_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ai_analysis_requests_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-
-      // ============================================================================
-      // KYC DATA TABLE
-      // ============================================================================
-      kyc_data: {
-        Row: {
-          id: string
-          user_id: string
-          identity_documents: Json
-          financial_documents: Json
-          employment_verification: Json
-          consent: Json
-          verification_status: string
-          verification_score: number | null
-          reviewed_by: string | null
-          review_date: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          identity_documents: Json
-          financial_documents: Json
-          employment_verification: Json
-          consent: Json
-          verification_status?: string
-          verification_score?: number | null
-          reviewed_by?: string | null
-          review_date?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          identity_documents?: Json
-          financial_documents?: Json
-          employment_verification?: Json
-          consent?: Json
-          verification_status?: string
-          verification_score?: number | null
-          reviewed_by?: string | null
-          review_date?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "kyc_data_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "kyc_data_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          }
-        ]
-      }
-
-      // ============================================================================
-      // ADMIN PERMISSIONS TABLE
-      // ============================================================================
-      admin_permissions: {
-        Row: {
-          id: string
-          admin_id: string
-          level: string
-          departments: string[]
-          permissions: Json
-          created_by: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          admin_id: string
-          level: string
-          departments: string[]
-          permissions: Json
-          created_by: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          admin_id?: string
-          level?: string
-          departments?: string[]
-          permissions?: Json
-          created_by?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "admin_permissions_admin_id_fkey"
-            columns: ["admin_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "admin_permissions_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          }
-        ]
-      }
-
-      // ============================================================================
-      // NOTIFICATIONS TABLE
-      // ============================================================================
-      notifications: {
-        Row: {
-          id: string
-          user_id: string
-          type: string
-          title: string
-          message: string
-          data: Json | null
-          read: boolean
-          sent_at: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          type: string
-          title: string
-          message: string
-          data?: Json | null
-          read?: boolean
-          sent_at?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          type?: string
-          title?: string
-          message?: string
-          data?: Json | null
-          read?: boolean
-          sent_at?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "notifications_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          }
-        ]
-      }
-
-      // ============================================================================
-      // TEMPLATES TABLE
-      // ============================================================================
       templates: {
         Row: {
-          id: string
-          user_id: string
-          name: string
+          ai_template_id: string | null
+          category: string | null
+          compliance_metadata: Json | null
+          created_at: string | null
+          created_by: string | null
           description: string | null
-          category: string
-          content: Json
-          signature_fields: Json
-          is_public: boolean
-          tags: string[]
-          usage_count: number
-          created_at: string
-          updated_at: string
+          fields: Json
+          file_path: string
+          id: string
+          industry: string | null
+          is_ai_generated: boolean | null
+          is_public: boolean | null
+          jurisdiction: string | null
+          name: string
+          signature_field_specs: Json | null
+          template_type: string | null
+          updated_at: string | null
         }
         Insert: {
-          id?: string
-          user_id: string
-          name: string
+          ai_template_id?: string | null
+          category?: string | null
+          compliance_metadata?: Json | null
+          created_at?: string | null
+          created_by?: string | null
           description?: string | null
-          category: string
-          content: Json
-          signature_fields: Json
-          is_public?: boolean
-          tags?: string[]
-          usage_count?: number
-          created_at?: string
-          updated_at?: string
+          fields: Json
+          file_path: string
+          id?: string
+          industry?: string | null
+          is_ai_generated?: boolean | null
+          is_public?: boolean | null
+          jurisdiction?: string | null
+          name: string
+          signature_field_specs?: Json | null
+          template_type?: string | null
+          updated_at?: string | null
         }
         Update: {
-          id?: string
-          user_id?: string
-          name?: string
+          ai_template_id?: string | null
+          category?: string | null
+          compliance_metadata?: Json | null
+          created_at?: string | null
+          created_by?: string | null
           description?: string | null
-          category?: string
-          content?: Json
-          signature_fields?: Json
-          is_public?: boolean
-          tags?: string[]
-          usage_count?: number
-          created_at?: string
-          updated_at?: string
+          fields?: Json
+          file_path?: string
+          id?: string
+          industry?: string | null
+          is_ai_generated?: boolean | null
+          is_public?: boolean | null
+          jurisdiction?: string | null
+          name?: string
+          signature_field_specs?: Json | null
+          template_type?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "templates_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "templates_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          }
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
         ]
       }
+      users: {
+        Row: {
+          account_type: string | null
+          company_name: string | null
+          created_at: string | null
+          email: string
+          first_name: string
+          full_name: string
+          id: string
+          is_active: boolean | null
+          is_verified: boolean | null
+          last_login_at: string | null
+          last_name: string
+          namibian_id: string | null
+          password_hash: string | null
+          phone: string | null
+          role: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          account_type?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          email: string
+          first_name: string
+          full_name: string
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          last_login_at?: string | null
+          last_name: string
+          namibian_id?: string | null
+          password_hash?: string | null
+          phone?: string | null
+          role?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          account_type?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          email?: string
+          first_name?: string
+          full_name?: string
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          last_login_at?: string | null
+          last_name?: string
+          namibian_id?: string | null
+          password_hash?: string | null
+          phone?: string | null
+          role?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
-
-    // ============================================================================
-    // VIEWS
-    // ============================================================================
     Views: {
       [_ in never]: never
     }
-
-    // ============================================================================
-    // FUNCTIONS
-    // ============================================================================
     Functions: {
-      [_ in never]: never
+      get_document_audit_trail: {
+        Args: { doc_uuid: string }
+        Returns: {
+          action: string
+          created_at: string
+          details: Json
+          user_name: string
+        }[]
+      }
     }
-
-    // ============================================================================
-    // ENUMS
-    // ============================================================================
     Enums: {
       ai_method:
         | "gpt4_vision"
@@ -842,7 +1031,110 @@ export interface Database {
         | "auto_rejected"
         | "completed"
         | "failed"
-      user_role: "_user" | "admin" | "super_admin"
+      user_role: "user" | "admin" | "super_admin"
+    }
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
 }
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never

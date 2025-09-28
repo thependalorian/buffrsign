@@ -69,7 +69,7 @@ export class GroqAIIntegration {
 
       return {
         success: true,
-        data: response.data,
+        data: response.data as GroqResponse,
         metadata: {
           timestamp: new Date(),
           requestId: response.metadata?.requestId || '',
@@ -171,7 +171,7 @@ export class GroqAIIntegration {
 
       return {
         success: true,
-        data: response.data,
+        data: response.data as GroqResponse,
         metadata: {
           timestamp: new Date(),
           requestId: response.metadata?.requestId || '',
@@ -244,7 +244,7 @@ RESPONSE STRUCTURE:
 
       return {
         success: true,
-        data: response.data,
+        data: response.data as GroqResponse,
         metadata: {
           timestamp: new Date(),
           requestId: response.metadata?.requestId || '',
@@ -470,7 +470,7 @@ Keep responses practical and easy to understand for business users.`;
   // UTILITY METHODS
   // ============================================================================
 
-  private async makeAPICall(endpoint: string, body: unknown): Promise<any> {
+  private async makeAPICall(endpoint: string, body: unknown): Promise<APIResponse<unknown>> {
     const response = await fetch(`${this.apiBaseUrl}${endpoint}`, {
       method: 'POST',
       headers: {

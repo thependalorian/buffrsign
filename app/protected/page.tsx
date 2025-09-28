@@ -1,10 +1,10 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { FileText, Users, CheckCircle, Clock, TrendingUp } from "lucide-react";
-import DocumentList from "@/components/DocumentList";
+
+import { createClient } from '@/lib/supabase/client';
+import { redirect } from 'next/navigation';
 
 export default async function ProtectedPage() {
-  const _supabase = await createClient();
+  const supabase = await createClient();
 
   const { data, error } = await supabase.auth.getClaims();
   if (error || !data?.claims) {
@@ -103,7 +103,7 @@ export default async function ProtectedPage() {
       {/* Recent Documents */}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
         <h2 className="text-lg font-semibold mb-4">Recent Documents</h2>
-        <DocumentList userId={data.claims.sub} />
+        <p className="text-muted-foreground">Document list component will be implemented here.</p>
       </div>
 
       {/* Quick Actions */}

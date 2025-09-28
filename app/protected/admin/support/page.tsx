@@ -1,10 +1,6 @@
-/**
- * Admin Support Management Page
- * 
- * Purpose: Support ticket management and customer service oversight for BuffrSign
- * Location: /app/protected/admin/support/page.tsx
- * Features: Ticket management, agent assignment, response tracking, analytics
- */
+"use client";
+
+import { Plus, Users, FileText, Settings, ArrowRight, CheckCircle2, Bot } from 'lucide-react';
 
 export default function ProtectedAdminSupportPage() {
   return (
@@ -514,7 +510,7 @@ export default function ProtectedAdminSupportPage() {
 
         {/* AI Support Assistant */}
         <div className="bg-white rounded-lg shadow-sm p-8">
-          <h2 className="text-xl font-semibold mb-6">🤖 AI Support Assistant</h2>
+          <h2 className="text-xl font-semibold mb-6"><Bot className="w-5 h-5 inline-block mr-2" /> AI Support Assistant</h2>
           <div className="space-y-6">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
               <h3 className="font-medium text-blue-900 mb-3">Smart Support Insights</h3>

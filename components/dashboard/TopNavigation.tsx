@@ -1,11 +1,9 @@
 // BuffrSign Platform - Top Navigation Component
 // Provides top navigation bar with _user menu, notifications, and mobile controls
 
-'use client';
-
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../lib/contexts/auth-context';
-import { UserProfile } from '../../lib/types/auth';
+import { UserProfile } from '@/lib/auth/types';
 
 // ============================================================================
 // TOP NAVIGATION PROPS

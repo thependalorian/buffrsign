@@ -1,14 +1,6 @@
-"use client";
-
-/**
- * Document Email Manager Component
- * 
- * Comprehensive email management interface for _document workflows
- */
-
 import React, { useState } from 'react';
 import { useDocumentEmailIntegration } from '@/lib/hooks/useDocumentEmailIntegration';
-import { DocumentRecipient } from '@/lib/hooks/useDocumentEmailIntegration';
+
 
 interface DocumentEmailManagerProps {
   documentId: string;
@@ -33,8 +25,7 @@ export const DocumentEmailManager: React.FC<DocumentEmailManagerProps> = ({
     notifyCompletion,
     notifyExpiration,
     notifyDecline,
-    refreshNotifications,
-    refreshRecipients
+    refreshNotifications
   } = useDocumentEmailIntegration(documentId);
 
   const [selectedRecipients, setSelectedRecipients] = useState<string[]>([]);
@@ -143,7 +134,7 @@ export const DocumentEmailManager: React.FC<DocumentEmailManagerProps> = ({
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Email Management</h2>
-          <p className="text-muted-foreground">Manage email notifications for "{documentTitle}"</p>
+          <p className="text-muted-foreground">Manage email notifications for &quot;{documentTitle}&quot;</p>
         </div>
         <div className="flex gap-2">
           <button

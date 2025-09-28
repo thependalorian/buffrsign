@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { AuthProvider, useAuth } from '../../lib/auth-context'
 
@@ -42,11 +42,13 @@ describe('AuthContext', () => {
   });
 
   it('should provide auth context to children', () => {
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    )
+    act(() => {
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>
+      )
+    })
 
     expect(screen.getByTestId('loading')).toBeInTheDocument()
     expect(screen.getByTestId('_user')).toBeInTheDocument()
@@ -55,21 +57,25 @@ describe('AuthContext', () => {
   })
 
   it('should handle initial loading state', () => {
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    )
+    act(() => {
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>
+      )
+    })
 
     expect(screen.getByTestId('loading')).toHaveTextContent('Loading')
   })
 
   it('should handle no _user state', async () => {
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    )
+    act(() => {
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>
+      )
+    })
 
     await waitFor(() => {
       expect(screen.getByTestId('_user')).toHaveTextContent('No User')
@@ -81,7 +87,9 @@ describe('AuthContext', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
     
     expect(() => {
-      render(<TestComponent />)
+      act(() => {
+        render(<TestComponent />)
+      })
     }).toThrow('useAuth must be used within an AuthProvider')
     
     consoleSpy.mockRestore()

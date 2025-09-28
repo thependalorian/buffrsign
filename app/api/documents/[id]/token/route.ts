@@ -34,7 +34,7 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
     }
 
     // Check if _user has access to the document
-    const _supabase = await getSupabaseClient();
+    const supabase = await getSupabaseClient();
     const { data: _document, error: documentError } = await supabase
       .from('documents')
       .select('id, owner_id, shared_with, status')
@@ -50,7 +50,7 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
 
     // Check _document access permissions
     const hasAccess = _document.owner_id === _user.sub || 
-                     (_document.shared_with && _document.shared_with.includes(_user.sub));
+                     (_document.shared_with && (Array.isArray(_document.shared_with) ? _document.shared_with.includes(_user.sub) : false));
 
     if (!hasAccess) {
       return NextResponse.json(
@@ -102,7 +102,7 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
         status: _document.status,
       },
     });
-  } catch {
+  } catch (error) {
     console.error('Document token creation error:', error);
     return NextResponse.json(
       { error: 'Failed to create _document token' },
@@ -130,7 +130,7 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
     }
 
     // Get _document information
-    const _supabase = await getSupabaseClient();
+    const supabase = await getSupabaseClient();
     const { data: _document, error: documentError } = await supabase
       .from('documents')
       .select('id, title, owner_id, shared_with, status, created_at')
@@ -155,7 +155,7 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
       isValidAccess = true;
       tokenType = 'signature';
     } else if (_document.owner_id === _user.sub || 
-               (_document.shared_with && _document.shared_with.includes(_user.sub))) {
+                (_document.shared_with && (Array.isArray(_document.shared_with) ? _document.shared_with.includes(_user.sub) : false))) {
       isValidAccess = true;
       tokenType = 'access';
     }
@@ -197,7 +197,7 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
         },
       },
     });
-  } catch {
+  } catch (error) {
     console.error('Document access validation error:', error);
     return NextResponse.json(
       { error: 'Failed to validate _document access' },
@@ -255,7 +255,7 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
       success: true,
       message: 'Document token revoked successfully',
     });
-  } catch {
+  } catch (error) {
     console.error('Document token revocation error:', error);
     return NextResponse.json(
       { error: 'Failed to revoke _document token' },

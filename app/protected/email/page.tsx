@@ -1,5 +1,5 @@
 import { EmailSystemDashboard } from '@/components/email/EmailSystemDashboard';
-import { EmailNotificationList } from '@/components/email/EmailNotificationList';
+import EmailNotificationList from '@/components/email/EmailNotificationList';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -23,7 +23,7 @@ export default function EmailDashboardPage() {
             <div className="card-body">
               <h2 className="card-title">Recent Email Notifications</h2>
               <EmailNotificationList 
-                showUserSpecific={true}
+                showFilters={true}
                 limit={10}
               />
             </div>

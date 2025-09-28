@@ -26,7 +26,6 @@ export async function POST(request: NextRequest) {
     const {
       messages,
       userTier,
-      options = {} as Record<string, unknown>,
       type = 'chat' // 'chat', 'analyze', 'explain', 'compliance'
     } = body;
 
@@ -110,7 +109,7 @@ export async function POST(request: NextRequest) {
       model: aiIntegration.getGroqModelInfo(userTier as UserTier).model
     });
 
-  } catch {
+  } catch (error) {
     console.error('Groq API Error:', error);
     
     return NextResponse.json(
@@ -123,7 +122,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     // Verify JWT token
     const authResult = await verifyJWT(request);
@@ -158,7 +157,7 @@ export async function GET() {
       }
     });
 
-  } catch {
+  } catch (error) {
     console.error('Groq API Error:', error);
     
     return NextResponse.json(

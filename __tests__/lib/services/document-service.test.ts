@@ -3,7 +3,7 @@
  * Test suite for DocumentService class
  */
 
-import { documentService } from '../../../lib/services/_document-service';
+import { documentService } from '../../../lib/services/document-service';
 
 // Mock Supabase client
 jest.mock('../../../lib/supabase', () => ({
@@ -112,8 +112,7 @@ describe('DocumentService', () => {
 
   describe('validateFile', () => {
     it('should validate a valid PDF file', () => {
-      const validFile = new File(['test content'], 'test.pdf', { type: 'application/pdf' });
-      Object.defineProperty(validFile, 'size', { value: 1024 * 1024 }); // 1MB
+      const validFile = new File(['test content'], 'test.pdf', { type: 'application/pdf', size: 1024 * 1024 }); // 1MB
 
       const result = documentService.validateFile(validFile);
 
@@ -122,8 +121,7 @@ describe('DocumentService', () => {
     });
 
     it('should reject file that is too large', () => {
-      const largeFile = new File(['test content'], 'large.pdf', { type: 'application/pdf' });
-      Object.defineProperty(largeFile, 'size', { value: 15 * 1024 * 1024 }); // 15MB
+      const largeFile = new File(['test content'], 'large.pdf', { type: 'application/pdf', size: 15 * 1024 * 1024 }); // 15MB
 
       const result = documentService.validateFile(largeFile);
 
@@ -132,8 +130,7 @@ describe('DocumentService', () => {
     });
 
     it('should reject unsupported file type', () => {
-      const invalidFile = new File(['test content'], 'test.txt', { type: 'text/plain' });
-      Object.defineProperty(invalidFile, 'size', { value: 1024 });
+      const invalidFile = new File(['test content'], 'test.txt', { type: 'text/plain', size: 1024 });
 
       const result = documentService.validateFile(invalidFile);
 

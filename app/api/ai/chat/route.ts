@@ -1,70 +1,72 @@
 /**
  * AI Chat API Route
- * Handles general AI interactions for _document processing
+ * Handles general AI interactions for document processing
  * Matches Python backend: /api/v1/ai/chat
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { BuffrSignAIIntegration } from '@/lib/ai/ai-integration';
 import { verifyJWT } from '@/lib/middleware/jwt-middleware';
-import type { UserTier } from '@/lib/ai/ai-types';
+import { ChatRequestSchema, validateRequest } from '@/lib/validation/ai-schemas';
+import { checkChatRateLimit } from '@/lib/security/rate-limiter';
+import { withAISecurity } from '@/lib/security/security-headers';
+import { ErrorSanitizer } from '@/lib/security/error-sanitizer';
+import type { UserTier, ChatRequest, GroqMessage } from '@/lib/ai/ai-types';
 
-export async function POST(request: NextRequest) {
+export const POST = withAISecurity(async (request: NextRequest) => {
+  const requestId = crypto.randomUUID();
+  let authResult: any; // Declare authResult outside try block
+  
   try {
-    // Verify JWT token and get _user information
+    // Check rate limit
+    const rateLimitResponse = await checkChatRateLimit(request);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
+    // Verify JWT token and get user information
     const authResult = await verifyJWT(request);
     if (!authResult.success) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
+      return ErrorSanitizer.createErrorResponse(
+        'Unauthorized',
+        401,
+        { requestId }
       );
     }
 
-    // User authenticated successfully
-    const body = await request.json();
-    
-    const {
-      message,
-      session_id,
-      document_id,
-      workflow_id,
-      context = {},
-      userTier = 'standard'
-    } = body;
-
-    // Validate required fields
-    if (!message) {
-      return NextResponse.json(
-        { error: 'Message is required' },
-        { status: 400 }
+    // Parse and validate request body
+    let body: ChatRequest;
+    try {
+      body = await request.json();
+    } catch {
+      return ErrorSanitizer.createErrorResponse(
+        'Invalid JSON in request body',
+        400,
+        { requestId }
       );
     }
 
-    // Validate _user tier
-    if (!['standard', 'pro'].includes(userTier)) {
-      return NextResponse.json(
-        { error: 'Invalid _user tier. Must be "standard" or "pro"' },
-        { status: 400 }
-      );
-    }
+    // Validate request data
+    const validatedData = validateRequest(ChatRequestSchema, body);
 
     const aiIntegration = new BuffrSignAIIntegration();
     
     // Process request through AI agent
     const response = await aiIntegration.getBuffrSignAssistantResponse(
-      message,
-      userTier as UserTier,
+      validatedData.message,
+      validatedData.userTier as UserTier,
       {
-        documentType: context.document_type,
-        workflowStage: context.workflow_stage,
-        previousMessages: context.previous_messages || []
+        documentType: validatedData.context?.document_type,
+        workflowStage: validatedData.context?.workflow_stage,
+        previousMessages: (validatedData.context?.previous_messages as string[] || []).map(msg => ({ role: '_user', content: msg }))
       }
     );
 
     if (!response.success) {
-      return NextResponse.json(
-        { error: response.error || 'AI processing failed' },
-        { status: 500 }
+      return ErrorSanitizer.handleAIError(
+        response.error || 'AI processing failed',
+        'chat',
+        requestId
       );
     }
 
@@ -72,25 +74,31 @@ export async function POST(request: NextRequest) {
       success: true,
       data: {
         response: response.data?.content || 'No response received',
-        session_id: session_id || `session_${Date.now()}`,
-        document_id,
-        workflow_id,
-        user_tier: userTier,
-        model: aiIntegration.getGroqModelInfo(userTier as UserTier).model,
+        session_id: validatedData.session_id || `session_${Date.now()}`,
+        document_id: validatedData.document_id,
+        workflow_id: validatedData.workflow_id,
+        user_tier: validatedData.userTier,
+        model: aiIntegration.getGroqModelInfo(validatedData.userTier as UserTier).model,
         timestamp: new Date().toISOString(),
-        usage: response.data?.usage
+        usage: response.data?.usage,
+        requestId
       }
     });
 
-  } catch {
-    console.error('AI Chat API Error:', error);
+  } catch (error) {
+    ErrorSanitizer.logError(error, {
+      endpoint: 'ai/chat',
+      requestId,
+      additionalInfo: { userId: authResult._user?.sub }
+    });
     
-    return NextResponse.json(
-      { 
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    if (error instanceof Error && error.message.includes('Validation failed')) {
+      return ErrorSanitizer.createErrorResponse(error, 400, { requestId });
+    }
+    
+    return ErrorSanitizer.createErrorResponse(error, 500, { requestId });
   }
-}
+}, {
+  maxRequestSize: 1024 * 1024, // 1MB
+  timeoutMs: 30000 // 30 seconds
+});

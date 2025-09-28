@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useEffect, useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { EmailAnalyticsChartProps, EmailAnalytics } from '@/lib/types/email';
 
 function EmailAnalyticsChart({ 

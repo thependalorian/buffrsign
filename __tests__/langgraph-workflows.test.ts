@@ -47,7 +47,7 @@ describe('LangGraphWorkflows', () => {
       expect(result).toEqual(mockResult);
       expect(result.status).toBe('completed');
       expect(result.workflowId).toBe('wf123');
-      expect(global.fetch).toHaveBeenCalledWith('/api/ai/execute-_document-processing', {
+      expect(global.fetch).toHaveBeenCalledWith('/api/ai/execute-document-processing', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ documentId: 'doc123' })
@@ -252,7 +252,7 @@ describe('LangGraphWorkflows', () => {
       expect(result).toEqual(mockResult);
       expect(result.performanceGains).toBe(0.25);
       expect(result.optimizations).toHaveLength(3);
-      expect(global.fetch).toHaveBeenCalledWith('/api/ai/optimize-_document-processing', {
+      expect(global.fetch).toHaveBeenCalledWith('/api/ai/optimize-document-processing', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ documentId: 'doc123' })
@@ -322,7 +322,7 @@ describe('LangGraphWorkflows', () => {
 
       await langGraphWorkflows.saveWorkflowResults('doc123', mockWorkflow);
 
-      expect(consoleSpy).toHaveBeenCalledWith('Saving workflow results for _document:', 'doc123', mockWorkflow);
+      expect(consoleSpy).toHaveBeenCalledWith('Saving workflow results for document:', 'doc123', mockWorkflow);
       
       consoleSpy.mockRestore();
     });

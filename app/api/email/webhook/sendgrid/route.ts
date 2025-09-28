@@ -35,7 +35,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         // Verify webhook signature (if configured)
         if (signature && timestamp) {
           const provider = emailService['providers'].get('sendgrid');
-          if (provider && !provider.verifyWebhookSignature(body, signature, timestamp)) {
+          if (provider && provider.verifyWebhookSignature && !provider.verifyWebhookSignature(body, signature, timestamp)) {
             console.warn('Invalid SendGrid webhook signature');
             continue;
           }
@@ -43,22 +43,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
         // Parse webhook event
         const provider = emailService['providers'].get('sendgrid');
-        const webhookEvent: EmailWebhookEvent | null = provider 
-          ? provider.parseWebhookEvent(event)
-          : {
-              event: event.event,
-              timestamp: event.timestamp,
-              messageId: event.sg_message_id,
-              email: event.email,
-              reason: event.reason,
-              url: event.url,
-              userAgent: event.useragent,
-              ip: event.ip,
-            };
+        const webhookEvent: EmailWebhookEvent | null = provider && provider.parseWebhookEvent ? provider.parseWebhookEvent(event) : {
+          event: event.event,
+          timestamp: event.timestamp,
+          messageId: event.sg_message_id,
+          email: event.email,
+          reason: event.reason,
+        };
 
         if (webhookEvent) {
           // Handle the webhook event
-          await emailService.handleWebhookEvent('sendgrid', webhookEvent);
+          await emailService.handleWebhookEvent(webhookEvent);
         }
       } catch (eventError) {
         console.error('Error processing SendGrid webhook event:', eventError);

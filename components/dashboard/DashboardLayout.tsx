@@ -1,11 +1,10 @@
+'use client';
+
 // BuffrSign Platform - Dashboard Layout Component
 // Provides the main dashboard layout with navigation, sidebar, and content area
 
-'use client';
-
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../lib/contexts/auth-context';
-// import { UserRole, KYCStatus } from '../../lib/types';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/lib/contexts/auth-context';
 import Sidebar from './Sidebar';
 import TopNavigation from './TopNavigation';
 import MobileSidebar from './MobileSidebar';
@@ -37,7 +36,7 @@ export default function DashboardLayout({
   showBreadcrumbs = true,
   breadcrumbs = []
 }: DashboardLayoutProps) {
-  const { _user, loading } = useAuth();
+  const { user: _user, loading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 

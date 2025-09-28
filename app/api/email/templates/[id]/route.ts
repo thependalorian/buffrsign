@@ -15,11 +15,11 @@ const _updateTemplateSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const _supabase = createClient();
-    const { id } = params;
+    const supabase = await createClient();
+    const { id } = await params;
 
     const { data: template, error } = await supabase
       .from('email_templates')
@@ -42,7 +42,7 @@ export async function GET(
     }
 
     return NextResponse.json({ template });
-  } catch {
+  } catch (error) {
     console.error('Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -53,15 +53,15 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const _supabase = createClient();
-    const { id } = params;
+    const supabase = await createClient();
+    const { id } = await params;
     const body = await request.json();
 
     // Validate request body
-    const validatedData = updateTemplateSchema.parse(body);
+    const validatedData = _updateTemplateSchema.parse(body);
 
     // Check if _user is authenticated
     const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
@@ -101,7 +101,7 @@ export async function PUT(
       success: true,
       template
     });
-  } catch {
+  } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation error', details: error.errors },
@@ -119,11 +119,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const _supabase = createClient();
-    const { id } = params;
+    const supabase = await createClient();
+    const { id } = await params;
 
     // Check if _user is authenticated
     const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
@@ -158,7 +158,7 @@ export async function DELETE(
       success: true,
       message: 'Template deleted successfully'
     });
-  } catch {
+  } catch (error) {
     console.error('Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

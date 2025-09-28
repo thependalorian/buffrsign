@@ -3,8 +3,8 @@
 
 'use client';
 
-import { getDocument, getUser, createDocument } from '../database/db-utils';
-import { AlignedModels } from './aligned-models';
+import { getDocument, DocumentMetadata } from '../database/db-utils';
+
 
 
 // ============================================================================
@@ -589,63 +589,7 @@ export class PydanticAIAgents {
     }
   }
 
-  /**
-   * Extract entities from document
-   */
-  async extractEntities(documentId: string): Promise<{
-    entities: Entity[];
-    confidence: number;
-  }> {
-    try {
-      const response = await fetch(`${this.apiBaseUrl}/extract-entities`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(this.apiKey && { 'Authorization': `Bearer ${this.apiKey}` })
-        },
-        body: JSON.stringify({ documentId })
-      });
 
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      return result;
-    } catch (error) {
-      console.error('Entity extraction error:', error);
-      throw new Error(error instanceof Error ? error.message : 'Entity extraction failed');
-    }
-  }
-
-  /**
-   * Analyze sentiment
-   */
-  async analyzeSentiment(documentId: string): Promise<{
-    sentiment: SentimentAnalysis;
-    confidence: number;
-  }> {
-    try {
-      const response = await fetch(`${this.apiBaseUrl}/analyze-sentiment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(this.apiKey && { 'Authorization': `Bearer ${this.apiKey}` })
-        },
-        body: JSON.stringify({ documentId })
-      });
-
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      return result;
-    } catch (error) {
-      console.error('Sentiment analysis error:', error);
-      throw new Error(error instanceof Error ? error.message : 'Sentiment analysis failed');
-    }
-  }
 
   /**
    * Check compliance requirements
@@ -724,7 +668,7 @@ export class PydanticAIAgents {
   /**
    * Get _document metadata
    */
-  async getDocumentMetadata(documentId: string): Promise<any> {
+  async getDocumentMetadata(documentId: string): Promise<DocumentMetadata | null> {
     try {
       const _document = await getDocument(documentId);
       return _document;

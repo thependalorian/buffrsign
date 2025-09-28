@@ -1,0 +1,35 @@
+# Terraform files
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfplan.*
+.terraform/
+.terraform.lock.hcl
+
+# Secrets and sensitive files
+secrets.tfvars
+*.tfvars
+!terraform.tfvars.example
+!secrets.tfvars.example
+
+# SSH keys
+*.pem
+*.key
+id_rsa*
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

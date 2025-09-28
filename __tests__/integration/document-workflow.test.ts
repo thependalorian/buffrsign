@@ -3,8 +3,8 @@
  * Tests the complete _document processing pipeline
  */
 
-import { DocumentService } from '../../lib/services/_document-service'
-import { DocumentAnalyzer } from '../../lib/services/_document-analyzer'
+import { DocumentService } from '../../lib/services/document-service'
+import { DocumentAnalyzer } from '../../lib/services/document-analyzer'
 import { WorkflowEngine } from '../../lib/services/workflow-engine'
 import { WorkflowNodeType, WorkflowActionType } from '../../lib/ai-types'
 

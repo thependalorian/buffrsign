@@ -7,14 +7,14 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useEmailPreferences } from '@/lib/hooks/useEmailPreferences';
 import { EmailPreferencesFormProps } from '@/lib/types/email';
 
 function EmailPreferencesForm({ 
   userId, 
   onSave, 
-  onCancel 
+  onCancel
 }: EmailPreferencesFormProps) {
   const {
     preferences,

@@ -257,6 +257,7 @@ export interface Signature extends BaseEntity {
   user_agent: string;
   verification_status: SignatureVerificationStatus;
   certificate_info?: DigitalCertificate;
+  signed_data_string?: string; // Added this line
 }
 
 export interface SignatureData {
@@ -286,6 +287,7 @@ export interface DigitalCertificate {
   valid_from: string;
   valid_until: string;
   public_key: string;
+  private_key: string; // Added this line
   certificate_chain: string[];
 }
 

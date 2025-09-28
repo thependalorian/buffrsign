@@ -63,9 +63,11 @@ export interface DocumentTokenResponse {
 // JWT Service Class
 export class JWTService {
   private static instance: JWTService;
-  private getSupabaseClient = async () => await createClient();
+  private supabase: ReturnType<typeof createClient>;
 
-  private constructor() {}
+  private constructor() {
+    this.supabase = createClient();
+  }
 
   public static getInstance(): JWTService {
     if (!JWTService.instance) {

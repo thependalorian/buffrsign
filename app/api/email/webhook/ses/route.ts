@@ -37,7 +37,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     if (signature && timestamp) {
       const emailService = new EmailService();
       const provider = emailService['providers'].get('ses');
-      if (provider && !provider.verifyWebhookSignature(body, signature, timestamp)) {
+      if (provider && provider.verifyWebhookSignature && !provider.verifyWebhookSignature(body, signature, timestamp)) {
         console.warn('Invalid SES webhook signature');
         return NextResponse.json(
           { error: 'Invalid signature' },
@@ -54,22 +54,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // Parse webhook event
     const provider = emailService['providers'].get('ses');
-    const webhookEvent: EmailWebhookEvent | null = provider 
-      ? provider.parseWebhookEvent(snsMessage)
-      : {
-          event: sesEvent.eventType,
-          timestamp: new Date(sesEvent.mail.timestamp).getTime(),
-          messageId: sesEvent.mail.messageId,
-          email: sesEvent.mail.destination?.[0],
-          reason: sesEvent.bounce?.bounceType || sesEvent.complaint?.complaintFeedbackType,
-          url: sesEvent.click?.link,
-          userAgent: sesEvent.open?.userAgent,
-          ip: sesEvent.open?.ipAddress,
-        };
+    const webhookEvent: EmailWebhookEvent | null = provider && provider.parseWebhookEvent ? provider.parseWebhookEvent(snsMessage) : {
+      event: sesEvent.eventType,
+      timestamp: new Date(sesEvent.mail.timestamp).getTime(),
+      messageId: sesEvent.mail.messageId,
+      email: sesEvent.mail.destination[0],
+      reason: sesEvent.bounce?.bounceType || sesEvent.complaint?.complaintFeedbackType || 'Unknown',
+    };
 
     if (webhookEvent) {
       // Handle the webhook event
-      await emailService.handleWebhookEvent('ses', webhookEvent);
+      await emailService.handleWebhookEvent(webhookEvent);
     }
 
     return NextResponse.json({ success: true });

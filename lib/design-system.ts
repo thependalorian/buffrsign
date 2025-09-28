@@ -151,16 +151,17 @@ export const designTokens = {
 // ============================================================================
 
 export const businessModel = {
-  // Pricing Structure
+  // Pricing Structure - Updated for Free Standard Plan until October 2025
   pricing: {
     standard: {
-      documentSigning: 25, // N$25 per document
-      aiTokens: 2, // N$2 per 100 tokens
+      documentSigning: 0, // FREE until October 2025
+      aiTokens: 0, // FREE until October 2025
       freeStarterPack: {
-        signatures: 3,
-        tokens: 500
+        signatures: 10, // Increased from 3 to 10
+        tokens: 2000 // Increased from 500 to 2000
       },
-      minTopUp: 50 // N$50 minimum
+      minTopUp: 0, // No minimum during free period
+      freeUntil: '2025-10-31' // Free until end of October 2025
     },
     pro: {
       monthlyFee: 199, // N$199/month
@@ -319,6 +320,13 @@ export interface FormFieldProps {
   error?: string;
   value?: string;
   onChange?: (value: string) => void;
+}
+
+export interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  score: number;
 }
 
 export interface SignatureFieldProps {
@@ -536,7 +544,14 @@ export const designUtils = {
   getColor: (color: string, shade: number = 500) => {
     const [category, ...rest] = color.split('-');
     const colorName = rest.join('-') || 'primary';
-    return designTokens.colors[category as keyof typeof designTokens.colors]?.[colorName as any]?.[shade] || color;
+    const colorCategory = designTokens.colors[category as keyof typeof designTokens.colors];
+    if (colorCategory && typeof colorCategory === 'object' && colorName in colorCategory) {
+      const colorPalette = colorCategory[colorName as keyof typeof colorCategory];
+      if (colorPalette && typeof colorPalette === 'object' && shade in colorPalette) {
+        return colorPalette[shade as keyof typeof colorPalette];
+      }
+    }
+    return color;
   },
   
   // Spacing utilities
@@ -638,9 +653,11 @@ export const componentStyles = {
 // EXPORT ALL
 // ============================================================================
 
-export default {
+const designSystem = {
   designTokens,
   businessModel,
   designUtils,
   componentStyles
 };
+
+export default designSystem;

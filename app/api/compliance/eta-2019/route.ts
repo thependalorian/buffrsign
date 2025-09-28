@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     );
 
     return NextResponse.json(complianceResult);
-  } catch {
+  } catch (error) {
     console.error('ETA compliance validation error:', error);
     return NextResponse.json(
       { error: 'Internal server error during compliance validation' },

@@ -2,7 +2,7 @@
 // Ensures consistency between Pydantic/Zod models and database types
 
 import { z } from 'zod';
-import { Database } from '../../types/supabase';
+
 
 // ============================================================================
 // BASE VALIDATION SCHEMAS

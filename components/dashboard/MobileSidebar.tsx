@@ -1,13 +1,11 @@
+"use client";
+
 // BuffrSign Platform - Mobile Sidebar Component
 // Provides mobile-responsive sidebar navigation
 
-'use client';
-
-import React from 'react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { UserProfile } from '../../lib/types/auth';
-// import { UserRole } from '../../lib/types';
+import Link from 'next/link';
+import { UserProfile } from '@/lib/auth/types';
 
 // ============================================================================
 // MOBILE SIDEBAR PROPS

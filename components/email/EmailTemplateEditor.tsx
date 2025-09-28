@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EmailTemplateEditorProps, EmailTemplate, EmailType } from '@/lib/types/email';
 
 function EmailTemplateEditor({
@@ -22,7 +22,7 @@ function EmailTemplateEditor({
     html_template: '',
     text_template: '',
     variables: [] as string[],
-    branding_options: {} as Record<string, any>,
+    branding_options: {} as Record<string, unknown>,
     locale: 'en-NA',
     is_active: true,
     is_default: false,

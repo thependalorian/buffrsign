@@ -6,10 +6,8 @@
  * Features: Real-time status, tooltip details, blue-purple theme
  */
 
-'use client';
-
 import React, { useState } from 'react';
-import { designTokens } from '@/lib/design-system';
+
 
 interface ComplianceStatusIndicatorProps {
   compliant: boolean;
@@ -33,9 +31,9 @@ export function ComplianceStatusIndicator({
   const [showDetails, setShowDetails] = useState(false);
 
   const getComplianceColor = (compliant: boolean, score: number) => {
-    if (compliant && score >= 90) return designTokens.colors.success;
-    if (compliant && score >= 70) return designTokens.colors.warning;
-    return designTokens.colors.error;
+    if (compliant && score >= 90) return 'text-chart-2'; // Success Green
+    if (compliant && score >= 70) return 'text-chart-3'; // Warning Orange
+    return 'text-chart-5'; // Error Red
   };
 
   const getComplianceIcon = (compliant: boolean, score: number) => {
@@ -113,8 +111,7 @@ export function ComplianceStatusIndicator({
         </span>
         {showScore && (
           <span 
-            className={`font-semibold ${sizeClasses.score}`}
-            style={{ color: complianceColor }}
+            className={`font-semibold ${sizeClasses.score} ${complianceColor}`}
           >
             {score}%
           </span>
@@ -140,8 +137,7 @@ export function ComplianceStatusIndicator({
               <div className="flex justify-between">
                 <span className="text-base-content/70">Status:</span>
                 <span 
-                  className="font-semibold"
-                  style={{ color: complianceColor }}
+                  className={`font-semibold ${complianceColor}`}
                 >
                   {compliant ? 'Compliant' : 'Non-Compliant'}
                 </span>
@@ -150,8 +146,7 @@ export function ComplianceStatusIndicator({
               <div className="flex justify-between">
                 <span className="text-base-content/70">Score:</span>
                 <span 
-                  className="font-semibold"
-                  style={{ color: complianceColor }}
+                  className={`font-semibold ${complianceColor}`}
                 >
                   {score}%
                 </span>
@@ -167,11 +162,11 @@ export function ComplianceStatusIndicator({
             <div className="mt-2">
               <div className="w-full bg-base-300 rounded-full h-2">
                 <div
-                  className="h-2 rounded-full transition-all duration-300"
-                  style={{
-                    width: `${score}%`,
-                    backgroundColor: complianceColor
-                  }}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    compliant && score >= 90 ? 'bg-chart-2' : 
+                    compliant && score >= 70 ? 'bg-chart-3' : 'bg-chart-5'
+                  }`}
+                  style={{ width: `${score}%` }}
                 ></div>
               </div>
             </div>

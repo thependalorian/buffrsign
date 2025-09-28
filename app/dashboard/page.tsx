@@ -5,6 +5,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { Cpu, Lock, Zap } from 'lucide-react';
 import DashboardLayout, { DashboardSection, DashboardCard, DashboardStats } from '../../components/dashboard/DashboardLayout';
 
 // ============================================================================
@@ -341,7 +342,7 @@ export default function DashboardPage() {
             className="text-center"
           >
             <div className="text-center">
-              <div className="text-3xl mb-2">🤖</div>
+              <div className="text-3xl mb-2"><Cpu /></div>
               <p className="text-sm text-base-content/70">
                 Upload documents and let AI automatically detect signature fields, 
                 extract key information, and provide compliance insights.
@@ -355,7 +356,7 @@ export default function DashboardPage() {
             className="text-center"
           >
             <div className="text-center">
-              <div className="text-3xl mb-2">🔒</div>
+              <div className="text-3xl mb-2"><Lock /></div>
               <p className="text-sm text-base-content/70">
                 Legally binding digital signatures with PKI certificates, 
                 audit trails, and compliance validation.
@@ -369,7 +370,7 @@ export default function DashboardPage() {
             className="text-center"
           >
             <div className="text-center">
-              <div className="text-3xl mb-2">⚡</div>
+              <div className="text-3xl mb-2"><Zap /></div>
               <p className="text-sm text-base-content/70">
                 Create automated signature workflows with multiple participants, 
                 approval gates, and real-time tracking.

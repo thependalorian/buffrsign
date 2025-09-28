@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { _user } = authResult;
+    
     const body = await request.json();
     
     const {
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
 
     if (result && typeof result === 'object' && 'success' in result && !result.success) {
       return NextResponse.json(
-        { error: (result as any).error || 'Operation failed' },
+        { error: (result as { error?: string }).error || 'Operation failed' },
         { status: 500 }
       );
     }
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString()
     });
 
-  } catch {
+  } catch (error) {
     console.error('LlamaIndex API Error:', error);
     
     return NextResponse.json(

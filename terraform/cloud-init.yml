@@ -1,0 +1,164 @@
+#cloud-config
+
+# Update system packages
+package_update: true
+package_upgrade: true
+
+# Install additional packages
+packages:
+  - git
+  - curl
+  - wget
+  - htop
+  - ufw
+  - fail2ban
+  - openssl
+  - certbot
+
+# Configure Docker
+runcmd:
+  # Start Docker service
+  - systemctl start docker
+  - systemctl enable docker
+  
+  # Configure firewall
+  - ufw --force enable
+  - ufw allow ssh
+  - ufw allow 80
+  - ufw allow 443
+  - ufw allow 2376 from ${admin_ip}
+  
+  # Configure fail2ban
+  - systemctl start fail2ban
+  - systemctl enable fail2ban
+  
+  # Create application directory
+  - mkdir -p /opt/buffrsign
+  - chown root:root /opt/buffrsign
+  
+  # Set up log rotation
+  - echo '/var/log/buffrsign/*.log { daily rotate 7 compress delaycompress missingok notifempty create 644 root root }' > /etc/logrotate.d/buffrsign
+
+# Write environment file
+write_files:
+  - path: /opt/buffrsign/.env
+    content: |
+      # BuffrSign Environment Configuration
+      ENVIRONMENT=production
+      NODE_ENV=production
+      
+      # Domain Configuration
+      API_HOSTNAME=api.${domain_name}
+      FRONTEND_HOSTNAME=${domain_name}
+      LETSENCRYPT_EMAIL=${email}
+      
+      # Database Configuration
+      DATABASE_URL=postgresql://postgres:password@localhost:5432/buffrsign
+      SUPABASE_URL=${supabase_url}
+      SUPABASE_SERVICE_KEY=${supabase_service_key}
+      SUPABASE_ANON_KEY=${supabase_anon_key}
+      
+      # Authentication
+      JWT_SECRET=${jwt_secret}
+      JWT_EXPIRES_IN=7d
+      
+      # Google OAuth Configuration
+      GOOGLE_CLIENT_ID=${google_client_id}
+      GOOGLE_CLIENT_SECRET=${google_client_secret}
+      GOOGLE_REDIRECT_URI=https://sign.buffr.ai/auth/callback
+      
+      # Digital Signature Configuration
+      SIGNATURE_ALGORITHM=RSA-SHA256
+      CERTIFICATE_AUTHORITY=internal
+      SIGNATURE_VALIDITY_DAYS=365
+      
+      # Email Configuration
+      EMAIL_PROVIDER=supabase
+      SMTP_HOST=smtp.gmail.com
+      SMTP_PORT=587
+      SMTP_USER=your_email@gmail.com
+      SMTP_PASS=your_app_password
+      FROM_EMAIL=noreply@${domain_name}
+      
+      # Document Storage Configuration
+      STORAGE_PROVIDER=supabase
+      STORAGE_BUCKET=documents
+      MAX_FILE_SIZE=10485760
+      ALLOWED_FILE_TYPES=pdf,doc,docx
+      
+      # Security Configuration
+      CORS_ORIGINS=https://${domain_name},https://api.${domain_name}
+      RATE_LIMIT_WINDOW=900000
+      RATE_LIMIT_MAX=100
+      ENCRYPTION_KEY=your_encryption_key_here_minimum_32_characters
+      
+      # Compliance Configuration
+      NAMIBIA_ETA_COMPLIANCE=true
+      SADC_CROSS_BORDER=true
+      AUDIT_LOGGING=true
+      
+      # Logging Configuration
+      LOG_LEVEL=info
+      LOG_FORMAT=json
+    owner: root:root
+    permissions: '0600'
+
+# Create systemd service for BuffrSign
+  - path: /etc/systemd/system/buffrsign.service
+    content: |
+      [Unit]
+      Description=BuffrSign Digital Signature Platform
+      After=docker.service
+      Requires=docker.service
+      
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      WorkingDirectory=/opt/buffrsign
+      ExecStart=/usr/bin/docker compose -f docker-compose.yml -f docker-compose.caddy.yml up -d
+      ExecStop=/usr/bin/docker compose -f docker-compose.yml -f docker-compose.caddy.yml down
+      TimeoutStartSec=0
+      
+      [Install]
+      WantedBy=multi-user.target
+    owner: root:root
+    permissions: '0644'
+
+# Enable the service
+  - path: /opt/buffrsign/enable-service.sh
+    content: |
+      #!/bin/bash
+      systemctl daemon-reload
+      systemctl enable buffrsign
+      systemctl start buffrsign
+    owner: root:root
+    permissions: '0755'
+
+# Final setup commands
+  - path: /opt/buffrsign/final-setup.sh
+    content: |
+      #!/bin/bash
+      cd /opt/buffrsign
+      
+      # Clone repository (replace with actual repo)
+      # git clone https://github.com/your-org/buffrsign-starter.git .
+      
+      # Copy deployment files
+      # cp -r /tmp/buffrsign-deployment/* .
+      
+      # Set permissions
+      chmod +x deploy.py
+      chmod 600 .env
+      
+      # Enable and start service
+      /opt/buffrsign/enable-service.sh
+      
+      echo "BuffrSign deployment completed!"
+      echo "API: https://api.${domain_name}"
+      echo "App: https://${domain_name}"
+    owner: root:root
+    permissions: '0755'
+
+# Run final setup
+runcmd:
+  - /opt/buffrsign/final-setup.sh

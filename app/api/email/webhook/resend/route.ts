@@ -35,7 +35,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         // Verify webhook signature (if configured)
         if (signature && timestamp) {
           const provider = emailService['providers'].get('resend');
-          if (provider && !provider.verifyWebhookSignature(body, signature, timestamp)) {
+          if (provider && provider.verifyWebhookSignature && !provider.verifyWebhookSignature(body, signature, timestamp)) {
             console.warn('Invalid Resend webhook signature');
             continue;
           }
@@ -43,22 +43,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
         // Parse webhook event
         const provider = emailService['providers'].get('resend');
-        const webhookEvent: EmailWebhookEvent | null = provider 
-          ? provider.parseWebhookEvent(event)
-          : {
-              event: event.type,
-              timestamp: new Date(event.created_at).getTime(),
-              messageId: event.data?.email_id || event.data?.id,
-              email: event.data?.to || event.data?.email,
-              reason: event.data?.reason,
-              url: event.data?.url,
-              userAgent: event.data?.user_agent,
-              ip: event.data?.ip,
-            };
+        const webhookEvent: EmailWebhookEvent | null = provider && provider.parseWebhookEvent ? provider.parseWebhookEvent(event) : {
+          event: event.type,
+          timestamp: new Date(event.created_at).getTime(),
+          messageId: event.id,
+          email: event.email,
+          reason: event.reason,
+        };
 
         if (webhookEvent) {
           // Handle the webhook event
-          await emailService.handleWebhookEvent('resend', webhookEvent);
+          await emailService.handleWebhookEvent(webhookEvent);
         }
       } catch (eventError) {
         console.error('Error processing Resend webhook event:', eventError);

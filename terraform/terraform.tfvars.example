@@ -1,0 +1,58 @@
+# BuffrSign Starter Terraform Variables Example
+# Copy this file to terraform.tfvars and fill in your values
+
+# Google Cloud Configuration
+project_id = "your-gcp-project-id"
+region     = "us-central1"
+
+# Domain Configuration
+frontend_domain = "starter.buffrsign.ai"
+api_domain      = "api-starter.buffrsign.ai"
+
+# Database Configuration
+create_database = true
+db_tier         = "db-f1-micro"
+db_password     = "your-secure-database-password"
+
+# Redis Configuration
+create_redis = true
+
+# Neo4j Configuration (Manual setup required)
+create_neo4j = false
+
+# Storage Configuration
+create_document_storage = true
+
+# Backend Environment Variables
+backend_env = {
+  APP_ENV                = "production"
+  DATABASE_URL          = "postgresql://buffrsign_user:your-password@/buffrsign_starter?host=/cloudsql/your-project:us-central1:buffrsign-starter-db"
+  REDIS_URL             = "redis://your-redis-host:6379"
+  JWT_SECRET_KEY        = "your-jwt-secret-key"
+  CORS_ORIGINS          = "https://starter.buffrsign.ai,https://www.starter.buffrsign.ai"
+  ALLOWED_HOSTS         = "api-starter.buffrsign.ai"
+  SUPABASE_URL          = "https://your-project.supabase.co"
+  SUPABASE_ANON_KEY     = "your-supabase-anon-key"
+  SUPABASE_SERVICE_ROLE_KEY = "your-supabase-service-role-key"
+  OPENAI_API_KEY        = "your-openai-api-key"
+  GROQ_API_KEY          = "your-groq-api-key"
+  NEO4J_URI             = "neo4j+s://your-neo4j-instance.databases.neo4j.io"
+  NEO4J_USERNAME        = "neo4j"
+  NEO4J_PASSWORD        = "your-neo4j-password"
+  TWILIO_ACCOUNT_SID    = "your-twilio-account-sid"
+  TWILIO_AUTH_TOKEN     = "your-twilio-auth-token"
+  SENDGRID_API_KEY      = "your-sendgrid-api-key"
+}
+
+# Security Keys (sensitive)
+jwt_secret_key              = "your-jwt-secret-key"
+supabase_anon_key          = "your-supabase-anon-key"
+supabase_service_role_key  = "your-supabase-service-role-key"
+openai_api_key             = "your-openai-api-key"
+groq_api_key               = "your-groq-api-key"
+neo4j_uri                  = "neo4j+s://your-neo4j-instance.databases.neo4j.io"
+neo4j_username             = "neo4j"
+neo4j_password             = "your-neo4j-password"
+twilio_account_sid         = "your-twilio-account-sid"
+twilio_auth_token          = "your-twilio-auth-token"
+sendgrid_api_key           = "your-sendgrid-api-key"

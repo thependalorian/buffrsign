@@ -2,245 +2,518 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { UserProfile, UserRole, AuthState, LoginCredentials, SignUpCredentials } from '@/lib/types/auth';
+import { 
+  UserProfile, 
+  UserRole, 
+  AuthState, 
+  LoginCredentials, 
+  SignUpCredentials,
+  AdminUser,
+  AuthContextType as EnhancedAuthContextType
+} from '@/lib/auth/types';
+import { User } from '@supabase/supabase-js';
+import { AuthenticationService } from '@/lib/auth/service';
+import { getAdminLevel, isBuffrEmail } from '@/lib/auth/admin-auth';
+import { authConfig } from '@/lib/auth/config';
 
-interface AuthContextType extends AuthState {
-  signIn: (credentials: LoginCredentials) => Promise<{ error: Error | null }>;
-  signUp: (credentials: SignUpCredentials) => Promise<{ error: Error | null }>;
-  signOut: () => Promise<{ error: Error | null }>;
-  updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: Error | null }>;
-  resetPassword: (email: string) => Promise<{ error: Error | null }>;
-  updatePassword: (password: string) => Promise<{ error: Error | null }>;
-  hasPermission: (permission: keyof UserProfile['permissions']) => boolean;
-  isRole: (role: UserRole) => boolean;
-  refreshUser: () => Promise<void>;
-  getSupabaseClient: () => ReturnType<typeof createClient>;
+
+// ========== Simple Toast Function ==========
+// TODO: Replace with proper toast component when available
+const toast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+  console.log(`[${type.toUpperCase()}] ${message}`);
+};
+
+/**
+ * Authentication Context for BuffrSign
+ * 
+ * This context provides comprehensive authentication functionality for the BuffrSign application.
+ * It integrates with the core auth modules to provide document signing and management capabilities.
+ */
+
+// ========== Context Creation ==========
+
+const AuthContext = createContext<EnhancedAuthContextType | undefined>(undefined);
+
+// ========== Auth Provider Component ==========
+
+interface AuthProviderProps {
+  children: React.ReactNode;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: AuthProviderProps) {
+  // ========== State Management ==========
+  
   const [state, setState] = useState<AuthState>({
-    _user: null,
+    user: null,
     session: null,
     loading: true,
-    error: null,
+    error: null
   });
 
-  const _supabase = useMemo(() => createClient(), []);
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
+  const supabase = createClient();
+  const authService = useMemo(() => new AuthenticationService(), []);
 
-  const fetchUserProfile = useCallback(async (userId: string) => {
+  // ========== Admin Authentication Hook ==========
+  
+  const useAdminAuth = useCallback(() => {
+    if (!state.user) {
+      return {
+        isAdmin: false,
+        adminLevel: null,
+        isBuffrEmail: false,
+        canManageSuperAdmins: false,
+        canAccessAdminPanel: false
+      };
+    }
+
+    const isAdmin = state.user.role === 'admin' || state.user.role === 'super_admin';
+    const adminLevel = getAdminLevel(state.user.email, state.user.role);
+    const isBuffr = state.user.email.toLowerCase().endsWith('@buffr.ai');
+    const canManageSuperAdmins = state.user.permissions.can_manage_super_admins;
+    const canAccessAdminPanel = state.user.permissions.can_access_admin_panel;
+
+    return {
+      isAdmin,
+      adminLevel,
+      isBuffrEmail: isBuffr,
+      canManageSuperAdmins,
+      canAccessAdminPanel
+    };
+  }, [state.user]);
+
+  const adminAuth = useAdminAuth();
+
+  // ========== Session Management ==========
+
+  const loadUserProfile = useCallback(async (user: User | UserProfile) => {
     try {
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', userId)
+        .eq('id', user.id)
         .single();
 
       if (error) {
-        console.error('Error fetching _user profile:', error);
-        setState(prev => ({ ...prev, error: 'Failed to fetch _user profile' }));
+        console.error('Error loading profile:', error);
+        setState(prev => ({ 
+          ...prev, 
+          loading: false, 
+          error: 'Failed to load user profile' 
+        }));
         return;
       }
 
-      if (profile) {
-        setState(prev => ({
-          ...prev,
-          _user: profile,
-          loading: false,
-          error: null,
-        }));
+      const userProfile: UserProfile = {
+        id: user.id,
+        email: user.email || '',
+        first_name: profile?.first_name || '',
+        last_name: profile?.last_name || '',
+        role: profile?.role || 'user',
+        permissions: profile?.permissions || authConfig.defaultPermissions,
+        preferences: profile?.preferences || authConfig.defaultPreferences,
+        created_at: profile?.created_at || user.created_at,
+        updated_at: profile?.updated_at || user.updated_at,
+        last_login_at: profile?.last_login_at || null,
+        is_active: profile?.is_active ?? true,
+        is_verified: 'email_confirmed_at' in user && user.email_confirmed_at ? true : false
+      };
+
+      setState(prev => ({ 
+        ...prev, 
+        user: userProfile, 
+        session: null, // We'll get the actual session from Supabase
+        loading: false, 
+        error: null 
+      }));
+
+      // Load admin user data if applicable
+      const isAdmin = userProfile.role === 'admin' || userProfile.role === 'super_admin';
+      if (isAdmin) {
+        const adminLevel = getAdminLevel(userProfile.email, userProfile.role);
+        const isBuffr = userProfile.email.toLowerCase().endsWith('@buffr.ai');
+        
+        setAdminUser({
+          ...userProfile,
+          is_admin: true,
+          admin_level: adminLevel || 'admin',
+          buffr_email: isBuffr
+        });
       }
+
     } catch (error) {
-      console.error('Error fetching _user profile:', error);
-      setState(prev => ({ ...prev, error: 'Failed to fetch _user profile' }));
+      console.error('Error loading user profile:', error);
+      setState(prev => ({ 
+        ...prev, 
+        loading: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      }));
     }
   }, [supabase]);
 
-  // Initialize auth state
-  useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        // Get initial session
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session) {
-          await fetchUserProfile(session._user.id);
-        }
-      } catch (error) {
-        console.error('Auth initialization error:', error);
-        setState(prev => ({ ...prev, error: 'Failed to initialize authentication' }));
-      } finally {
-        setState(prev => ({ ...prev, loading: false }));
-      }
-    };
+  const initializeAuth = useCallback(async () => {
+    try {
+      setState(prev => ({ ...prev, loading: true, error: null }));
 
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error('Error getting session:', error);
+        setState(prev => ({ ...prev, loading: false, error: error.message }));
+        return;
+      }
+
+      if (session?._user) {
+        await loadUserProfile(session._user);
+      } else {
+        setState(prev => ({ 
+          ...prev, 
+          user: null, 
+          session: null, 
+          loading: false, 
+          error: null 
+        }));
+      }
+    } catch (error) {
+      console.error('Error initializing auth:', error);
+      setState(prev => ({ 
+        ...prev, 
+        loading: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      }));
+    }
+  }, [supabase.auth, loadUserProfile]);
+
+  // ========== Authentication Methods ==========
+
+  const signIn = useCallback(async (credentials: LoginCredentials) => {
+    try {
+      setState(prev => ({ ...prev, loading: true, error: null }));
+      
+      const result = await authService.signIn(credentials);
+      
+      if (result.error) {
+        setState(prev => ({ ...prev, loading: false, error: result.error }));
+        return { error: result.error };
+      }
+
+      if (result.user) {
+        await loadUserProfile(result.user);
+        toast('Successfully signed in!', 'success');
+      }
+
+      return { error: null };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Sign in failed';
+      setState(prev => ({ ...prev, loading: false, error: errorMessage }));
+      return { error: errorMessage };
+    }
+  }, [authService, loadUserProfile]);
+
+  const signUp = useCallback(async (credentials: SignUpCredentials) => {
+    try {
+      setState(prev => ({ ...prev, loading: true, error: null }));
+      
+      const result = await authService.signUp(credentials);
+      
+      if (result.error) {
+        setState(prev => ({ ...prev, loading: false, error: result.error }));
+        return { error: result.error };
+      }
+
+      toast('Account created successfully! Please check your email to verify your account.', 'success');
+      return { error: null };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Sign up failed';
+      setState(prev => ({ ...prev, loading: false, error: errorMessage }));
+      return { error: errorMessage };
+    }
+  }, [authService]);
+
+  const signOut = useCallback(async () => {
+    try {
+      setState(prev => ({ ...prev, loading: true, error: null }));
+      
+      const result = await authService.signOut();
+      
+      if (result.error) {
+        setState(prev => ({ ...prev, loading: false, error: result.error }));
+        return { error: result.error };
+      }
+
+      setState(prev => ({ 
+        ...prev, 
+        user: null, 
+        session: null, 
+        loading: false, 
+        error: null 
+      }));
+      setAdminUser(null);
+      toast('Successfully signed out!', 'success');
+      return { error: null };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Sign out failed';
+      setState(prev => ({ ...prev, loading: false, error: errorMessage }));
+      return { error: errorMessage };
+    }
+  }, [authService]);
+
+  const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {
+    try {
+      if (!state.user) {
+        return { error: 'No user logged in' };
+      }
+
+      setState(prev => ({ ...prev, loading: true, error: null }));
+      
+      const result = await authService.updateProfile(state.user.id, updates);
+      
+      if (result.error) {
+        setState(prev => ({ ...prev, loading: false, error: result.error }));
+        return { error: result.error };
+      }
+
+      // Profile was updated successfully
+      setState(prev => ({ 
+        ...prev, 
+        loading: false, 
+        error: null 
+      }));
+      toast('Profile updated successfully!', 'success');
+
+      return { error: null };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Profile update failed';
+      setState(prev => ({ ...prev, loading: false, error: errorMessage }));
+      return { error: errorMessage };
+    }
+  }, [authService, state.user]);
+
+  const resetPassword = useCallback(async (email: string) => {
+    try {
+      setState(prev => ({ ...prev, loading: true, error: null }));
+      
+      const result = await authService.resetPassword(email);
+      
+      if (result.error) {
+        setState(prev => ({ ...prev, loading: false, error: result.error }));
+        return { error: result.error };
+      }
+
+      toast('Password reset email sent!', 'success');
+      return { error: null };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Password reset failed';
+      setState(prev => ({ ...prev, loading: false, error: errorMessage }));
+      return { error: errorMessage };
+    }
+  }, [authService]);
+
+  const signInWithGoogle = useCallback(async () => {
+    try {
+      setState(prev => ({ ...prev, loading: true, error: null }));
+      
+      const result = await authService.signInWithGoogle();
+      
+      if (result.error) {
+        setState(prev => ({ ...prev, loading: false, error: result.error }));
+        return { error: result.error };
+      }
+
+      toast('Redirecting to Google...', 'info');
+      return { error: null };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Google sign in failed';
+      setState(prev => ({ ...prev, loading: false, error: errorMessage }));
+      return { error: errorMessage };
+    }
+  }, [authService]);
+
+
+  // ========== Admin Methods ==========
+
+  const createAdminUser = useCallback(async (email: string, firstName: string, lastName: string, role?: UserRole) => {
+    try {
+      if (!state.user?.permissions.can_manage_users) {
+        return { error: 'Insufficient permissions to create admin users' };
+      }
+
+      setState(prev => ({ ...prev, loading: true, error: null }));
+      
+      const result = await authService.createAdminUser(email, firstName, lastName, role);
+      
+      if (result.error) {
+        setState(prev => ({ ...prev, loading: false, error: result.error }));
+        return { error: result.error };
+      }
+
+      toast('Admin user created successfully!', 'success');
+      return { error: null };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Admin user creation failed';
+      setState(prev => ({ ...prev, loading: false, error: errorMessage }));
+      return { error: errorMessage };
+    }
+  }, [authService, state.user?.permissions.can_manage_users]);
+
+  const promoteToAdmin = useCallback(async (userId: string) => {
+    try {
+      if (!state.user?.permissions.can_manage_users) {
+        return { error: 'Insufficient permissions to promote users' };
+      }
+
+      setState(prev => ({ ...prev, loading: true, error: null }));
+      
+      const result = await authService.promoteToAdmin(userId);
+      
+      if (result.error) {
+        setState(prev => ({ ...prev, loading: false, error: result.error }));
+        return { error: result.error };
+      }
+
+      toast('User promoted to admin successfully!', 'success');
+      return { error: null };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'User promotion failed';
+      setState(prev => ({ ...prev, loading: false, error: errorMessage }));
+      return { error: errorMessage };
+    }
+  }, [authService, state.user?.permissions.can_manage_users]);
+
+  const demoteFromAdmin = useCallback(async (userId: string) => {
+    try {
+      if (!state.user?.permissions.can_manage_users) {
+        return { error: 'Insufficient permissions to demote users' };
+      }
+
+      setState(prev => ({ ...prev, loading: true, error: null }));
+      
+      const result = await authService.demoteFromAdmin(userId);
+      
+      if (result.error) {
+        setState(prev => ({ ...prev, loading: false, error: result.error }));
+        return { error: result.error };
+      }
+
+      toast('User demoted from admin successfully!', 'success');
+      return { error: null };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'User demotion failed';
+      setState(prev => ({ ...prev, loading: false, error: errorMessage }));
+      return { error: errorMessage };
+    }
+  }, [authService, state.user?.permissions.can_manage_users]);
+
+  // ========== Permission Helpers ==========
+
+  const hasPermission = useCallback((permission: keyof UserProfile['permissions']) => {
+    return state.user?.permissions[permission] ?? false;
+  }, [state.user]);
+
+  const isAdmin = useMemo(() => adminAuth.isAdmin, [adminAuth.isAdmin]);
+  const adminLevel = useMemo(() => adminAuth.adminLevel || undefined, [adminAuth.adminLevel]);
+  const isBuffrEmail = useMemo(() => adminAuth.isBuffrEmail, [adminAuth.isBuffrEmail]);
+  const canManageSuperAdmins = useMemo(() => adminAuth.canManageSuperAdmins, [adminAuth.canManageSuperAdmins]);
+  const canAccessAdminPanel = useMemo(() => adminAuth.canAccessAdminPanel, [adminAuth.canAccessAdminPanel]);
+
+  // ========== Additional Required Methods ==========
+  
+  const isRole = useCallback((role: UserRole) => {
+    return state.user?.role === role;
+  }, [state.user]);
+
+  const refreshUser = useCallback(async () => {
+    if (state.user) {
+      await loadUserProfile(state.user);
+    }
+  }, [state.user, loadUserProfile]);
+
+  const refreshToken = useCallback(async () => {
+    try {
+      const { data: { session }, error } = await supabase.auth.refreshSession();
+      if (error) {
+        return { error: error.message };
+      }
+      return { error: null };
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : 'Token refresh failed' };
+    }
+  }, [supabase.auth]);
+
+  // ========== Effects ==========
+
+  useEffect(() => {
     initializeAuth();
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (event === 'SIGNED_IN' && session) {
-          await fetchUserProfile(session._user.id);
+        if (event === 'SIGNED_IN' && session?._user) {
+          await loadUserProfile(session._user);
         } else if (event === 'SIGNED_OUT') {
-          setState({
-            _user: null,
-            session: null,
-            loading: false,
-            error: null,
-          });
+          setState(prev => ({ 
+            ...prev, 
+            user: null, 
+            session: null, 
+            loading: false, 
+            error: null 
+          }));
+          setAdminUser(null);
         }
       }
     );
 
     return () => subscription.unsubscribe();
-  }, [fetchUserProfile, supabase.auth]);
+  }, [initializeAuth, loadUserProfile, supabase.auth]);
 
+  // ========== Context Value ==========
 
-  const signIn = async (credentials: LoginCredentials) => {
-    try {
-      setState(prev => ({ ...prev, loading: true, error: null }));
-      
-      const { error } = await supabase.auth.signInWithPassword({
-        email: credentials.email,
-        password: credentials.password,
-      });
-
-      if (error) throw error;
-
-      return { error: null };
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      setState(prev => ({ ...prev, error: errorMessage }));
-      return { error: error instanceof Error ? error : new Error(errorMessage) };
-    } finally {
-      setState(prev => ({ ...prev, loading: false }));
-    }
-  };
-
-  const signUp = async (credentials: SignUpCredentials) => {
-    try {
-      setState(prev => ({ ...prev, loading: true, error: null }));
-      
-      const { error } = await supabase.auth.signUp({
-        email: credentials.email,
-        password: credentials.password,
-        options: {
-          data: {
-            first_name: credentials.first_name,
-            last_name: credentials.last_name,
-            company_name: credentials.company_name,
-            phone: credentials.phone,
-            role: credentials.role || '_user',
-          },
-          emailRedirectTo: `${window.location.origin}/auth/confirm?next=/protected`,
-        },
-      });
-
-      if (error) throw error;
-
-      return { error: null };
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      setState(prev => ({ ...prev, error: errorMessage }));
-      return { error: error instanceof Error ? error : new Error(errorMessage) };
-    } finally {
-      setState(prev => ({ ...prev, loading: false }));
-    }
-  };
-
-  const signOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      return { error };
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      return { error: error instanceof Error ? error : new Error(errorMessage) };
-    }
-  };
-
-  const updateProfile = async (updates: Partial<UserProfile>) => {
-    try {
-      if (!state._user) throw new Error('No _user logged in');
-
-      const { error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', state._user.id);
-
-      if (error) throw error;
-
-      // Refresh _user profile
-      await refreshUser();
-
-      return { error: null };
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      setState(prev => ({ ...prev, error: errorMessage }));
-      return { error: error instanceof Error ? error : new Error(errorMessage) };
-    }
-  };
-
-  const resetPassword = async (email: string) => {
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/update-password`,
-      });
-      return { error };
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      return { error: error instanceof Error ? error : new Error(errorMessage) };
-    }
-  };
-
-  const updatePassword = async (password: string) => {
-    try {
-      const { error } = await supabase.auth.updateUser({ password });
-      return { error };
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      return { error: error instanceof Error ? error : new Error(errorMessage) };
-    }
-  };
-
-  const hasPermission = useCallback((permission: keyof UserProfile['permissions']) => {
-    return state._user?.permissions?.[permission] || false;
-  }, [state._user]);
-
-  const isRole = useCallback((role: UserRole) => {
-    return state._user?.role === role;
-  }, [state._user]);
-
-  const refreshUser = async () => {
-    if (state._user) {
-      await fetchUserProfile(state._user.id);
-    }
-  };
-
-  const getSupabaseClient = () => supabase;
-
-  const value: AuthContextType = {
+  const contextValue: EnhancedAuthContextType = {
+    // State
     ...state,
+    
+    // Admin state
+    adminUser,
+    
+    // Authentication methods
     signIn,
     signUp,
     signOut,
     updateProfile,
     resetPassword,
-    updatePassword,
+    signInWithGoogle,
+    
+    // Admin methods
+    createAdminUser,
+    promoteToAdmin,
+    demoteFromAdmin,
+    
+    // Permission helpers
     hasPermission,
     isRole,
     refreshUser,
-    getSupabaseClient,
+    refreshToken,
+    
+    // Admin helpers
+    isAdmin,
+    adminLevel,
+    isBuffrEmail,
+    canManageSuperAdmins,
+    canAccessAdminPanel,
+
+    // Supabase client
+    supabase,
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
+// ========== Hook ==========
+
+export function useAuth(): EnhancedAuthContextType {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');

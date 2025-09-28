@@ -41,7 +41,7 @@ export default function EmailPreferencesPage() {
                 <div>
                   <h3 className="font-semibold">Document Invitations</h3>
                   <p className="text-sm text-base-content/70">
-                    Receive emails when you're invited to sign documents
+                    Receive emails when you&apos;re invited to sign documents
                   </p>
                 </div>
                 <div className="badge badge-primary">Always On</div>

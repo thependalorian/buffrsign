@@ -3,8 +3,8 @@
  * Tests actual functionality with minimal mocking to ensure everything works together
  */
 
-import { DocumentService } from '../../lib/services/_document-service';
-import { DocumentAnalyzer } from '../../lib/services/_document-analyzer';
+import { DocumentService } from '../../lib/services/document-service';
+import { DocumentAnalyzer } from '../../lib/services/document-analyzer';
 import { WorkflowEngine } from '../../lib/services/workflow-engine';
 import { WorkflowOrchestrator, WorkflowStepType, WorkflowStatus } from '../../lib/ai/workflow-orchestrator';
 import { WorkflowNodeType, WorkflowActionType } from '../../lib/ai-types';

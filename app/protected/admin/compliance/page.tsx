@@ -1,10 +1,4 @@
-/**
- * Admin Compliance Monitoring Page
- * 
- * Purpose: Comprehensive compliance oversight and monitoring for BuffrSign administrators
- * Location: /app/protected/admin/compliance/page.tsx
- * Features: Compliance monitoring, audit trails, regulatory reporting, risk assessment
- */
+import { Shield, FileCheck, AlertTriangle, CheckCircle2, Download, Eye, Calendar, Users, Loader2 } from 'lucide-react';
 
 export default function ProtectedAdminCompliancePage() {
   return (

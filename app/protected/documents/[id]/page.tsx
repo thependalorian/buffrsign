@@ -10,20 +10,7 @@
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { 
-  FileText, 
-  Users, 
-  Clock, 
-  CheckCircle, 
-  AlertCircle, 
-  Edit3, 
-  Eye, 
-  Download,
-  Share2,
-  MessageSquare,
-  History,
-  Shield
-} from 'lucide-react';
+import { FileText, Users, Clock, CheckCircle, AlertCircle, Edit3, Eye, Download, Share2, MessageSquare, History, Shield } from 'lucide-react';
 
 export default function DocumentViewerPage() {
   const params = useParams();

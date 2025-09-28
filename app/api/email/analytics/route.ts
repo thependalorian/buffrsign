@@ -12,7 +12,7 @@ import { EmailAnalyticsRequest, EmailAnalyticsResponse } from '@/lib/types/email
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     // Get authenticated user
-    const _supabase = createClient();
+    const supabase = await createClient();
     const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !_user) {
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       .eq('id', _user.id)
       .single();
 
-    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin'].includes(profile.role as string)) {
       return NextResponse.json(
         { error: 'Insufficient permissions' },
         { status: 403 }
@@ -112,10 +112,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 }
 
-export async function GET(): Promise<NextResponse> {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     // Get authenticated user
-    const _supabase = createClient();
+    const supabase = await createClient();
     const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !_user) {
@@ -132,7 +132,7 @@ export async function GET(): Promise<NextResponse> {
       .eq('id', _user.id)
       .single();
 
-    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin'].includes(profile.role as string)) {
       return NextResponse.json(
         { error: 'Insufficient permissions' },
         { status: 403 }

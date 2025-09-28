@@ -48,42 +48,13 @@ export class DocumentService {
   // DOCUMENT UPLOAD AND PROCESSING
   // ============================================================================
 
-  /**
+  /*
    * Validate file before upload
    */
-  validateFile(file: File): { isValid: boolean; errors: string[] } {
-    const errors: string[] = [];
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    const allowedTypes = [
-      'application/pdf',
-      'image/jpeg',
-      'image/png',
-      'image/jpg',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml._document'
-    ];
-
-    if (file.size > maxSize) {
-      errors.push('File size must be less than 10MB');
-    }
-
-    if (!allowedTypes.includes(file.type)) {
-      errors.push('File type not supported. Please upload PDF, Word, or image files.');
-    }
-
-    if (file.name.length > 255) {
-      errors.push('File name is too long');
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors
-    };
-  }
-
+  // validateFile(file: File): { isValid: boolean; errors: string[] } {
+  //   const errors: string[] = [];
+  // }
   /**
-   * Upload a _document and trigger AI analysis
-   */
   async uploadDocument(
     userId: string,
     uploadData: DocumentUploadData

@@ -1,31 +1,31 @@
 "use client";
 
-/**
- * Email System Dashboard Component
- * 
- * Comprehensive dashboard for monitoring and managing the email system
- */
-
 import React, { useState, useEffect } from 'react';
 import { useEmailAnalytics } from '@/lib/hooks/useEmailAnalytics';
-import { useEmailPreferences } from '@/lib/hooks/useEmailPreferences';
 import { EmailAnalyticsChart } from './EmailAnalyticsChart';
 import { EmailPreferencesForm } from './EmailPreferencesForm';
+import { EmailSystemStatus } from '@/lib/types/email';
 
 interface EmailSystemDashboardProps {
   userId?: string;
   showUserPreferences?: boolean;
+  showAdminControls?: boolean;
+  showSystemHealth?: boolean;
+  showQueueManagement?: boolean;
+  showBlacklistManagement?: boolean;
+  showTemplateManagement?: boolean;
 }
 
 export const EmailSystemDashboard: React.FC<EmailSystemDashboardProps> = ({
-  userId,
   showUserPreferences = true
 }) => {
-  const { analytics, loading: analyticsLoading, error: analyticsError } = useEmailAnalytics();
-  const { preferences, loading: preferencesLoading, error: preferencesError } = useEmailPreferences();
+  const { analytics, loading: analyticsLoading, error: analyticsError } = useEmailAnalytics({
+    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days ago
+    endDate: new Date().toISOString().split('T')[0] // today
+  });
   
   const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'preferences' | 'system'>('overview');
-  const [systemStatus, setSystemStatus] = useState<any>(null);
+  const [systemStatus, setSystemStatus] = useState<EmailSystemStatus | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Fetch system status
@@ -50,13 +50,13 @@ export const EmailSystemDashboard: React.FC<EmailSystemDashboardProps> = ({
 
   // Calculate summary statistics
   const getSummaryStats = () => {
-    if (!analytics) return null;
+    if (!analytics || analytics.length === 0) return null;
 
-    const totalEmails = analytics.total_sent || 0;
-    const deliveredEmails = analytics.total_delivered || 0;
-    const openedEmails = analytics.total_opened || 0;
-    const clickedEmails = analytics.total_clicked || 0;
-    const bouncedEmails = analytics.total_bounced || 0;
+    const totalEmails = analytics.reduce((sum, item) => sum + item.total_sent, 0);
+    const deliveredEmails = analytics.reduce((sum, item) => sum + item.total_delivered, 0);
+    const openedEmails = analytics.reduce((sum, item) => sum + item.total_opened, 0);
+    const clickedEmails = analytics.reduce((sum, item) => sum + item.total_clicked, 0);
+    const bouncedEmails = analytics.reduce((sum, item) => sum + item.total_bounced, 0);
 
     const deliveryRate = totalEmails > 0 ? (deliveredEmails / totalEmails * 100).toFixed(1) : '0';
     const openRate = deliveredEmails > 0 ? (openedEmails / deliveredEmails * 100).toFixed(1) : '0';
@@ -98,7 +98,7 @@ export const EmailSystemDashboard: React.FC<EmailSystemDashboardProps> = ({
           <button
             key={tab.id}
             className={`tab ${activeTab === tab.id ? 'tab-active' : ''}`}
-            onClick={() => setActiveTab(tab.id as any)}
+            onClick={() => setActiveTab(tab.id as 'overview' | 'analytics' | 'preferences' | 'system')}
           >
             <span className="mr-2">{tab.icon}</span>
             {tab.label}
@@ -181,23 +181,8 @@ export const EmailSystemDashboard: React.FC<EmailSystemDashboardProps> = ({
                   <span>Failed to load recent activity</span>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {analytics.recent_activity?.slice(0, 5).map((activity: unknown, _index: number) => (
-                    <div key={_index} className="flex justify-between items-center p-3 bg-base-200 rounded-lg">
-                      <div>
-                        <div className="font-medium">{activity.type}</div>
-                        <div className="text-sm text-muted-foreground">{activity.description}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm text-muted-foreground">
-                          {new Date(activity.timestamp).toLocaleString()}
-                        </div>
-                        <div className="badge badge-outline">{activity.status}</div>
-                      </div>
-                    </div>
-                  )) || (
-                    <p className="text-muted-foreground">No recent activity</p>
-                  )}
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No recent activity data available</p>
                 </div>
               )}
             </div>
@@ -211,7 +196,11 @@ export const EmailSystemDashboard: React.FC<EmailSystemDashboardProps> = ({
           <div className="card bg-base-100 shadow-xl">
             <div className="card-body">
               <h2 className="card-title">Email Performance Analytics</h2>
-              <EmailAnalyticsChart />
+              <EmailAnalyticsChart 
+                data={analytics}
+                type="delivery"
+                groupBy="day"
+              />
             </div>
           </div>
 
@@ -276,13 +265,9 @@ export const EmailSystemDashboard: React.FC<EmailSystemDashboardProps> = ({
           <div className="card bg-base-100 shadow-xl">
             <div className="card-body">
               <h2 className="card-title">Email Preferences</h2>
-              {preferencesLoading ? (
+              {loading ? (
                 <div className="flex justify-center">
                   <span className="loading loading-spinner"></span>
-                </div>
-              ) : preferencesError ? (
-                <div className="alert alert-error">
-                  <span>Failed to load preferences</span>
                 </div>
               ) : (
                 <EmailPreferencesForm />

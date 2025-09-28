@@ -7,9 +7,9 @@ const addToBlacklistSchema = z.object({
   reason: z.enum(['Bounced email', 'Spam complaint', 'Manual addition', 'Invalid email'])
 });
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const _supabase = createClient();
+    const supabase = await createClient();
     const { searchParams } = new URL(request.url);
     
     const limit = parseInt(searchParams.get('limit') || '100');
@@ -39,14 +39,14 @@ export async function GET() {
     }
 
     // Get blacklist statistics
-    const { data: stats, error: statsError } = await supabase
+    const { data: stats } = await supabase
       .from('email_blacklist')
       .select('reason')
       .then(({ data }) => {
         if (!data) return { data: null, error: null };
         
         const stats = data.reduce((acc, item) => {
-          acc[item.reason] = (acc[item.reason] || 0) + 1;
+          acc[item.reason as string] = (acc[item.reason as string] || 0) + 1;
           return acc;
         }, {} as Record<string, number>);
         
@@ -62,7 +62,7 @@ export async function GET() {
         total: blacklistItems?.length || 0
       }
     });
-  } catch {
+  } catch (error) {
     console.error('Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -73,7 +73,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const _supabase = createClient();
+    const supabase = await createClient();
     const body = await request.json();
 
     // Validate request body
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
       success: true,
       blacklistItem
     }, { status: 201 });
-  } catch {
+  } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation error', details: error.errors },

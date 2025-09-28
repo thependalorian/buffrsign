@@ -1,7 +1,7 @@
 // BuffrSign Platform - Database Utilities
 // Direct database connections matching Python backend architecture
 
-import { supabase } from '@/lib/supabase';
+
 import { createClient } from '@supabase/supabase-js';
 
 // ============================================================================
@@ -24,7 +24,7 @@ export interface ChunkResult {
   document_id: string;
   content: string;
   similarity: number;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   document_title: string;
   document_source: string;
 }
@@ -112,7 +112,7 @@ export interface DocumentMetadata {
   expires_at?: string;
   created_at: string;
   updated_at: string;
-  ai_analysis?: Record<string, any>;
+  ai_analysis?: Record<string, unknown>;
   analysis_status?: string;
   category?: string;
   description?: string;
@@ -207,11 +207,11 @@ export interface GraphSearchResult {
   entity_id: string;
   entity_type: string;
   entity_name: string;
-  properties: Record<string, any>;
+  properties: Record<string, unknown>;
   relationships: Array<{
     target_entity: string;
     relationship_type: string;
-    properties: Record<string, any>;
+    properties: Record<string, unknown>;
   }>;
   score: number;
 }
@@ -251,7 +251,7 @@ export async function searchKnowledgeGraph(
 export async function getEntityRelationships(
   entityName: string,
   depth: number = 2
-): Promise<Record<string, any>> {
+): Promise<Record<string, unknown>> {
   try {
     const { data, error } = await supabaseService.rpc('get_entity_relationships', {
       entity_name: entityName,
@@ -278,7 +278,7 @@ export async function getEntityTimeline(
   entityName: string,
   startDate?: string,
   endDate?: string
-): Promise<Record<string, any>[]> {
+): Promise<Record<string, unknown>[]> {
   try {
     const { data, error } = await supabaseService.rpc('get_entity_timeline', {
       entity_name: entityName,
@@ -335,7 +335,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 export interface SessionData {
   id: string;
   user_id: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   created_at: string;
   updated_at: string;
   expires_at: string;
@@ -347,7 +347,7 @@ export interface SessionData {
  */
 export async function createSession(
   userId: string,
-  metadata: Record<string, any> = {},
+  metadata: Record<string, unknown> = {},
   timeoutMinutes: number = 60
 ): Promise<string> {
   try {
@@ -369,7 +369,7 @@ export async function createSession(
       throw new Error(`Create session failed: ${error.message}`);
     }
 
-    return data.id;
+    return data.id as string;
   } catch (error) {
     console.error('Create session error:', error);
     throw new Error(error instanceof Error ? error.message : 'Create session failed');
@@ -410,7 +410,7 @@ export async function getSession(sessionId: string): Promise<SessionData | null>
  */
 export async function updateSession(
   sessionId: string,
-  metadata: Record<string, any>
+  metadata: Record<string, unknown>
 ): Promise<boolean> {
   try {
     const { error } = await supabaseService
@@ -453,6 +453,70 @@ export async function deleteSession(sessionId: string): Promise<boolean> {
   } catch (error) {
     console.error('Delete session error:', error);
     throw new Error(error instanceof Error ? error.message : 'Delete session failed');
+  }
+}
+
+// ============================================================================
+// EMAIL PROVIDER UTILITIES
+// ============================================================================
+
+export interface EmailProviderConfig {
+  id: string;
+  provider_name: string;
+  is_active: boolean;
+  configuration: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Get active email provider configuration
+ */
+export async function getActiveEmailProvider(): Promise<EmailProviderConfig | null> {
+  try {
+    const { data, error } = await supabaseService
+      .from('email_providers')
+      .select('*')
+      .eq('is_active', true)
+      .single();
+
+    if (error) {
+      console.error('Get active email provider error:', error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Get active email provider error:', error);
+    return null;
+  }
+}
+
+/**
+ * Update email provider configuration
+ */
+export async function updateEmailProviderConfig(
+  providerName: string,
+  config: Record<string, any>
+): Promise<boolean> {
+  try {
+    const { error } = await supabaseService
+      .from('email_providers')
+      .update({
+        configuration: config,
+        updated_at: new Date().toISOString()
+      })
+      .eq('provider_name', providerName);
+
+    if (error) {
+      console.error('Update email provider config error:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Update email provider config error:', error);
+    return false;
   }
 }
 

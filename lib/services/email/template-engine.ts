@@ -5,11 +5,10 @@
  * for the BuffrSign email system.
  */
 
-import { 
-  EmailTemplate, 
-  TemplateContext, 
+import {
+  EmailTemplate,
+  TemplateContext,
   ProcessedTemplate,
-  TemplateVariable,
   EmailType 
 } from '@/lib/types/email';
 
@@ -66,7 +65,7 @@ export class EmailTemplateEngine {
         subject: this.processString(template.subject_template, context),
         html_content: this.processString(template.html_template, context),
         text_content: this.processString(template.text_template, context),
-        variables_used: this.extractUsedVariables(template, context),
+        variables_used: this.extractUsedVariables(template),
       };
 
       return processedTemplate;
@@ -139,7 +138,7 @@ export class EmailTemplateEngine {
   /**
    * Replace variables in template string
    */
-  private replaceVariables(template: string, variables: Record<string, any>): string {
+  private replaceVariables(template: string, variables: Record<string, unknown>): string {
     let processed = template;
 
     Object.entries(variables).forEach(([key, value]) => {
@@ -272,7 +271,7 @@ export class EmailTemplateEngine {
   /**
    * Extract variables used in template
    */
-  private extractUsedVariables(template: EmailTemplate, context: TemplateContext): string[] {
+  private extractUsedVariables(template: EmailTemplate): string {
     const variables: string[] = [];
     const allContent = `${template.subject_template} ${template.html_template} ${template.text_template}`;
     
@@ -326,7 +325,7 @@ export class EmailTemplateEngine {
         minute: '2-digit',
         timeZone: 'Africa/Windhoek',
       });
-    } catch (error) {
+    } catch {
       return dateString;
     }
   }

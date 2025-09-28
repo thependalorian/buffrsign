@@ -1,13 +1,13 @@
-'use client'
+"use client";
 
-import { useCallback, useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { type User } from '@supabase/supabase-js'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
+import { useState, useEffect, useCallback } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { type User } from '@supabase/supabase-js';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 
 export default function SettingsPage() {
   const _supabase = createClient()
@@ -27,26 +27,26 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const initialize = async () => {
-      const { data: { _user } } = await supabase.auth.getUser()
+      const { data: { _user } } = await _supabase.auth.getUser()
       if (_user) {
         setUser(_user)
         // Fetch notification settings from profile
-        const { data: profile } = await supabase
+        const { data: profile } = await _supabase
           .from('profiles')
           .select('workflow_updates, security_alerts')
           .eq('id', _user.id)
           .single()
         if (profile) {
           setNotificationSettings({
-            workflow_updates: profile.workflow_updates ?? true,
-            security_alerts: profile.security_alerts ?? true,
+            workflow_updates: (profile.workflow_updates as boolean) ?? true,
+            security_alerts: (profile.security_alerts as boolean) ?? true,
           })
         }
       }
       setLoading(false)
     }
     initialize()
-  }, [supabase])
+  }, [_supabase])
 
   const handlePasswordUpdate = async () => {
     if (newPassword !== confirmPassword) {
@@ -59,7 +59,7 @@ export default function SettingsPage() {
     }
 
     setLoading(true)
-    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    const { error } = await _supabase.auth.updateUser({ password: newPassword })
     if (error) {
       setFeedback({ type: 'error', message: error.message })
     } else {
@@ -74,7 +74,7 @@ export default function SettingsPage() {
     if (!_user) return
 
     setLoading(true)
-    const { error } = await supabase.from('profiles').update(notificationSettings).eq('id', _user.id)
+    const { error } = await _supabase.from('profiles').update(notificationSettings).eq('id', _user.id)
     if (error) {
       setFeedback({ type: 'error', message: 'Failed to update notifications.' })
     } else {

@@ -1,13 +1,12 @@
-'use client'
+'use client';
 
-import { useCallback, useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { type User } from '@supabase/supabase-js'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { PlusCircle } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { PlusCircle } from 'lucide-react';
 
 // Assuming a workflow type based on the database schema
 type Workflow = {
@@ -20,8 +19,8 @@ type Workflow = {
 };
 
 export default function WorkflowsPage() {
-  const _supabase = createClient()
-  const [_user, setUser] = useState<User | null>(null)
+  
+  
   const [workflows, setWorkflows] = useState<Workflow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -29,6 +28,7 @@ export default function WorkflowsPage() {
   const fetchWorkflows = useCallback(async (userId: string) => {
     // NOTE: This assumes a 'workflows' table exists.
     // In a real implementation, you would also fetch related _document info.
+    const supabase = createClient()
     const { data, error } = await supabase
       .from('workflows')
       .select(`id, name, status, created_at, document_title`)
@@ -48,13 +48,13 @@ export default function WorkflowsPage() {
       setWorkflows(data as Workflow[])
     }
     setLoading(false)
-  }, [supabase])
+  }, [])
 
   useEffect(() => {
     const initialize = async () => {
+      const supabase = createClient()
       const { data: { _user } } = await supabase.auth.getUser()
       if (_user) {
-        setUser(_user)
         await fetchWorkflows(_user.id)
       } else {
         setLoading(false)
@@ -62,7 +62,7 @@ export default function WorkflowsPage() {
       }
     }
     initialize()
-  }, [supabase, fetchWorkflows])
+  }, [fetchWorkflows])
 
   const getStatusVariant = (status: Workflow['status']) => {
     switch (status) {
@@ -126,7 +126,7 @@ export default function WorkflowsPage() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center">
-                    You haven't created any workflows yet.
+                    You haven&apos;t created any workflows yet.
                   </TableCell>
                 </TableRow>
               )}

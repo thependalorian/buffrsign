@@ -1,5 +1,6 @@
 import { EmailAnalyticsChart } from '@/components/email/EmailAnalyticsChart';
 import { Metadata } from 'next';
+import { TrendingUp, BarChart3, Mail, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Email Analytics - BuffrSign Admin',
@@ -75,9 +76,9 @@ export default function AdminEmailAnalyticsPage() {
         <div className="card-body">
           <h2 className="card-title">Email Performance Over Time</h2>
           <EmailAnalyticsChart 
-            startDate="2024-01-01"
-            endDate="2024-12-31"
-            showDetailedMetrics={true}
+            data={[]}
+            type="delivery"
+            groupBy="day"
           />
         </div>
       </div>

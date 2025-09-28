@@ -3,14 +3,14 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const _supabase = createClient();
-    const { id } = params;
+    const supabase = await createClient();
+    const { id } = await params;
 
-    // Check if _user is authenticated
-    const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
+    // Check if user is authenticated
+    const { data: { _user }, error: authError } = await supabase.auth.getUser();
     if (authError || !_user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -42,7 +42,7 @@ export async function DELETE(
       success: true,
       message: 'Email removed from blacklist successfully'
     });
-  } catch {
+  } catch (error) {
     console.error('Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

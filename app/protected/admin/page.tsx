@@ -1,12 +1,12 @@
-'use client'
+'use client';
 
-import { useCallback, useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { type User } from '@supabase/supabase-js'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table' // Assuming table components exist
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { useCallback, useEffect, useState } from 'react';
+import { createClient } from '../../../lib/supabase/client';
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';
+import { Badge } from '../../../components/ui/badge';
+import { Button } from '../../../components/ui/button';
 
 type Profile = {
   id: string
@@ -17,52 +17,47 @@ type Profile = {
 }
 
 export default function AdminPage() {
-  const _supabase = createClient()
-  const [_user, setUser] = useState<User | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
+  const supabase = createClient();
   const [allProfiles, setAllProfiles] = useState<Profile[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const fetchAdminData = useCallback(async () => {
-    const { data: { _user } } = await supabase.auth.getUser()
-    if (!_user) {
+    const { data: { _user: currentUser } } = await supabase.auth.getUser()
+    if (!currentUser) {
       setError('You must be logged in to view this page.')
       setLoading(false)
       return
     }
-    setUser(_user)
 
-    // 1. Fetch current _user's profile to check role
-    const { data: profileData, error: profileError } = await supabase
+    // 1. Fetch current user's profile to check role
+    const { data: currentProfileData, error: profileError } = await supabase
       .from('profiles')
       .select(`*`)
-      .eq('id', _user.id)
+      .eq('id', currentUser.id)
       .single()
 
-    if (profileError || !profileData) {
+    if (profileError || !currentProfileData) {
       setError('Could not load your profile. Access denied.')
       setLoading(false)
       return
     }
 
-    setProfile(profileData as Profile)
-
-    // 2. Check if _user is an admin
-    if (profileData.role !== 'Admin' && profileData.role !== 'Super Admin') {
+    // 2. Check if user is an admin
+    if (currentProfileData.role !== 'Admin' && currentProfileData.role !== 'Super Admin') {
       setError('You do not have permission to view this page.')
       setLoading(false)
       return
     }
 
-    // 3. Fetch all _user profiles
+    // 3. Fetch all user profiles
     const { data: allProfilesData, error: allProfilesError } = await supabase
       .from('profiles')
       .select(`*`)
       .order('created_at', { ascending: false })
 
     if (allProfilesError) {
-      setError('Failed to load _user data.')
+      setError('Failed to load user data.')
     } else {
       setAllProfiles(allProfilesData as Profile[])
     }

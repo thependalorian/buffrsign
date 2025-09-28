@@ -10,15 +10,15 @@ import { createClient } from '../../lib/supabase/server';
 
 // Mock Supabase client
 jest.mock('../../lib/supabase/server', () => ({
-  createClient: jest.fn(() => ({
-    from: jest.fn(() => ({
+  createClient: () => ({
+    from: jest.fn((tableName) => ({
       select: jest.fn(() => ({
         eq: jest.fn(() => ({
           single: jest.fn(() => ({
             data: {
-              id: 'test-_user-id',
+              id: 'test-user-id',
               email: 'test@example.com',
-              role: '_user',
+              role: 'user',
               permissions: ['read', 'write'],
             },
             error: null,
@@ -42,7 +42,10 @@ jest.mock('../../lib/supabase/server', () => ({
       data: null,
       error: null,
     })),
-  })),
+    auth: {
+      getUser: jest.fn(() => ({ data: { user: { id: 'test-user-id' } }, error: null })),
+    },
+  }),
 }));
 
 // Mock crypto

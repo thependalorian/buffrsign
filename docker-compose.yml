@@ -1,0 +1,137 @@
+services:
+  # BuffrSign Digital Signature API Service
+  buffrsign-api:
+    build: ./backend
+    container_name: buffrsign-api
+    restart: always
+    ports:
+      - "8001:8001"
+    environment:
+      # Environment Configuration
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - NODE_ENV=${NODE_ENV:-development}
+      
+      # Database Configuration
+      - DATABASE_URL=${DATABASE_URL}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      
+      # Authentication Configuration
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
+      
+      # Digital Signature Configuration
+      - SIGNATURE_ALGORITHM=${SIGNATURE_ALGORITHM:-RSA-SHA256}
+      - CERTIFICATE_AUTHORITY=${CERTIFICATE_AUTHORITY:-internal}
+      - SIGNATURE_VALIDITY_DAYS=${SIGNATURE_VALIDITY_DAYS:-365}
+      
+      # Email Configuration
+      - EMAIL_PROVIDER=${EMAIL_PROVIDER:-supabase}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - FROM_EMAIL=${FROM_EMAIL}
+      
+      # Document Storage Configuration
+      - STORAGE_PROVIDER=${STORAGE_PROVIDER:-supabase}
+      - STORAGE_BUCKET=${STORAGE_BUCKET:-documents}
+      - MAX_FILE_SIZE=${MAX_FILE_SIZE:-10485760}
+      - ALLOWED_FILE_TYPES=${ALLOWED_FILE_TYPES:-pdf,doc,docx}
+      
+      # Security Configuration
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:8082}
+      - RATE_LIMIT_WINDOW=${RATE_LIMIT_WINDOW:-900000}
+      - RATE_LIMIT_MAX=${RATE_LIMIT_MAX:-100}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      
+      # Compliance Configuration
+      - NAMIBIA_ETA_COMPLIANCE=${NAMIBIA_ETA_COMPLIANCE:-true}
+      - SADC_CROSS_BORDER=${SADC_CROSS_BORDER:-true}
+      - AUDIT_LOGGING=${AUDIT_LOGGING:-true}
+      
+      # Logging Configuration
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_FORMAT=${LOG_FORMAT:-json}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - buffrsign-network
+
+  # BuffrSign Frontend Service
+  buffrsign-frontend:
+    build:
+      context: ./app
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8001}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+        NEXT_PUBLIC_ENVIRONMENT: ${NEXT_PUBLIC_ENVIRONMENT:-development}
+    container_name: buffrsign-frontend
+    restart: always
+    ports:
+      - "8082:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8001}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - buffrsign-network
+    depends_on:
+      - buffrsign-api
+
+  # BuffrSign Worker Service (Background Jobs)
+  buffrsign-worker:
+    build: ./backend
+    container_name: buffrsign-worker
+    restart: always
+    command: ["npm", "run", "worker"]
+    environment:
+      # Same environment as API
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - NODE_ENV=${NODE_ENV:-development}
+      - DATABASE_URL=${DATABASE_URL}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - SIGNATURE_ALGORITHM=${SIGNATURE_ALGORITHM:-RSA-SHA256}
+      - CERTIFICATE_AUTHORITY=${CERTIFICATE_AUTHORITY:-internal}
+      - EMAIL_PROVIDER=${EMAIL_PROVIDER:-supabase}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - FROM_EMAIL=${FROM_EMAIL}
+      - STORAGE_PROVIDER=${STORAGE_PROVIDER:-supabase}
+      - STORAGE_BUCKET=${STORAGE_BUCKET:-documents}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - NAMIBIA_ETA_COMPLIANCE=${NAMIBIA_ETA_COMPLIANCE:-true}
+      - SADC_CROSS_BORDER=${SADC_CROSS_BORDER:-true}
+      - AUDIT_LOGGING=${AUDIT_LOGGING:-true}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_FORMAT=${LOG_FORMAT:-json}
+    networks:
+      - buffrsign-network
+    depends_on:
+      - buffrsign-api
+
+networks:
+  buffrsign-network:
+    driver: bridge
+
+volumes:
+  buffrsign-data:

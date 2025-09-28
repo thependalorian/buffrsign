@@ -522,7 +522,7 @@ export class PydanticValidator {
           firstError.message,
           firstError.path.join('.'),
           firstError.code,
-          firstError.input
+          undefined
         );
       }
       throw error;
@@ -550,7 +550,7 @@ export class PydanticValidator {
             firstError.message,
             firstError.path.join('.'),
             firstError.code,
-            firstError.input
+            undefined
           )
         };
       }

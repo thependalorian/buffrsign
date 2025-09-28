@@ -12,16 +12,16 @@ import { documentEmailIntegration } from '@/lib/services/document-email-integrat
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
   try {
-    const documentId = params.id;
+    const { id: documentId } = await params;
     
     // Get authenticated user
-    const supabase = createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const supabase = await createClient();
+    const { data: { _user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user) {
+    if (authError || !_user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -72,39 +72,39 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
   try {
-    const documentId = params.id;
+    const { id: documentId } = await params;
     const body = await request.json();
     const { action, recipients, recipientId, reason } = body;
     
     // Get authenticated user
-    const supabase = createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const supabase = await createClient();
+    const { data: { _user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user) {
+    if (authError || !_user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    // Verify _user has access to the document
-    const { data: _document, error: docError } = await supabase
+    // Verify user has access to the document
+    const { data: document, error: docError } = await supabase
       .from('documents')
       .select('id, owner_id, title')
       .eq('id', documentId)
       .single();
 
-    if (docError || !_document) {
+    if (docError || !document) {
       return NextResponse.json(
         { error: 'Document not found' },
         { status: 404 }
       );
     }
 
-    if (_document.owner_id !== _user.id) {
+    if (document.owner_id !== _user.id) {
       return NextResponse.json(
         { error: 'Access denied' },
         { status: 403 }

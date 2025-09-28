@@ -1,15 +1,16 @@
-'use client'
+"use client";
 
-import { useCallback, useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { type User } from '@supabase/supabase-js'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useState, useEffect, useCallback } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { type User } from '@supabase/supabase-js';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export default function ProfilePage() {
-  const _supabase = createClient()
+  const supabase = createClient()
+  
   const [_user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [fullName, setFullName] = useState<string | null>(null)
@@ -30,8 +31,8 @@ export default function ProfilePage() {
       }
 
       if (data) {
-        setFullName(data.full_name)
-        setWebsite(data.website)
+        setFullName(data.full_name as string | null)
+        setWebsite(data.website as string | null)
       }
     } catch (error) {
       console.error('Error loading _user data!', error)

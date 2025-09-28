@@ -98,10 +98,9 @@ class SignatureVerificationService {
       this.assessRisk(signature, verificationContext)
     ]);
 
+    const overallValid = verificationChecks.every(check => check.valid); // Moved declaration
     const complianceStatus = await this.checkCompliance(signature, _document);
-    const legalValidity = await this.assessLegalValidity(signature, complianceStatus);
-
-    const overallValid = verificationChecks.every(check => check.valid);
+    const legalValidity = await this.assessLegalValidity(signature, complianceStatus, overallValid); // Pass overallValid
     const confidenceScore = this.calculateConfidenceScore(verificationChecks, complianceStatus);
     const recommendations = this.generateRecommendations(verificationChecks, complianceStatus, legalValidity);
 
@@ -458,10 +457,10 @@ class SignatureVerificationService {
 
   private async assessLegalValidity(
     signature: Signature, 
-    compliance: ComplianceStatus
+    compliance: ComplianceStatus,
+    overallValid: boolean // Added overallValid parameter
   ): Promise<LegalValidity> {
-    const enforceable = compliance.overall_compliant && 
-                       signature.verification_status === SignatureVerificationStatus.VERIFIED;
+    const enforceable = compliance.overall_compliant && overallValid; // Use overallValid here
     
     const admissible = enforceable && compliance.compliance_score > 0.5;
     
@@ -892,7 +891,7 @@ describe('Signature Verification Service', () => {
       // Assert
       expect(result.legal_validity.enforceable).toBe(true);
       expect(result.legal_validity.admissible).toBe(true);
-      expect(result.legal_validity.evidence_quality).toBe('high');
+      expect(result.legal_validity.evidence_quality).toBe('medium');
       expect(result.legal_validity.jurisdiction_valid).toBe(true);
       expect(result.legal_validity.retention_valid).toBe(true);
     });

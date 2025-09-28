@@ -33,6 +33,26 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*.local
 .env
+.env.buffr
+.env.production
+.env.development
+.env.staging
+
+# Google Drive credentials and tokens
+credentials.json
+token.json
+service_account.json
+
+# API Keys and Secrets
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Documentation with secrets
+GOOGLE_OAUTH_SETUP.md
+GOOGLE_SIGNUP_IMPLEMENTATION_SUMMARY.md
+VERCEL_WORKLOAD_IDENTITY_SETUP.md
 
 # vercel
 .vercel

@@ -9,23 +9,14 @@
  * - User activity tracking
  */
 
-'use client';
+"use client";
 
-import { useCallback, useEffect, useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { FileText, Clock, TrendingUp, CheckCircle2, AlertCircle, BarChart3, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  FileText, 
-  Clock, 
-  TrendingUp,
-  CheckCircle2,
-  AlertCircle,
-  BarChart3,
-  Loader2
-} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { DocumentStatus } from '@/lib/types';
 
 interface UsageStats {
   totalDocuments: number;
@@ -36,8 +27,14 @@ interface UsageStats {
   completionRate: number;
 }
 
+enum DocumentStatus {
+  SIGNED = 'signed',
+  COMPLETED = 'completed',
+  PENDING_SIGNATURE = 'pending_signature',
+}
+
 export default function UsageStatisticsPage() {
-  const { _user, getSupabaseClient } = useAuth();
+  const { user, supabase } = useAuth();
   const [usageStats, setUsageStats] = useState<UsageStats>({
     totalDocuments: 0,
     signedDocuments: 0,
@@ -50,18 +47,17 @@ export default function UsageStatisticsPage() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchUsageStats = useCallback(async () => {
-    if (!_user?.id) return;
+    if (!user?.id) return;
     
     try {
       setLoading(true);
       setError(null);
 
       // Fetch _document statistics
-      const _supabase = getSupabaseClient();
       const { data: documents, error: documentsError } = await supabase
         .from('documents')
         .select('status, created_at, updated_at')
-        .eq('created_by', _user.id);
+        .eq('created_by', user.id);
 
       if (documentsError) {
         throw documentsError;
@@ -71,17 +67,17 @@ export default function UsageStatisticsPage() {
       const { data: signatures, error: signaturesError } = await supabase
         .from('signatures')
         .select('id, created_at')
-        .eq('signer_id', _user.id);
+        .eq('signer_id', user.id);
 
       if (signaturesError) {
         throw signaturesError;
       }
 
       const totalDocuments = documents?.length || 0;
-      const signedDocuments = documents?.filter(doc => 
+      const signedDocuments = documents?.filter((doc: any) => 
         doc.status === DocumentStatus.SIGNED || doc.status === DocumentStatus.COMPLETED
       ).length || 0;
-      const pendingDocuments = documents?.filter(doc => 
+      const pendingDocuments = documents?.filter((doc: any) => 
         doc.status === DocumentStatus.PENDING_SIGNATURE
       ).length || 0;
       const totalSignatures = signatures?.length || 0;
@@ -104,13 +100,13 @@ export default function UsageStatisticsPage() {
     } finally {
       setLoading(false);
     }
-  }, [_user?.id, getSupabaseClient]);
+  }, [user?.id, supabase]);
 
   useEffect(() => {
-    if (_user) {
+    if (user) {
       fetchUsageStats();
     }
-  }, [_user, fetchUsageStats]);
+  }, [user, fetchUsageStats]);
 
 
   const monthlyStats = [
@@ -168,7 +164,7 @@ export default function UsageStatisticsPage() {
           Usage Statistics
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Track your _document signing activity and performance
+          Track your document signing activity and performance
         </p>
       </div>
 

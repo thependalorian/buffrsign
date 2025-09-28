@@ -15,15 +15,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  Clock, 
-  FileText, 
-  User, 
-  Calendar,
-  AlertCircle,
-  CheckCircle2,
-  Loader2
-} from 'lucide-react';
+import { Clock, FileText, User, Calendar, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { DocumentStatus } from '@/lib/types';
 
@@ -38,7 +30,7 @@ interface PendingSignature {
 }
 
 export default function PendingSignaturesPage() {
-  const { _user, getSupabaseClient } = useAuth();
+  const { user: _user, supabase } = useAuth();
   const [pendingSignatures, setPendingSignatures] = useState<PendingSignature[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +40,7 @@ export default function PendingSignaturesPage() {
       setLoading(true);
       setError(null);
 
-      const _supabase = getSupabaseClient();
+      
       const { data: documents, error: documentsError } = await supabase
         .from('documents')
         .select(`
@@ -67,11 +59,11 @@ export default function PendingSignaturesPage() {
       }
 
       const signatures: PendingSignature[] = documents?.map(doc => ({
-        id: doc.id,
-        title: doc.title,
+        id: doc.id as string,
+        title: doc.title as string,
         sender: 'System User', // Simplified since we can't join with profiles
-        sentDate: doc.created_at ? new Date(doc.created_at).toLocaleDateString() : 'Unknown',
-        dueDate: doc.expires_at ? new Date(doc.expires_at).toLocaleDateString() : 'No due date',
+        sentDate: doc.created_at ? new Date(doc.created_at as string).toLocaleDateString() : 'Unknown',
+        dueDate: doc.expires_at ? new Date(doc.expires_at as string).toLocaleDateString() : 'No due date',
         priority: 'medium' as const, // Default priority
         status: doc.status as DocumentStatus
       })) || [];
@@ -83,7 +75,7 @@ export default function PendingSignaturesPage() {
     } finally {
       setLoading(false);
     }
-  }, [getSupabaseClient]);
+  }, [supabase]);
 
   useEffect(() => {
     if (_user) {

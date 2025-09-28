@@ -10,5 +10,5 @@ export { default as EmailNotificationList } from './EmailNotificationList';
 export { default as EmailTemplateEditor } from './EmailTemplateEditor';
 export { DocumentEmailManager } from './DocumentEmailManager';
 export { EmailSystemDashboard } from './EmailSystemDashboard';
-export { EmailQueueManager } from './EmailQueueManager';
-export { EmailBlacklistManager } from './EmailBlacklistManager';
+export { default as EmailQueueManager } from './EmailQueueManager';
+export { default as EmailBlacklistManager } from './EmailBlacklistManager';

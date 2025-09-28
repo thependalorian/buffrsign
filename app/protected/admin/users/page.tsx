@@ -1,10 +1,6 @@
-/**
- * Admin User Management Page
- * 
- * Purpose: Comprehensive _user management for BuffrSign administrators
- * Location: /app/protected/admin/users/page.tsx
- * Features: User CRUD, role management, KYC oversight, bulk operations
- */
+"use client";
+
+import { Plus, Users, FileText, Settings, ArrowRight, CheckCircle2, Bot } from 'lucide-react';
 
 export default function ProtectedAdminUsersPage() {
   return (
@@ -492,7 +488,7 @@ export default function ProtectedAdminUsersPage() {
 
         {/* AI User Management Assistant */}
         <div className="bg-white rounded-lg shadow-sm p-8">
-          <h2 className="text-xl font-semibold mb-6">🤖 AI User Management Assistant</h2>
+          <h2 className="text-xl font-semibold mb-6"><Bot className="w-5 h-5 inline-block mr-2" /> AI User Management Assistant</h2>
           <div className="space-y-6">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
               <h3 className="font-medium text-blue-900 mb-3">Smart User Insights</h3>

@@ -13,7 +13,7 @@ import { SendEmailRequest, SendEmailResponse } from '@/lib/types/email';
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     // Get authenticated user
-    const _supabase = createClient();
+    const supabase = await createClient();
     const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !_user) {

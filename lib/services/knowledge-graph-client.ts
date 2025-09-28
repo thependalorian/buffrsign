@@ -315,7 +315,7 @@ export class KnowledgeGraphClient {
     eventType: string,
     documentId: string,
     userId: string,
-    properties: Record<string, any> = {}
+    properties: Record<string, unknown> = {}
   ): Promise<GraphNode> {
     try {
       const response = await fetch(`${this.baseUrl}/api/knowledge-graph/audit-events`, {
@@ -418,11 +418,7 @@ export class KnowledgeGraphClient {
   async getEntityRelationships(
     entityName: string,
     depth: number = 2
-  ): Promise<{
-    central_entity: string;
-    related_facts: SearchResult[];
-    search_method: string;
-  }> {
+  ): Promise<EntityRelationshipsResult> {
     try {
       const response = await fetch(`${this.baseUrl}/api/knowledge-graph/entities/${entityName}/relationships`, {
         method: 'GET',
@@ -501,7 +497,7 @@ export class KnowledgeGraphClient {
     documentId: string,
     content: string,
     title: string,
-    metadata: Record<string, any> = {}
+    metadata: Record<string, unknown> = {}
   ): Promise<{
     episodes_created: number;
     total_chunks: number;

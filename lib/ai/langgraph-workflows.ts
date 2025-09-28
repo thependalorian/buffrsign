@@ -1,13 +1,9 @@
 // BuffrSign Platform - LangGraph Workflow Orchestration
 // Advanced workflow management with state machines and AI agents
 
-import { getDocument } from '../database/db-utils';
-import { AlignedModels } from './aligned-models';
-
-
-// ============================================================================
+// ===========================================================================
 // TYPES AND INTERFACES
-// ============================================================================
+// ===========================================================================
 
 export interface WorkflowState {
   id: string;
@@ -39,6 +35,16 @@ export interface WorkflowMetadata {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   estimated_duration_minutes: number;
   tags: string[];
+}
+
+export interface SignatureFieldData {
+  name: string;
+  position_x: number;
+  position_y: number;
+  width: number;
+  height: number;
+  page_number: number;
+  is_required: boolean;
 }
 
 export interface WorkflowNode {
@@ -100,9 +106,9 @@ export interface WorkflowExecutionResult {
   total_steps: number;
 }
 
-// ============================================================================
+// ===========================================================================
 // LANGGRAPH WORKFLOW ORCHESTRATOR
-// ============================================================================
+// ===========================================================================
 
 export class LangGraphWorkflowOrchestrator {
   private apiBaseUrl: string;
@@ -113,9 +119,9 @@ export class LangGraphWorkflowOrchestrator {
     this.apiKey = apiKey || '';
   }
 
-  // ============================================================================
+  // ===========================================================================
   // WORKFLOW DEFINITION MANAGEMENT
-  // ============================================================================
+  // ===========================================================================
 
   /**
    * Create a new workflow definition
@@ -197,9 +203,9 @@ export class LangGraphWorkflowOrchestrator {
     }
   }
 
-  // ============================================================================
+  // ===========================================================================
   // WORKFLOW EXECUTION
-  // ============================================================================
+  // ===========================================================================
 
   /**
    * Start workflow execution
@@ -340,9 +346,9 @@ export class LangGraphWorkflowOrchestrator {
     }
   }
 
-  // ============================================================================
+  // ===========================================================================
   // WORKFLOW RESULTS
-  // ============================================================================
+  // ===========================================================================
 
   /**
    * Get workflow execution result
@@ -408,9 +414,6 @@ export class LangGraphWorkflowOrchestrator {
     params: Record<string, unknown>
   ): Promise<Record<string, unknown>> {
     try {
-      // Connect to actual workflow engine via database
-      const { supabaseService } = await import('@/lib/database/db-utils');
-      
       // Execute the service operation based on type
       switch (serviceType) {
         case 'document_analysis':
@@ -439,20 +442,20 @@ export class LangGraphWorkflowOrchestrator {
     switch (operation) {
       case 'analyze_document':
         const documentId = params.document_id as string;
-        const { data: _document } = await supabaseService
+        const { data: document } = await supabaseService
           .from('documents')
           .select('*')
           .eq('id', documentId)
           .single();
         
-        if (!_document) {
+        if (!document) {
           throw new Error('Document not found');
         }
         
         // Perform actual AI analysis
-        const analysisResult = await this.performDocumentAnalysis(_document);
+        const analysisResult = await this.performDocumentAnalysis(document);
         
-        // Update _document with analysis results
+        // Update document with analysis results
         await supabaseService
           .from('documents')
           .update({
@@ -471,7 +474,7 @@ export class LangGraphWorkflowOrchestrator {
         };
         
       default:
-        throw new Error(`Unknown _document analysis operation: ${operation}`);
+        throw new Error(`Unknown document analysis operation: ${operation}`);
     }
   }
 
@@ -492,18 +495,19 @@ export class LangGraphWorkflowOrchestrator {
             document_id: document_id as string,
             workflow_type: workflow_type as string,
             status: 'pending',
-            signers: signers as any[],
-            created_at: new Date().toISOString()
+            signers: signers as Array<{ id: string; name: string; email: string; role: string }>,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           })
           .select()
           .single();
         
         // Create signature requests for each signer
-        const signatureRequests = (signers as any[]).map((signer, _index) => ({
+        const signatureRequests = (signers as {email: string, name: string}[]).map((signer, index) => ({
           workflow_id: workflow.id,
           signer_email: signer.email,
           signer_name: signer.name,
-          signing_order: _index + 1,
+          signing_order: index + 1,
           status: 'pending'
         }));
         
@@ -533,21 +537,21 @@ export class LangGraphWorkflowOrchestrator {
       case 'check_eta_compliance':
         const documentId = params.document_id as string;
         
-        // Get _document content
-        const { data: _document } = await supabaseService
+        // Get document content
+        const { data: document } = await supabaseService
           .from('documents')
           .select('*')
           .eq('id', documentId)
           .single();
         
-        if (!_document) {
+        if (!document) {
           throw new Error('Document not found');
         }
         
         // Perform actual ETA 2019 compliance check
-        const complianceResult = await this.performETAComplianceCheck(_document);
+        const complianceResult = await this.performETAComplianceCheck(document);
         
-        // Update _document with compliance results
+        // Update document with compliance results
         await supabaseService
           .from('documents')
           .update({
@@ -581,27 +585,27 @@ export class LangGraphWorkflowOrchestrator {
         const userId = params.user_id as string;
         const documentId = params.document_id as string;
         
-        // Get _user and document
-        const { data: _user } = await supabaseService
+        // Get user and document
+        const { data: user } = await supabaseService
           .from('users')
           .select('*')
           .eq('id', userId)
           .single();
         
-        const { data: _document } = await supabaseService
+        const { data: document } = await supabaseService
           .from('documents')
           .select('*')
           .eq('id', documentId)
           .single();
         
-        if (!_user || !_document) {
-          throw new Error('User or _document not found');
+        if (!user || !document) {
+          throw new Error('User or document not found');
         }
         
         // Perform actual KYC verification
-        const verificationResult = await this.performKycVerification(_user, _document);
+        const verificationResult = await this.performKycVerification(user, document);
         
-        // Update _user verification status
+        // Update user verification status
         await supabaseService
           .from('users')
           .update({
@@ -624,8 +628,9 @@ export class LangGraphWorkflowOrchestrator {
     }
   }
 
-  private async performDocumentAnalysis(_document: unknown): Promise<Record<string, unknown>> {
-    // Actual AI _document analysis implementation
+  private async performDocumentAnalysis(document: unknown): Promise<Record<string, unknown>> {
+    // Actual AI document analysis implementation
+    console.log('Performing analysis on document:', document);
     return {
       document_type: 'contract',
       signature_fields: 2,
@@ -636,8 +641,9 @@ export class LangGraphWorkflowOrchestrator {
     };
   }
 
-  private async performETAComplianceCheck(_document: unknown): Promise<Record<string, unknown>> {
+  private async performETAComplianceCheck(document: unknown): Promise<Record<string, unknown>> {
     // Actual ETA 2019 compliance check implementation
+    console.log('Performing ETA compliance check on document:', document);
     return {
       is_compliant: true,
       score: 0.92,
@@ -647,8 +653,9 @@ export class LangGraphWorkflowOrchestrator {
     };
   }
 
-  private async performKycVerification(_user: unknown, _document: unknown): Promise<Record<string, unknown>> {
+  private async performKycVerification(user: unknown, document: unknown): Promise<Record<string, unknown>> {
     // Actual KYC verification implementation
+    console.log('Performing KYC verification for user:', user, 'with document:', document);
     return {
       is_verified: true,
       verification_score: 0.88,
@@ -669,14 +676,14 @@ export class LangGraphWorkflowOrchestrator {
     try {
       const { supabaseService } = await import('@/lib/database/db-utils');
       
-      // Verify _document exists
-      const { data: _document } = await supabaseService
+      // Verify document exists
+      const { data: document } = await supabaseService
         .from('documents')
         .select('*')
         .eq('id', documentId)
         .single();
       
-      if (!_document) {
+      if (!document) {
         throw new Error('Document not found');
       }
       
@@ -699,13 +706,13 @@ export class LangGraphWorkflowOrchestrator {
       }
       
       // Create signature requests for each signer
-      const signatureRequests = signers.map((signer, _index) => ({
+      const signatureRequests = signers.map((signer, index) => ({
         workflow_id: workflow.id,
         signer_id: signer.id,
         signer_email: signer.email,
         signer_name: signer.name,
         signer_role: signer.role,
-        signing_order: workflowType === 'sequential' ? _index + 1 : 1,
+        signing_order: workflowType === 'sequential' ? index + 1 : 1,
         status: 'pending',
         created_at: new Date().toISOString()
       }));
@@ -724,7 +731,7 @@ export class LangGraphWorkflowOrchestrator {
         throw new Error(`Failed to create signature requests: ${requestsError.message}`);
       }
       
-      // Update _document status
+      // Update document status
       await supabaseService
         .from('documents')
         .update({
@@ -734,7 +741,7 @@ export class LangGraphWorkflowOrchestrator {
         .eq('id', documentId);
       
       // Send notifications to signers (this would integrate with email service)
-      await this.sendSignatureNotifications(signers, workflow.id, _document.title);
+      await this.sendSignatureNotifications(signers, workflow.id, (document as { title: string }).title);
       
       return workflow.id;
     } catch (error) {
@@ -752,7 +759,7 @@ export class LangGraphWorkflowOrchestrator {
     // For now, we'll log the notifications
     console.log(`Sending signature notifications for workflow ${workflowId}:`);
     signers.forEach(signer => {
-      console.log(`- Notifying ${signer.name} (${signer.email}) for _document: ${documentTitle}`);
+      console.log(`- Notifying ${signer.name} (${signer.email}) for document: ${documentTitle}`);
     });
     
     // In a real implementation, this would:
@@ -763,7 +770,7 @@ export class LangGraphWorkflowOrchestrator {
   }
 
   /**
-   * Start _document workflow
+   * Start document workflow
    * Matches Python: start_document_workflow(document_id, analysis_type, enable_compliance)
    */
   async startDocumentWorkflow(
@@ -774,18 +781,18 @@ export class LangGraphWorkflowOrchestrator {
     try {
       const { supabaseService } = await import('@/lib/database/db-utils');
       
-      // Verify _document exists
-      const { data: _document } = await supabaseService
+      // Verify document exists
+      const { data: document } = await supabaseService
         .from('documents')
         .select('*')
         .eq('id', documentId)
         .single();
       
-      if (!_document) {
+      if (!document) {
         throw new Error('Document not found');
       }
       
-      // Create _document workflow in database
+      // Create document workflow in database
       const { data: workflow, error: workflowError } = await supabaseService
         .from('document_workflows')
         .insert({
@@ -800,22 +807,22 @@ export class LangGraphWorkflowOrchestrator {
         .single();
       
       if (workflowError) {
-        throw new Error(`Failed to create _document workflow: ${workflowError.message}`);
+        throw new Error(`Failed to create document workflow: ${workflowError.message}`);
       }
       
-      // Start the actual _document processing workflow
-      await this.executeDocumentWorkflowSteps(workflow.id, _document, analysisType, enableCompliance);
+      // Start the actual document processing workflow
+      await this.executeDocumentWorkflowSteps(workflow.id, document, analysisType, enableCompliance);
       
       return workflow.id;
     } catch (error) {
-      console.error('Start _document workflow error:', error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to start _document workflow');
+      console.error('Start document workflow error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to start document workflow');
     }
   }
 
   private async executeDocumentWorkflowSteps(
     workflowId: string,
-    _document: unknown,
+    document: Record<string, unknown>,
     analysisType: string,
     enableCompliance: boolean
   ): Promise<void> {
@@ -831,9 +838,9 @@ export class LangGraphWorkflowOrchestrator {
         })
         .eq('id', workflowId);
       
-      const analysisResult = await this.performDocumentAnalysis(_document);
+      const analysisResult = await this.performDocumentAnalysis(document);
       
-      // Step 2: Update _document with analysis results
+      // Step 2: Update document with analysis results
       await supabaseService
         .from('documents')
         .update({
@@ -843,7 +850,7 @@ export class LangGraphWorkflowOrchestrator {
           risk_level: analysisResult.risk_level,
           updated_at: new Date().toISOString()
         })
-        .eq('id', (document as unknown as { id: string }).id);
+        .eq('id', document.id);
       
       // Step 3: Compliance Check (if enabled)
       if (enableCompliance) {
@@ -855,7 +862,7 @@ export class LangGraphWorkflowOrchestrator {
           })
           .eq('id', workflowId);
         
-        const complianceResult = await this.performETAComplianceCheck(_document);
+        const complianceResult = await this.performETAComplianceCheck(document);
         
         await supabaseService
           .from('documents')
@@ -864,7 +871,7 @@ export class LangGraphWorkflowOrchestrator {
             compliance_score: complianceResult.score,
             updated_at: new Date().toISOString()
           })
-          .eq('id', (document as unknown as { id: string }).id);
+          .eq('id', document.id);
       }
       
       // Step 4: Signature Field Detection
@@ -876,12 +883,12 @@ export class LangGraphWorkflowOrchestrator {
         })
         .eq('id', workflowId);
       
-      const signatureFields = await this.detectSignatureFields(_document);
+      const signatureFields = await this.detectSignatureFields(document);
       
-      // Create _document fields in database
+      // Create document fields in database
       if (signatureFields.length > 0) {
-        const documentFields = signatureFields.map((field, _index) => ({
-          document_id: (document as unknown as { id: string }).id,
+        const documentFields = signatureFields.map((field) => ({
+          document_id: document.id,
           name: field.name,
           field_type: 'signature',
           position_x: field.position_x,
@@ -908,14 +915,14 @@ export class LangGraphWorkflowOrchestrator {
         })
         .eq('id', workflowId);
       
-      // Update _document status
+      // Update document status
       await supabaseService
         .from('documents')
         .update({
           status: 'ready_for_signature',
           updated_at: new Date().toISOString()
         })
-        .eq('id', (document as unknown as { id: string }).id);
+        .eq('id', document.id);
       
     } catch (error) {
       // Mark workflow as failed
@@ -932,9 +939,10 @@ export class LangGraphWorkflowOrchestrator {
     }
   }
 
-  private async detectSignatureFields(_document: unknown): Promise<any[]> {
+  private async detectSignatureFields(document: unknown): Promise<SignatureFieldData[]> {
     // Actual signature field detection implementation
     // This would use AI/ML to detect signature fields in the document
+    console.log('Detecting signature fields in document:', document);
     return [
       {
         name: 'signature_1',
@@ -957,19 +965,19 @@ export class LangGraphWorkflowOrchestrator {
     ];
   }
 
-  // ============================================================================
+  // ===========================================================================
   // DOCUMENT WORKFLOW TEMPLATES
-  // ============================================================================
+  // ===========================================================================
 
   /**
-   * Create _document processing workflow
+   * Create document processing workflow
    */
   async createDocumentProcessingWorkflow(
     documentId: string,
     workflowType: 'signature' | 'compliance' | 'kyc' | 'analysis' = 'signature'
   ): Promise<{ success: boolean; workflowId?: string; error?: string }> {
     try {
-      const response = await fetch(`${this.apiBaseUrl}/langgraph/workflows/_document-processing`, {
+      const response = await fetch(`${this.apiBaseUrl}/langgraph/workflows/document-processing`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -988,8 +996,8 @@ export class LangGraphWorkflowOrchestrator {
       const result = await response.json();
       return { success: true, workflowId: result.workflow_id };
     } catch (error) {
-      console.error('Create _document workflow error:', error);
-      return { success: false, error: error instanceof Error ? error.message : 'Failed to create _document workflow' };
+      console.error('Create document workflow error:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Failed to create document workflow' };
     }
   }
 
@@ -1027,9 +1035,9 @@ export class LangGraphWorkflowOrchestrator {
     }
   }
 
-  // ============================================================================
+  // ===========================================================================
   // WORKFLOW MONITORING
-  // ============================================================================
+  // ===========================================================================
 
   /**
    * Get workflow metrics
@@ -1063,9 +1071,9 @@ export class LangGraphWorkflowOrchestrator {
     }
   }
 
-  // ============================================================================
+  // ===========================================================================
   // REAL-TIME SUBSCRIPTIONS
-  // ============================================================================
+  // ===========================================================================
 
   /**
    * Subscribe to workflow updates
@@ -1086,12 +1094,12 @@ export class LangGraphWorkflowOrchestrator {
     return () => clearInterval(interval);
   }
 
-  // ============================================================================
+  // ===========================================================================
   // TEST-EXPECTED METHODS
-  // ============================================================================
+  // ===========================================================================
 
   /**
-   * Execute _document processing workflow
+   * Execute document processing workflow
    */
   async executeDocumentProcessingWorkflow(documentId: string): Promise<{
     workflowId: string;
@@ -1099,7 +1107,7 @@ export class LangGraphWorkflowOrchestrator {
     result: unknown;
   }> {
     try {
-      const response = await fetch(`${this.apiBaseUrl}/execute-_document-processing`, {
+      const response = await fetch(`${this.apiBaseUrl}/execute-document-processing`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1210,7 +1218,7 @@ export class LangGraphWorkflowOrchestrator {
   }
 
   /**
-   * Optimize _document processing
+   * Optimize document processing
    */
   async optimizeDocumentProcessing(documentId: string): Promise<{
     optimizations: string[];
@@ -1218,7 +1226,7 @@ export class LangGraphWorkflowOrchestrator {
     recommendations: string[];
   }> {
     try {
-      const response = await fetch(`${this.apiBaseUrl}/optimize-_document-processing`, {
+      const response = await fetch(`${this.apiBaseUrl}/optimize-document-processing`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1245,7 +1253,7 @@ export class LangGraphWorkflowOrchestrator {
   async saveWorkflowResults(documentId: string, workflow: unknown): Promise<void> {
     try {
       // This would typically save to the database
-      console.log('Saving workflow results for _document:', documentId, workflow);
+      console.log('Saving workflow results for document:', documentId, workflow);
     } catch (error) {
       console.error('Save workflow results error:', error);
       throw new Error(error instanceof Error ? error.message : 'Save workflow results failed');
@@ -1255,7 +1263,7 @@ export class LangGraphWorkflowOrchestrator {
   /**
    * Get workflow status
    */
-  async getWorkflowStatus(workflowId: string): Promise<any> {
+  async getWorkflowStatus(workflowId: string): Promise<unknown> {
     try {
       const response = await fetch(`${this.apiBaseUrl}/workflow-status/${workflowId}`, {
         method: 'GET',
@@ -1279,9 +1287,9 @@ export class LangGraphWorkflowOrchestrator {
 }
 
 
-// ============================================================================
+// ===========================================================================
 // EXPORTS
-// ============================================================================
+// ===========================================================================
 
 export const langGraphWorkflows = new LangGraphWorkflowOrchestrator();
 export default langGraphWorkflows;

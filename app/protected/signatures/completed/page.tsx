@@ -15,15 +15,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  CheckCircle2, 
-  User, 
-  Calendar,
-  Download,
-  Eye,
-  Loader2,
-  AlertCircle
-} from 'lucide-react';
+import { CheckCircle2, User, Calendar, Download, Eye, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { DocumentStatus, DocumentType } from '@/lib/types';
 
@@ -38,7 +30,7 @@ interface CompletedSignature {
 }
 
 export default function CompletedSignaturesPage() {
-  const { _user, getSupabaseClient } = useAuth();
+  const { user: _user, supabase } = useAuth();
   const [completedSignatures, setCompletedSignatures] = useState<CompletedSignature[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +40,7 @@ export default function CompletedSignaturesPage() {
       setLoading(true);
       setError(null);
 
-      const _supabase = getSupabaseClient();
+      
       const { data: documents, error: documentsError } = await supabase
         .from('documents')
         .select(`
@@ -67,12 +59,12 @@ export default function CompletedSignaturesPage() {
         throw documentsError;
       }
 
-      const signatures: CompletedSignature[] = documents?.map(doc => ({
-        id: doc.id,
-        title: doc.title,
+      const signatures: CompletedSignature[] = documents?.map((doc: any) => ({
+        id: doc.id as string,
+        title: doc.title as string,
         signer: 'System User', // Simplified since we can't join with profiles
-        completedDate: doc.updated_at ? new Date(doc.updated_at).toLocaleDateString() : 'Unknown',
-        signedDate: doc.updated_at ? new Date(doc.updated_at).toLocaleDateString() : 'Unknown',
+        completedDate: doc.updated_at ? new Date(doc.updated_at as string).toLocaleDateString() : 'Unknown',
+        signedDate: doc.updated_at ? new Date(doc.updated_at as string).toLocaleDateString() : 'Unknown',
         status: doc.status as DocumentStatus,
         type: (doc.document_type as DocumentType) || DocumentType.OTHER
       })) || [];
@@ -84,7 +76,7 @@ export default function CompletedSignaturesPage() {
     } finally {
       setLoading(false);
     }
-  }, [getSupabaseClient]);
+  }, [supabase]);
 
   useEffect(() => {
     if (_user) {

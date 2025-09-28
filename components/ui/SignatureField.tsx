@@ -6,16 +6,16 @@
  * Features: TypeScript-based, Groq AI integration, ETA 2019 compliance, web-focused
  */
 
-import React, { useState, useRef } from 'react';
-import { SignatureData, ValidationResult, ComplianceStatus } from '@/lib/design-system';
+import React, { useState, useRef, useCallback } from 'react';
+import { SignatureData, SignatureValidation, ComplianceStatus } from '@/lib/design-system';
 import { cn } from '@/lib/utils';
 
 interface SignatureFieldProps {
   method: 'draw' | 'type' | 'upload';
-  validation: ValidationResult | null;
+  validation: SignatureValidation | null;
   compliance: ComplianceStatus;
   onSignature: (signature: SignatureData) => void;
-  onValidation: (validation: ValidationResult) => void;
+  onValidation: (validation: SignatureValidation) => void;
 }
 
 const SignatureField: React.FC<SignatureFieldProps> = ({
@@ -25,14 +25,14 @@ const SignatureField: React.FC<SignatureFieldProps> = ({
   onSignature,
   onValidation
 }) => {
-  const [_signatureData, setSignatureData] = useState<SignatureData | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
+  const [signatureData, setSignatureData] = useState<SignatureData | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // AI-powered validation using Groq
-  const validateSignature = async (data: SignatureData): Promise<ValidationResult> => {
+  const validateSignature = async (data: SignatureData): Promise<SignatureValidation> => {
     setIsValidating(true);
     
     try {
@@ -47,7 +47,7 @@ const SignatureField: React.FC<SignatureFieldProps> = ({
         })
       });
       
-      const result: ValidationResult = await response.json();
+      const result: SignatureValidation = await response.json();
       onValidation(result);
       return result;
     } catch (error) {
@@ -103,7 +103,6 @@ const SignatureField: React.FC<SignatureFieldProps> = ({
       verification_hash: generateVerificationHash(dataURL)
     };
     
-    setSignatureData(signatureData);
     onSignature(signatureData);
     validateSignature(signatureData);
   };
@@ -115,7 +114,6 @@ const SignatureField: React.FC<SignatureFieldProps> = ({
       verification_hash: generateVerificationHash(text)
     };
     
-    setSignatureData(signatureData);
     onSignature(signatureData);
     validateSignature(signatureData);
   };
@@ -158,7 +156,6 @@ const SignatureField: React.FC<SignatureFieldProps> = ({
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
     }
-    setSignatureData(null);
   };
 
   // Render signature method
@@ -172,8 +169,8 @@ const SignatureField: React.FC<SignatureFieldProps> = ({
               width={400}
               height={200}
               className={cn(
-                'border-2 border-dashed border-neutral-300 rounded-lg cursor-crosshair',
-                validation?.valid ? 'border-success-500' : 'border-error-500'
+                'border-2 border-dashed border-border rounded-lg cursor-crosshair',
+                validation?.valid ? 'border-chart-2' : 'border-chart-5'
               )}
               onMouseDown={handleDrawStart}
               onMouseMove={handleDrawMove}
@@ -183,7 +180,7 @@ const SignatureField: React.FC<SignatureFieldProps> = ({
             <div className="flex gap-2">
               <button
                 onClick={clearSignature}
-                className="px-4 py-2 text-sm bg-neutral-100 hover:bg-neutral-200 rounded-md"
+                className="px-4 py-2 text-sm bg-muted hover:bg-muted/80 rounded-md"
               >
                 Clear
               </button>
@@ -197,7 +194,7 @@ const SignatureField: React.FC<SignatureFieldProps> = ({
             <input
               type="text"
               placeholder="Type your signature"
-              className="w-full p-3 border border-neutral-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full p-3 border border-border rounded-md focus:ring-2 focus:ring-chart-1 focus:border-transparent"
               onChange={(e) => handleTypeSignature(e.target.value)}
             />
           </div>
@@ -218,13 +215,13 @@ const SignatureField: React.FC<SignatureFieldProps> = ({
             />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="w-full p-4 border-2 border-dashed border-neutral-300 rounded-lg hover:border-primary-500 transition-colors"
+              className="w-full p-4 border-2 border-dashed border-border rounded-lg hover:border-chart-1 transition-colors"
             >
               <div className="text-center">
-                <svg className="mx-auto h-12 w-12 text-neutral-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                <svg className="mx-auto h-12 w-12 text-muted-foreground" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                   <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <p className="mt-2 text-sm text-neutral-600">Upload signature image</p>
+                <p className="mt-2 text-sm text-muted-foreground">Upload signature image</p>
               </div>
             </button>
           </div>
@@ -246,8 +243,8 @@ const SignatureField: React.FC<SignatureFieldProps> = ({
             className={cn(
               'px-3 py-2 text-sm rounded-md transition-colors',
               method === m
-                ? 'bg-primary-500 text-white'
-                : 'bg-neutral-100 hover:bg-neutral-200'
+                ? 'bg-chart-1 text-white'
+                : 'bg-muted hover:bg-muted/80'
             )}
           >
             {m.charAt(0).toUpperCase() + m.slice(1)}
@@ -260,7 +257,7 @@ const SignatureField: React.FC<SignatureFieldProps> = ({
 
       {/* Validation Status */}
       {isValidating && (
-        <div className="flex items-center space-x-2 text-sm text-neutral-600">
+        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
           <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -273,21 +270,21 @@ const SignatureField: React.FC<SignatureFieldProps> = ({
       {validation && (
         <div className={cn(
           'p-3 rounded-md',
-          validation.valid ? 'bg-success-50 border border-success-200' : 'bg-error-50 border border-error-200'
+          validation.valid ? 'bg-chart-2/10 border border-chart-2/20' : 'bg-chart-5/10 border border-chart-5/20'
         )}>
           <div className="flex items-center space-x-2">
             {validation.valid ? (
-              <svg className="h-5 w-5 text-success-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 text-chart-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
             ) : (
-              <svg className="h-5 w-5 text-error-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 text-chart-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             )}
             <span className={cn(
               'text-sm font-medium',
-              validation.valid ? 'text-success-700' : 'text-error-700'
+              validation.valid ? 'text-chart-2' : 'text-chart-5'
             )}>
               {validation.valid ? 'Signature Valid' : 'Signature Invalid'}
             </span>
@@ -295,8 +292,8 @@ const SignatureField: React.FC<SignatureFieldProps> = ({
           
           {validation.recommendations.length > 0 && (
             <div className="mt-2">
-              <p className="text-sm text-neutral-600">Recommendations:</p>
-              <ul className="mt-1 text-sm text-neutral-600 list-disc list-inside">
+              <p className="text-sm text-muted-foreground">Recommendations:</p>
+              <ul className="mt-1 text-sm text-muted-foreground list-disc list-inside">
                 {validation.recommendations.map((rec, _index) => (
                   <li key={_index}>{rec}</li>
                 ))}
@@ -307,14 +304,14 @@ const SignatureField: React.FC<SignatureFieldProps> = ({
       )}
 
       {/* ETA 2019 Compliance Notice */}
-      <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+      <div className="p-3 bg-chart-1/10 border border-chart-1/20 rounded-md">
         <div className="flex items-start space-x-2">
-          <svg className="h-5 w-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="h-5 w-5 text-chart-1 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div>
-            <p className="text-sm font-medium text-blue-700">ETA 2019 Compliance</p>
-            <p className="text-sm text-blue-600">
+            <p className="text-sm font-medium text-chart-1">ETA 2019 Compliance</p>
+            <p className="text-sm text-chart-1/80">
               This signature complies with Namibian Electronic Transactions Act 2019 requirements.
             </p>
           </div>

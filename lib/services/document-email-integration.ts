@@ -7,7 +7,7 @@
 
 import { EmailService } from './email/email-service';
 import { createClient } from '@/lib/supabase/server';
-import { DocumentStatus, SignatureStatus } from '@/lib/types';
+import { DocumentStatus } from '@/lib/types';
 
 export interface DocumentEmailIntegration {
   // Document lifecycle events

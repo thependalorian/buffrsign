@@ -28,6 +28,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from starlette.middleware.base import BaseHTTPMiddleware
 import redis.asyncio as redis
 
+from services.fallback_service import app as fallback_app # Import fallback app
+
 # Import our modules
 from auth.auth_utils import get_current_user, create_access_token, verify_token
 from api.document_routes import router as document_router
@@ -251,6 +253,8 @@ app = FastAPI(
     redoc_url="/redoc" if APP_ENV == "development" else None,
     lifespan=lifespan
 )
+
+app.mount("/fallback", fallback_app) # Mount the fallback application
 
 # Add security middleware first
 app.add_middleware(SecurityMiddleware)
@@ -500,7 +504,7 @@ async def get_current_user_info(current_user: Dict[str, Any] = Depends(get_curre
 app.include_router(document_router, prefix="/api/v1/documents", tags=["documents"])
 app.include_router(signature_router, prefix="/api/v1/signatures", tags=["signatures"])
 app.include_router(workflow_router, prefix="/api/v1/workflows", tags=["workflows"])
-app.include_router(ai_router, tags=["ai"])
+    app.include_router(ai_router, tags=["ai"])
 
 # CLI integration endpoint
 @app.post("/api/v1/cli/execute")
@@ -526,6 +530,60 @@ async def cli_execute(
     except Exception as e:
         logger.error(f"CLI execution error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# Pydantic model for Party (already defined, but for clarity in this block)
+class Party(BaseModel):
+    email: str
+    name: str
+    role: str
+    signing_order: Optional[int] = None
+
+# Pydantic model for DocumentCreate (already defined, but for clarity in this block)
+class DocumentCreate(BaseModel):
+    title: str
+    content: str # Could be base64 encoded
+    initiator: str # email
+    parties: List[Party]
+    signature_fields: List[dict]
+
+# Pydantic model for LoanAgreementCreate
+class LoanAgreementCreate(BaseModel):
+    loan_id: str
+    customer_id: str
+    loan_amount: float
+    interest_rate: float
+    term_months: int
+    title: str = "Loan Agreement"
+    content: str # Base64 encoded PDF of the loan agreement
+    initiator: str # email of the BuffrLend system or agent
+    parties: List[Party] # Includes customer and BuffrLend representative
+    signature_fields: List[dict] # Pre-defined signature fields
+
+@app.post("/loan-agreements")
+async def create_loan_agreement_for_signing(loan_agreement: LoanAgreementCreate):
+    """
+    Endpoint to create a loan agreement for multi-party signing.
+    This is specifically tailored for BuffrLend integration.
+    """
+    # In a real app, this would use the BuffrSignEngine to process the loan agreement.
+    # The content (base64 encoded PDF) would be stored, signature fields identified,
+    # and the signing workflow initiated.
+    # new_doc = await engine.create_multi_party_document(loan_agreement.dict())
+    # return {"document_id": new_doc['id'], "status": new_doc['status']}
+    return {"message": "Loan agreement signing endpoint placeholder", "data": loan_agreement.dict()}
+
+@app.post("/documents/generic-signing")
+async def create_generic_document_for_signing(document: DocumentCreate):
+    """
+    Endpoint to create a generic document for multi-party signing.
+    This can be used by any Buffr project for various document types.
+    """
+    # In a real app, this would use the BuffrSignEngine to process the document.
+    # The content (base64 encoded PDF) would be stored, signature fields identified,
+    # and the signing workflow initiated.
+    # new_doc = await engine.create_multi_party_document(document.dict())
+    # return {"document_id": new_doc['id'], "status": new_doc['status']}
+    return {"message": "Generic document signing endpoint placeholder", "data": document.dict()}
 
 if __name__ == "__main__":
     uvicorn.run(

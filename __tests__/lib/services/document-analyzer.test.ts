@@ -1,4 +1,4 @@
-import { DocumentAnalyzer } from '../../../lib/services/_document-analyzer'
+import { DocumentAnalyzer } from '../../../lib/services/document-analyzer'
 import { RiskLevel } from '../../../lib/ai-types'
 
 // Mock the supabase module

@@ -7,9 +7,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { BuffrSignAIIntegration } from '@/lib/ai/ai-integration';
 import { verifyJWT } from '@/lib/middleware/jwt-middleware';
-import type { UserTier } from '@/lib/ai/ai-types';
+import type { UserTier, APIResponse, GroqResponse } from '@/lib/ai/ai-types';
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export async function POST(request: NextRequest) {
   try {
     // Verify JWT token and get user information
     const authResult = await verifyJWT(request);
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
-      );
+      ) as NextResponse;
     }
 
     // User authenticated successfully
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(
         { error: 'Either document_id or document_content is required' },
         { status: 400 }
-      );
+      ) as NextResponse;
     }
 
     // Validate user tier
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(
         { error: 'Invalid user tier. Must be "standard" or "pro"' },
         { status: 400 }
-      );
+      ) as NextResponse;
     }
 
     const aiIntegration = new BuffrSignAIIntegration();
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // If document_content is provided, use Groq for analysis
     if (document_content) {
       try {
-        const response = await aiIntegration.analyzeDocumentWithGroq({
+        const response: APIResponse<GroqResponse> = await aiIntegration.analyzeDocumentWithGroq({
           documentContent: document_content,
           userTier: userTier as UserTier,
           analysisType: analysis_type === 'comprehensive' ? 'comprehensive' : 'basic',
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           return NextResponse.json(
             { error: response.error || 'Document analysis failed' },
             { status: 500 }
-          );
+          ) as NextResponse;
         }
 
         const modelInfo = aiIntegration.getGroqModelInfo(userTier as UserTier);
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         return NextResponse.json(
           { error: 'Groq analysis failed', message: groqError instanceof Error ? groqError.message : 'Unknown error' },
           { status: 500 }
-        );
+        ) as NextResponse;
       }
     }
 
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         return NextResponse.json(
           { error: response.error || 'Document analysis failed' },
           { status: 500 }
-        );
+        ) as NextResponse;
       }
 
       return NextResponse.json({
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(
         { error: 'LlamaIndex analysis failed', message: llamaindexError instanceof Error ? llamaindexError.message : 'Unknown error' },
         { status: 500 }
-      );
+      ) as NextResponse;
     }
 
   } catch (error: unknown) {
@@ -133,6 +133,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         message: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
-    );
+    ) as NextResponse;
   }
 }

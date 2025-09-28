@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
 
     if (typeof result === 'object' && result && 'success' in result && !result.success) {
       return NextResponse.json(
-        { error: (result as any).error || 'Operation failed' },
+        { error: (result as { error?: string }).error || 'Operation failed' },
         { status: 500 }
       );
     }
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString()
     });
 
-  } catch {
+  } catch (error) {
     console.error('LangGraph API Error:', error);
     
     return NextResponse.json(

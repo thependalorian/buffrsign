@@ -690,6 +690,9 @@ describe('Signature Storage Service', () => {
       );
 
       testSignature = result.signature;
+      // Ensure testSignature.updated_at is different for subsequent updates
+      // This is a workaround for in-memory database not truly simulating time progression
+      await new Promise(resolve => setTimeout(resolve, 1)); // Wait 1ms
     });
 
     it('should retrieve signature by ID', async () => {
@@ -705,6 +708,7 @@ describe('Signature Storage Service', () => {
 
     it('should update signature with validation', async () => {
       // Arrange
+      const originalUpdatedAt = testSignature.updated_at;
       const updates = {
         verification_status: SignatureVerificationStatus.VERIFIED
       };
@@ -715,7 +719,7 @@ describe('Signature Storage Service', () => {
       // Assert
       expect(result.signature.verification_status).toBe(SignatureVerificationStatus.VERIFIED);
       expect(result.validation.valid).toBe(true);
-      expect(result.signature.updated_at).not.toBe(testSignature.updated_at);
+      expect(result.signature.updated_at).not.toBe(originalUpdatedAt);
     });
 
     it('should reject invalid signature updates', async () => {
@@ -807,7 +811,8 @@ describe('Signature Storage Service', () => {
         'Mozilla/5.0'
       );
 
-      const originalSignature = result.signature;
+      let originalSignature = result.signature;
+      const originalUpdatedAt = originalSignature.updated_at;
 
       // Act
       const updateResult = await service.updateSignature(originalSignature.id, {
@@ -820,7 +825,7 @@ describe('Signature Storage Service', () => {
       expect(updateResult.signature.signer_id).toBe(originalSignature.signer_id);
       expect(updateResult.signature.signature_data).toEqual(originalSignature.signature_data);
       expect(updateResult.signature.verification_status).toBe(SignatureVerificationStatus.VERIFIED);
-      expect(updateResult.signature.updated_at).not.toBe(originalSignature.updated_at);
+      expect(updateResult.signature.updated_at).not.toBe(originalUpdatedAt);
     });
 
     it('should handle concurrent signature creation', async () => {

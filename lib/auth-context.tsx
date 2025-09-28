@@ -12,7 +12,7 @@ import { UserRole, KYCStatus } from './types';
 // ============================================================================
 
 interface AuthContextType {
-  _user: AuthUser | null;
+  user: AuthUser | null;
   loading: boolean;
   error: string | null;
   signIn: (email: string, password: string) => Promise<AuthResponse>;
@@ -41,7 +41,7 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [_user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -144,7 +144,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const refreshUser = async (): Promise<void> => {
     try {
-      if (!_user) return;
+      if (!user) return;
       
       const response = await refreshSession();
       
@@ -157,7 +157,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     } catch (err) {
       console.error('User refresh error:', err);
-      setError('Failed to refresh _user session');
+      setError('Failed to refresh user session');
       setUser(null);
     }
   };
@@ -171,17 +171,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // ============================================================================
 
   const hasRole = (requiredRole: UserRole | UserRole[]): boolean => {
-    if (!_user) return false;
+    if (!user) return false;
     
     if (Array.isArray(requiredRole)) {
-      return requiredRole.includes(_user.role as UserRole);
+      return requiredRole.includes(user.role as UserRole);
     }
     
-    return _user.role === requiredRole;
+    return user.role === requiredRole;
   };
 
   const hasKYCStatus = (): boolean => {
-    if (!_user) return false;
+    if (!user) return false;
     
     // For now, we'll assume basic verification for all users
     // This should be updated when KYC status is properly implemented
@@ -189,20 +189,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const isAdmin = (): boolean => {
-    if (!_user) return false;
+    if (!user) return false;
     
     const adminRoles = [
       UserRole.ADMIN,
       UserRole.SUPER_ADMIN
     ];
     
-    return adminRoles.includes(_user.role as UserRole);
+    return adminRoles.includes(user.role as UserRole);
   };
 
   const isSuperAdmin = (): boolean => {
-    if (!_user) return false;
+    if (!user) return false;
     
-    return _user.role === UserRole.SUPER_ADMIN;
+    return user.role === UserRole.SUPER_ADMIN;
   };
 
   // ============================================================================
@@ -210,7 +210,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // ============================================================================
 
   const contextValue: AuthContextType = {
-    _user,
+    user,
     loading,
     error,
     signIn: handleSignIn,
@@ -292,7 +292,7 @@ export function ProtectedRoute({
   fallback,
   redirectTo
 }: ProtectedRouteProps) {
-  const { _user, loading, hasRole, hasKYCStatus } = useAuth();
+  const { user, loading, hasRole, hasKYCStatus } = useAuth();
 
   // Show loading state
   if (loading) {
@@ -304,7 +304,7 @@ export function ProtectedRoute({
   }
 
   // Check if _user is authenticated
-  if (!_user) {
+  if (!user) {
     if (redirectTo) {
       // Redirect to login page
       window.location.href = redirectTo;

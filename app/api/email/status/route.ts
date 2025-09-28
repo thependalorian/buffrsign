@@ -11,7 +11,7 @@ import { emailConfig } from '@/lib/config/email-config';
 export async function GET(): Promise<NextResponse> {
   try {
     // Get authenticated user
-    const _supabase = createClient();
+    const supabase = await createClient();
     const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !_user) {
@@ -23,15 +23,15 @@ export async function GET(): Promise<NextResponse> {
 
     // Get system configuration
     const systemConfig = {
-      provider: emailConfig.provider,
-      fromEmail: emailConfig.fromEmail,
-      fromName: emailConfig.fromName,
-      appUrl: emailConfig.appUrl,
-      queueEnabled: emailConfig.emailQueueEnabled,
-      retryAttempts: emailConfig.emailRetryAttempts,
-      retryDelay: emailConfig.emailRetryDelay,
-      batchSize: emailConfig.emailBatchSize,
-      rateLimit: emailConfig.emailRateLimit
+      provider: emailConfig().provider,
+      fromEmail: emailConfig().fromEmail,
+      fromName: emailConfig().fromName,
+      appUrl: emailConfig().appUrl,
+      queueEnabled: emailConfig().queueEnabled,
+      retryAttempts: emailConfig().retryAttempts,
+      retryDelay: emailConfig().retryDelay,
+      batchSize: emailConfig().batchSize,
+      rateLimit: emailConfig().rateLimit
     };
 
     // Check database connectivity
@@ -43,7 +43,7 @@ export async function GET(): Promise<NextResponse> {
         .limit(1);
       
       dbStatus = dbError ? 'error' : 'connected';
-    } catch {
+    } catch (error) {
       dbStatus = 'error';
     }
 
@@ -62,7 +62,7 @@ export async function GET(): Promise<NextResponse> {
       } else {
         queueStatus = 'error';
       }
-    } catch {
+    } catch (error) {
       queueStatus = 'error';
     }
 
@@ -92,9 +92,7 @@ export async function GET(): Promise<NextResponse> {
     let providerStatus = 'unknown';
     try {
       // This is a basic check - in production you might want to make an actual API call
-      const hasApiKey = emailConfig.provider === 'sendgrid' ? !!emailConfig.sendgridApiKey :
-                       emailConfig.provider === 'resend' ? !!emailConfig.resendApiKey :
-                       emailConfig.provider === 'ses' ? !!emailConfig.awsAccessKeyId : false;
+      const hasApiKey = !!emailConfig().apiKey;
       
       providerStatus = hasApiKey ? 'configured' : 'not_configured';
     } catch {
@@ -117,7 +115,7 @@ export async function GET(): Promise<NextResponse> {
       queue: {
         status: queueStatus,
         pendingCount: queueCount,
-        enabled: emailConfig.emailQueueEnabled
+        enabled: emailConfig().queueEnabled
       },
       
       // Recent statistics

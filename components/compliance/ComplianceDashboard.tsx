@@ -6,11 +6,9 @@
  * Features: ETA 2019, eIDAS, ESIGN Act compliance monitoring
  */
 
-'use client';
-
 import React, { useState, useEffect } from 'react';
 import { ETAComplianceValidator } from './ETAComplianceValidator';
-import { designTokens } from '@/lib/design-system';
+
 
 interface ComplianceDashboardProps {
   documentId: string;
@@ -81,9 +79,9 @@ export function ComplianceDashboard({
   };
 
   const getComplianceColor = (compliant: boolean, score: number) => {
-    if (compliant && score >= 90) return designTokens.colors.success;
-    if (compliant && score >= 70) return designTokens.colors.warning;
-    return designTokens.colors.error;
+    if (compliant && score >= 90) return 'text-chart-2'; // Success Green
+    if (compliant && score >= 70) return 'text-chart-3'; // Warning Orange
+    return 'text-chart-5'; // Error Red
   };
 
   const getComplianceIcon = (compliant: boolean, score: number) => {
@@ -178,8 +176,7 @@ export function ComplianceDashboard({
                             {getComplianceIcon(summary.compliant, summary.score)}
                           </span>
                           <span 
-                            className="text-lg font-bold"
-                            style={{ color: getComplianceColor(summary.compliant, summary.score) }}
+                            className={`text-lg font-bold ${getComplianceColor(summary.compliant, summary.score)}`}
                           >
                             {summary.score}%
                           </span>
@@ -280,7 +277,7 @@ export function ComplianceDashboard({
         <div className="divider"></div>
         <div className="text-center text-sm text-base-content/50">
           <p>
-            Compliance validation powered by BuffrSign's AI-driven legal framework analysis
+            Compliance validation powered by BuffrSign&apos;s AI-driven legal framework analysis
           </p>
           <p className="mt-1">
             Last updated: {new Date().toLocaleString()}

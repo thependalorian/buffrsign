@@ -3,7 +3,23 @@
  * Tests all AI service API endpoints
  */
 
-import { NextRequest } from 'next/server';
+jest.mock('next/server', () => ({
+  NextRequest: jest.fn().mockImplementation((url, init) => ({
+    url,
+    json: jest.fn(async () => JSON.parse(init.body)),
+    headers: new Headers(init.headers),
+    cookies: {
+      get: jest.fn((name) => ({
+        value: `mock-${name}-cookie-value`
+      }))
+    }
+  })),
+  NextResponse: jest.fn().mockImplementation((body, init) => ({
+    json: jest.fn(async () => JSON.parse(body)),
+    status: init.status,
+    headers: new Headers(init.headers)
+  })),
+}));
 import { BuffrSignAIIntegration } from '../lib/ai/ai-integration';
 
 // Mock the AI integration

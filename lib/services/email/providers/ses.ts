@@ -136,7 +136,7 @@ export class SESProvider {
   async sendTemplateEmail(
     to: string,
     templateName: string,
-    templateData: Record<string, any>,
+    templateData: Record<string, unknown>,
     customArgs?: Record<string, string>
   ): Promise<EmailSendResult> {
     if (!this.isInitialized) {
@@ -236,7 +236,6 @@ export class SESProvider {
         
         return {
           event: webhookEvent.event,
-          timestamp: new Date(webhookEvent.timestamp * 1000).getTime(),
           messageId: webhookEvent.sg_message_id,
           email: webhookEvent.email,
           reason: webhookEvent.reason || webhookEvent.type,
@@ -298,7 +297,7 @@ export class SESProvider {
   /**
    * Get delivery statistics from SendGrid
    */
-  async getDeliveryStats(startDate: string, endDate: string): Promise<any> {
+  async getDeliveryStats(startDate: string, endDate: string): Promise<SendGridDeliveryStats> {
     try {
       if (!this.isInitialized) {
         await this.initialize();
@@ -335,7 +334,7 @@ export class SESProvider {
   /**
    * Get sending quota from SendGrid
    */
-  async getSendingQuota(): Promise<any> {
+  async getSendingQuota(): Promise<SendGridSendingQuota> {
     try {
       if (!this.isInitialized) {
         await this.initialize();

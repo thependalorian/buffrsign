@@ -1,4 +1,6 @@
-export type UserRole = '_user' | 'admin' | 'super_admin';
+import type { Session } from '@supabase/supabase-js';
+
+export type UserRole = 'user' | 'admin' | 'super_admin';
 
 export interface UserProfile {
   id: string;
@@ -14,6 +16,8 @@ export interface UserProfile {
   created_at: string;
   updated_at: string;
   last_login_at?: string;
+  email_provider: string;
+  email_preferences: Record<string, any>;
   preferences: UserPreferences;
   permissions: UserPermissions;
 }
@@ -31,6 +35,7 @@ export interface UserPermissions {
   can_view_dashboard: boolean;
   can_manage_users: boolean;
   can_manage_documents: boolean;
+  can_manage_signatures: boolean;
   can_manage_compliance: boolean;
   can_view_analytics: boolean;
   can_manage_settings: boolean;
@@ -41,8 +46,8 @@ export interface UserPermissions {
 }
 
 export interface AuthState {
-  _user: UserProfile | null;
-  session: unknown | null;
+  user: UserProfile | null;
+  session: Session | null;
   loading: boolean;
   error: string | null;
 }

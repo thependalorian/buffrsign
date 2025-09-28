@@ -1,0 +1,76 @@
+# BuffrSign Microservices Terraform Variables Example
+# Copy this file to terraform.tfvars and update with your values
+
+# GCP Configuration
+project_id = "your-gcp-project-id"
+region     = "us-central1"
+
+# Domain Configuration
+frontend_domain = "buffrsign.ai"
+api_domain      = "api.buffrsign.ai"
+
+# Database Configuration
+create_databases = true
+create_redis     = true
+db_tier          = "db-f1-micro"
+
+# Database Passwords (generate strong passwords)
+auth_db_password      = "your-auth-db-password"
+document_db_password  = "your-document-db-password"
+signature_db_password = "your-signature-db-password"
+email_db_password     = "your-email-db-password"
+ai_db_password        = "your-ai-db-password"
+
+# Service Environment Variables
+api_gateway_env = {
+  REDIS_URL = "redis://10.0.0.0:6379"
+  AUTH_SERVICE_URL = "http://buffrsign-auth-service:8001"
+  DOCUMENT_SERVICE_URL = "http://buffrsign-document-service:8002"
+  SIGNATURE_SERVICE_URL = "http://buffrsign-signature-service:8003"
+  EMAIL_SERVICE_URL = "http://buffrsign-email-service:8004"
+  AI_SERVICE_URL = "http://buffrsign-ai-service:8005"
+}
+
+auth_service_env = {
+  DATABASE_URL = "postgresql://buffrsign_auth_user:your-auth-db-password@buffrsign-auth-db:5432/buffrsign_auth"
+  REDIS_URL = "redis://10.0.0.0:6379"
+  JWT_SECRET_KEY = "your-jwt-secret-key"
+}
+
+document_service_env = {
+  DATABASE_URL = "postgresql://buffrsign_document_user:your-document-db-password@buffrsign-document-db:5432/buffrsign_documents"
+  AUTH_SERVICE_URL = "http://buffrsign-auth-service:8001"
+  UPLOAD_DIR = "/app/uploads"
+}
+
+signature_service_env = {
+  DATABASE_URL = "postgresql://buffrsign_signature_user:your-signature-db-password@buffrsign-signature-db:5432/buffrsign_signatures"
+  AUTH_SERVICE_URL = "http://buffrsign-auth-service:8001"
+  DOCUMENT_SERVICE_URL = "http://buffrsign-document-service:8002"
+  EMAIL_SERVICE_URL = "http://buffrsign-email-service:8004"
+}
+
+email_service_env = {
+  DATABASE_URL = "postgresql://buffrsign_email_user:your-email-db-password@buffrsign-email-db:5432/buffrsign_emails"
+  AUTH_SERVICE_URL = "http://buffrsign-auth-service:8001"
+  SMTP_HOST = "smtp.gmail.com"
+  SMTP_PORT = "587"
+  SMTP_USERNAME = "your-smtp-username"
+  SMTP_PASSWORD = "your-smtp-password"
+  FROM_EMAIL = "noreply@buffrsign.com"
+}
+
+ai_service_env = {
+  DATABASE_URL = "postgresql://buffrsign_ai_user:your-ai-db-password@buffrsign-ai-db:5432/buffrsign_ai"
+  AUTH_SERVICE_URL = "http://buffrsign-auth-service:8001"
+  DOCUMENT_SERVICE_URL = "http://buffrsign-document-service:8002"
+  OPENAI_API_KEY = "your-openai-api-key"
+  GROQ_API_KEY = "your-groq-api-key"
+}
+
+frontend_env = {
+  NEXT_PUBLIC_API_URL = "https://api.buffrsign.ai"
+  NEXT_PUBLIC_APP_URL = "https://buffrsign.ai"
+  NEXT_PUBLIC_SUPABASE_URL = "your-supabase-url"
+  NEXT_PUBLIC_SUPABASE_ANON_KEY = "your-supabase-anon-key"
+}

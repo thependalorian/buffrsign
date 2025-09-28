@@ -10,12 +10,14 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
   try {
+    const { id: notificationId } = await params;
+    
     // Get authenticated user
-    const _supabase = createClient();
-    const { data: { _user: _user }, error: authError } = await supabase.auth.getUser();
+    const supabase = await createClient();
+    const { data: { _user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !_user) {
       return NextResponse.json(
@@ -23,8 +25,6 @@ export async function POST(
         { status: 401 }
       );
     }
-
-    const notificationId = params.id;
 
     if (!notificationId) {
       return NextResponse.json(
@@ -47,15 +47,15 @@ export async function POST(
       );
     }
 
-    // Check if _user has permission to cancel this email
+    // Check if user has permission to cancel this email
     if (notification.document_id) {
-      const { data: _document } = await supabase
+      const { data: document } = await supabase
         .from('documents')
         .select('created_by')
         .eq('id', notification.document_id)
         .single();
 
-      if (!_document || _document.created_by !== _user.id) {
+      if (!document || document.created_by !== _user.id) {
         return NextResponse.json(
           { error: 'Insufficient permissions' },
           { status: 403 }
@@ -76,7 +76,7 @@ export async function POST(
       .from('email_notifications')
       .update({
         status: 'cancelled',
-        error_message: 'Cancelled by _user',
+        error_message: 'Cancelled by user',
         updated_at: new Date().toISOString(),
       })
       .eq('id', notificationId);

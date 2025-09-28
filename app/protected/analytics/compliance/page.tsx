@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Compliance Reports Page
  * Location: /app/protected/analytics/compliance/page.tsx
@@ -9,23 +11,12 @@
  * - Risk assessment reports
  */
 
-'use client';
-
-import { useCallback, useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { useState, useEffect, useCallback } from 'react';
+import { Shield, FileCheck, AlertTriangle, CheckCircle2, Download, Eye, Calendar, Users, Loader2 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
-  Shield, 
-  FileCheck, 
-  AlertTriangle, 
-  CheckCircle2,
-  Download,
-  Eye,
-  Calendar,
-  Users,
-  Loader2
-} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { useAuth } from '@/lib/contexts/auth-context';
 
 interface ComplianceStats {
@@ -38,7 +29,7 @@ interface ComplianceStats {
 }
 
 export default function ComplianceReportsPage() {
-  const { _user, getSupabaseClient } = useAuth();
+  const { user, supabase } = useAuth();
   const [complianceStats, setComplianceStats] = useState<ComplianceStats>({
     totalDocuments: 0,
     compliantDocuments: 0,
@@ -51,18 +42,17 @@ export default function ComplianceReportsPage() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchComplianceStats = useCallback(async () => {
-    if (!_user?.id) return;
+    if (!user?.id) return;
     
     try {
       setLoading(true);
       setError(null);
 
       // Fetch _document compliance data
-      const _supabase = getSupabaseClient();
       const { data: documents, error: documentsError } = await supabase
         .from('documents')
         .select('id, status, created_at')
-        .eq('created_by', _user.id);
+        .eq('created_by', user.id);
 
       if (documentsError) {
         throw documentsError;
@@ -92,13 +82,13 @@ export default function ComplianceReportsPage() {
     } finally {
       setLoading(false);
     }
-  }, [_user?.id, getSupabaseClient]);
+  }, [user?.id, supabase]);
 
   useEffect(() => {
-    if (_user) {
+    if (user) {
       fetchComplianceStats();
     }
-  }, [_user, fetchComplianceStats]);
+  }, [user, fetchComplianceStats]);
 
 
   const complianceReports = [
@@ -144,8 +134,8 @@ export default function ComplianceReportsPage() {
     {
       id: '1',
       action: 'Document Signed',
-      _user: 'John Smith',
-      _document: 'Service Agreement - ABC Corp',
+      user: 'John Smith',
+      document: 'Service Agreement - ABC Corp',
       timestamp: '2024-01-15 14:30:00',
       ipAddress: '192.168.1.100',
       status: 'success'
@@ -153,8 +143,8 @@ export default function ComplianceReportsPage() {
     {
       id: '2',
       action: 'Document Uploaded',
-      _user: 'Sarah Johnson',
-      _document: 'NDA - Tech Startup',
+      user: 'Sarah Johnson',
+      document: 'NDA - Tech Startup',
       timestamp: '2024-01-15 13:45:00',
       ipAddress: '192.168.1.101',
       status: 'success'
@@ -162,8 +152,8 @@ export default function ComplianceReportsPage() {
     {
       id: '3',
       action: 'Compliance Check Failed',
-      _user: 'System',
-      _document: 'Contract Amendment - XYZ Ltd',
+      user: 'System',
+      document: 'Contract Amendment - XYZ Ltd',
       timestamp: '2024-01-15 12:20:00',
       ipAddress: 'System',
       status: 'warning'
@@ -171,8 +161,8 @@ export default function ComplianceReportsPage() {
     {
       id: '4',
       action: 'Document Deleted',
-      _user: 'Mike Wilson',
-      _document: 'Draft Agreement - Old Version',
+      user: 'Mike Wilson',
+      document: 'Draft Agreement - Old Version',
       timestamp: '2024-01-15 11:15:00',
       ipAddress: '192.168.1.102',
       status: 'success'
@@ -396,11 +386,11 @@ export default function ComplianceReportsPage() {
                       {entry.action}
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                      {entry._document}
+                      {entry.document}
                     </p>
                     <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
                       <Users className="w-3 h-3" />
-                      <span>{entry._user}</span>
+                      <span>{entry.user}</span>
                       <span>•</span>
                       <span>{entry.timestamp}</span>
                     </div>

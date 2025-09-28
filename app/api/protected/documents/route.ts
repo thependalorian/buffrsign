@@ -31,7 +31,7 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
     }
 
     // Build query based on _user role and permissions
-    const _supabase = await getSupabaseClient();
+    const supabase = await getSupabaseClient();
     let query = supabase
       .from('documents')
       .select(`
@@ -71,7 +71,7 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
       query = query.eq('mime_type', type);
     }
 
-    const { data: documents, error, count } = await query;
+    const { data: documents, count, error } = await query;
 
     if (error) {
       console.error('Error fetching documents:', error);
@@ -93,7 +93,7 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
         },
       },
     });
-  } catch {
+  } catch (error) {
     console.error('Documents API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -164,7 +164,7 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
     }
 
     // Create _document record
-    const _supabase = await getSupabaseClient();
+    const supabase = await getSupabaseClient();
     const { data: _document, error } = await supabase
       .from('documents')
       .insert({
@@ -211,7 +211,7 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
       data: _document,
       message: 'Document created successfully',
     }, { status: 201 });
-  } catch {
+  } catch (error) {
     console.error('Document creation error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

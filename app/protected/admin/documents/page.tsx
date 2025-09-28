@@ -1,10 +1,4 @@
-/**
- * Admin Document Management Page
- * 
- * Purpose: Comprehensive _document oversight and management for BuffrSign administrators
- * Location: /app/protected/admin/documents/page.tsx
- * Features: Document monitoring, signature verification, compliance oversight, analytics
- */
+import { Upload, FileText, Shield, Zap, CheckCircle, AlertCircle, Users, Bot } from "lucide-react";
 
 export default function ProtectedAdminDocumentsPage() {
   return (
@@ -485,7 +479,7 @@ export default function ProtectedAdminDocumentsPage() {
 
         {/* AI Document Assistant */}
         <div className="bg-white rounded-lg shadow-sm p-8">
-          <h2 className="text-xl font-semibold mb-6">🤖 AI Document Assistant</h2>
+          <h2 className="text-xl font-semibold mb-6"><Bot className="w-5 h-5 inline-block mr-2" /> AI Document Assistant</h2>
           <div className="space-y-6">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
               <h3 className="font-medium text-blue-900 mb-3">Smart Document Insights</h3>

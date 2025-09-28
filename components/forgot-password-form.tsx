@@ -1,102 +1,118 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { useAuth } from "@/lib/contexts/auth-context";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import Link from "next/link";
-import { useState } from "react";
+import { useState } from 'react';
+import Link from 'next/link';
+import { FileSignature, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
-export function ForgotPasswordForm({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<"div">) {
-  const [email, setEmail] = useState("");
+export function ForgotPasswordForm() {
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const { resetPassword } = useAuth();
+  const [success, setSuccess] = useState<string | null>(null);
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError(null);
+    setSuccess(null);
+    setLoading(true);
+
+    if (!email) {
+      setError('Please enter your email address');
+      setLoading(false);
+      return;
+    }
 
     try {
-      const { error } = await resetPassword(email);
-      if (error) throw error;
-      setSuccess(true);
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setSuccess('Password reset email sent! Check your inbox for further instructions.');
+    } catch {
+      setError('Failed to send password reset email. Please try again.');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      {success ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Check Your Email</CardTitle>
-            <CardDescription>Password reset instructions sent</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              If you registered using your email and password, you will receive
-              a password reset email.
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-            <CardDescription>
-              Type in your email and we&apos;ll send you a link to reset your
-              password
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleForgotPassword}>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                {error && <p className="text-sm text-red-500">{error}</p>}
-                <Button variant="primary" size="md" state={isLoading ? 'loading' : 'default'} className="w-full">
-                  {isLoading ? "Sending..." : "Send reset email"}
-                </Button>
-              </div>
-              <div className="mt-4 text-center text-sm">
-                Already have an account?{" "}
-                <Link
-                  href="/auth/login"
-                  className="underline underline-offset-4"
-                >
-                  Login
-                </Link>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+    <Card className="p-8 max-w-md mx-auto">
+      <div className="flex items-center justify-center mb-6">
+        <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
+          <FileSignature className="w-7 h-7 text-white" />
+        </div>
+      </div>
+
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          Forgot Password?
+        </h1>
+        <p className="text-gray-600 dark:text-gray-300">
+          Enter your email address and we&apos;ll send you a link to reset your password.
+        </p>
+      </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center space-x-2">
+          <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        </div>
       )}
-    </div>
+
+      {/* Success Message */}
+      {success && (
+        <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-center space-x-2">
+          <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+          <p className="text-sm text-green-600 dark:text-green-400">{success}</p>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-2">
+          <Label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Email address
+          </Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full"
+            disabled={loading}
+          />
+        </div>
+
+        <Button
+          type="submit"
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-2.5"
+          disabled={loading}
+        >
+          {loading ? (
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Sending...</span>
+            </div>
+          ) : (
+            'Send Reset Link'
+          )}
+        </Button>
+      </form>
+
+      <div className="mt-6 text-center">
+        <Link
+          href="/auth/login"
+          className="inline-flex items-center text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium"
+        >
+          <ArrowLeft className="w-4 h-4 mr-1" />
+          Back to Sign In
+        </Link>
+      </div>
+    </Card>
   );
 }

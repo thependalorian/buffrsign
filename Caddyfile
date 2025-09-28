@@ -1,0 +1,50 @@
+{
+    email {$LETSENCRYPT_EMAIL}
+}
+
+# BuffrSign API reverse proxy
+{$API_HOSTNAME} {
+    # Request body size limit (10MB)
+    request_body {
+        max_size 10MB
+    }
+    
+    # Security headers
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        X-XSS-Protection "1; mode=block"
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    }
+    
+    # CORS headers for API
+    header Access-Control-Allow-Origin "*"
+    header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    header Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+    
+    reverse_proxy buffrsign-api:8001
+}
+
+# BuffrSign Frontend reverse proxy
+{$FRONTEND_HOSTNAME} {
+    # Request body size limit (10MB)
+    request_body {
+        max_size 10MB
+    }
+    
+    # Security headers
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        X-XSS-Protection "1; mode=block"
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    }
+    
+    # Cache static assets
+    @static {
+        path *.css *.js *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2
+    }
+    header @static Cache-Control "public, max-age=31536000"
+    
+    reverse_proxy buffrsign-frontend:3000
+}

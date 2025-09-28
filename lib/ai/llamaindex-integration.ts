@@ -5,15 +5,13 @@
 'use client';
 
 import {
-  vectorSearch,
   hybridSearch,
   getDocument,
   listDocuments,
-  getDocumentChunks,
-  searchKnowledgeGraph,
   getEntityRelationships,
   getEntityTimeline,
   generateEmbedding,
+  DocumentMetadata,
 } from '../database/db-utils';
 
 
@@ -191,16 +189,23 @@ export class LlamaIndexDocumentIntelligence {
       
       // Convert to QueryResult format
       return results.map(result => ({
-        id: result.chunk_id,
-        text: result.content,
+        nodes: [{
+          id: result.chunk_id,
+          text: result.content,
+          metadata: {
+            document_id: result.document_id,
+            document_title: result.document_title,
+            document_source: result.document_source,
+            similarity: result.similarity,
+            ...result.metadata
+          }
+        }],
+        score: result.similarity,
         metadata: {
-          document_id: result.document_id,
-          document_title: result.document_title,
-          document_source: result.document_source,
-          similarity: result.similarity,
-          ...result.metadata
-        },
-        score: result.similarity
+          query,
+          method: 'hybrid_search',
+          timestamp: new Date().toISOString()
+        }
       }));
     } catch (error) {
       console.error('Hybrid search error:', error);
@@ -830,7 +835,7 @@ export class LlamaIndexDocumentIntelligence {
   /**
    * Get _document from database
    */
-  async getDocumentFromDB(documentId: string): Promise<any> {
+  async getDocumentFromDB(documentId: string): Promise<DocumentMetadata | null> {
     try {
       const _document = await getDocument(documentId);
       return _document;

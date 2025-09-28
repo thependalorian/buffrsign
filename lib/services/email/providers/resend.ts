@@ -99,7 +99,7 @@ export class ResendProvider {
   async sendTemplateEmail(
     to: string,
     templateId: string,
-    templateData: Record<string, any>,
+    templateData: Record<string, unknown>,
     customArgs?: Record<string, string>
   ): Promise<EmailSendResult> {
     if (!this.isInitialized) {
@@ -238,7 +238,7 @@ export class ResendProvider {
   /**
    * Get delivery statistics
    */
-  async getDeliveryStats(startDate: string, endDate: string): Promise<any> {
+  async getDeliveryStats(): Promise<ResendDeliveryStats> {
     try {
       // This would require Resend Analytics API
       // For now, return empty stats
@@ -260,7 +260,7 @@ export class ResendProvider {
   /**
    * Get email status
    */
-  async getEmailStatus(messageId: string): Promise<any> {
+  async getEmailStatus(messageId: string): Promise<ResendEmailStatus> {
     try {
       const response = await fetch(`${this.apiUrl}/emails/${messageId}`, {
         method: 'GET',

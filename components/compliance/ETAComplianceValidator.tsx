@@ -6,10 +6,8 @@
  * Features: Real-time compliance checking, detailed reporting, blue-purple theme
  */
 
-'use client';
+import React, { useState, useEffect, useCallback } from 'react';
 
-import React, { useState, useEffect } from 'react';
-import { designTokens, componentStyles } from '@/lib/design-system';
 
 // ETA 2019 Compliance Types
 interface ETAComplianceResult {
@@ -63,13 +61,7 @@ export function ETAComplianceValidator({
   const [error, setError] = useState<string | null>(null);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (documentId && signatureData) {
-      validateETACompliance();
-    }
-  }, [documentId, signatureData]);
-
-  const validateETACompliance = async () => {
+  const validateETACompliance = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -97,12 +89,18 @@ export function ETAComplianceValidator({
     } finally {
       setLoading(false);
     }
-  };
+  }, [documentId, signatureData, onComplianceChange]);
+
+  useEffect(() => {
+    if (documentId && signatureData) {
+      validateETACompliance();
+    }
+  }, [documentId, signatureData, validateETACompliance]);
 
   const getComplianceColor = (compliant: boolean, score: number) => {
-    if (compliant && score >= 90) return designTokens.colors.success;
-    if (compliant && score >= 70) return designTokens.colors.warning;
-    return designTokens.colors.error;
+    if (compliant && score >= 90) return 'text-chart-2'; // Success Green
+    if (compliant && score >= 70) return 'text-chart-3'; // Warning Orange
+    return 'text-chart-5'; // Error Red
   };
 
   const getComplianceIcon = (compliant: boolean, score: number) => {
@@ -182,8 +180,7 @@ export function ETAComplianceValidator({
           </div>
           <div className="text-right">
             <div 
-              className="text-3xl font-bold"
-              style={{ color: getComplianceColor(complianceResult.compliant, complianceResult.score) }}
+              className={`text-3xl font-bold ${getComplianceColor(complianceResult.compliant, complianceResult.score)}`}
             >
               {complianceResult.score}%
             </div>

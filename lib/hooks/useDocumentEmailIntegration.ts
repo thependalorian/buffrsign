@@ -7,6 +7,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
+
 export interface DocumentEmailNotification {
   id: string;
   recipient_email: string;
@@ -57,8 +58,7 @@ export function useDocumentEmailIntegration(documentId: string): UseDocumentEmai
   const [recipients, setRecipients] = useState<DocumentRecipient[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const _supabase = createClient();
+  const supabase = createClient();
 
   // Fetch email notifications for the document
   const fetchNotifications = useCallback(async () => {
@@ -83,12 +83,12 @@ export function useDocumentEmailIntegration(documentId: string): UseDocumentEmai
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setNotifications(data || []);
+      setNotifications((data as DocumentEmailNotification[]) || []);
     } catch (err) {
       console.error('Error fetching email notifications:', err);
       setError('Failed to fetch email notifications');
     }
-  }, [documentId, supabase]);
+  }, [documentId]);
 
   // Fetch _document recipients
   const fetchRecipients = useCallback(async () => {
@@ -100,12 +100,12 @@ export function useDocumentEmailIntegration(documentId: string): UseDocumentEmai
         .order('signing_order', { ascending: true });
 
       if (error) throw error;
-      setRecipients(data || []);
+      setRecipients((data as DocumentRecipient[]) || []);
     } catch (err) {
       console.error('Error fetching recipients:', err);
       setError('Failed to fetch recipients');
     }
-  }, [documentId, supabase]);
+  }, [documentId]);
 
   // Send email action
   const sendEmailAction = useCallback(async (action: string, data?: unknown) => {
@@ -118,7 +118,7 @@ export function useDocumentEmailIntegration(documentId: string): UseDocumentEmai
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ action, ...data }),
+        body: JSON.stringify({ action, ...(data as Record<string, unknown>) }),
       });
 
       if (!response.ok) {

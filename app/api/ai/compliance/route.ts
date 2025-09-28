@@ -28,7 +28,6 @@ export async function POST(request: NextRequest) {
       document_content,
       frameworks = ['ETA 2019', 'Namibian Labour Act'],
       userTier = 'standard',
-      context = {} as Record<string, unknown>
     } = body;
 
     // Validate required fields
@@ -106,7 +105,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-  } catch {
+  } catch (error) {
     console.error('AI Compliance API Error:', error);
     
     return NextResponse.json(

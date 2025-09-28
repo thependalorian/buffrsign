@@ -93,7 +93,7 @@ export class SendGridProvider {
   async sendTemplateEmail(
     to: string,
     templateId: string,
-    dynamicTemplateData: Record<string, any>,
+    dynamicTemplateData: Record<string, unknown>,
     customArgs?: Record<string, string>
   ): Promise<EmailSendResult> {
     if (!this.isInitialized) {
@@ -235,7 +235,7 @@ export class SendGridProvider {
   /**
    * Get delivery statistics
    */
-  async getDeliveryStats(startDate: string, endDate: string): Promise<any> {
+  async getDeliveryStats(): Promise<SendGridDeliveryStats> {
     try {
       // This would require SendGrid Stats API
       // For now, return empty stats

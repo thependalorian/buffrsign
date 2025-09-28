@@ -1,13 +1,15 @@
+"use client";
+
 // BuffrSign Platform - Sidebar Navigation Component
 // Provides navigation menu with role-based access control and _user profile
 
-'use client';
-
-import React, { useState } from 'react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { UserProfile } from '../../lib/types/auth';
-import { UserRole } from '../../lib/types';
+import Link from 'next/link';
+import { useState } from 'react';
+import { UserProfile } from '../../lib/auth/types';
+
+// Define UserRole locally to avoid import issues
+type UserRole = 'user' | 'admin' | 'super_admin';
 
 // ============================================================================
 // SIDEBAR PROPS
@@ -199,7 +201,7 @@ export default function Sidebar({ _user }: SidebarProps) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
       ),
-      roles: [UserRole.ADMIN, UserRole.SUPER_ADMIN],
+      roles: ['admin', 'super_admin'] as UserRole[],
       children: [
         {
           label: 'User Management',

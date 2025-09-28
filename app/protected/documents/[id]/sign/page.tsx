@@ -11,18 +11,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { 
-  FileText, 
-  PenTool, 
-  Type, 
-  Upload, 
-  CheckCircle, 
-  Shield,
-  Clock,
-  ArrowLeft,
-  Save,
-  Eye
-} from 'lucide-react';
+import { FileText, PenTool, Type, Upload, CheckCircle, Shield, Clock, ArrowLeft, Save, Eye } from 'lucide-react';
 
 export default function SignatureCollectionPage() {
   const params = useParams();
@@ -30,7 +19,7 @@ export default function SignatureCollectionPage() {
   const documentId = params.id;
   
   const [signatureMethod, setSignatureMethod] = useState('draw');
-  const [_signatureData, setSignatureData] = useState('');
+  const [signatureData, setSignatureData] = useState('');
   const [isSigning, setIsSigning] = useState(false);
   const [currentField, setCurrentField] = useState(0);
   
@@ -60,7 +49,7 @@ export default function SignatureCollectionPage() {
 
   useEffect(() => {
     // Initialize signature canvas
-    const canvas = _document.getElementById('signature-canvas') as HTMLCanvasElement;
+    const canvas = document.getElementById('signature-canvas') as HTMLCanvasElement;
     if (canvas) {
       setSignatureCanvas(canvas);
       const ctx = canvas.getContext('2d');

@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { _user } = authResult;
+    const _user = authResult._user;
     const body = await request.json();
     
     const {
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     // Handle different response types
     if (typeof response === 'object' && response && 'success' in response && !response.success) {
       return NextResponse.json(
-        { error: (response as any).error || 'Workflow creation failed' },
+        { error: (response as { error?: string }).error || 'Workflow creation failed' },
         { status: 500 }
       );
     }
@@ -83,15 +83,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: {
-        workflow_id: typeof response === 'string' ? response : (response as any).workflowId || `workflow_${Date.now()}`,
+        workflow_id: typeof response === 'string' ? response : (response as { workflowId?: string }).workflowId || `workflow_${Date.now()}`,
         workflow_type,
-        status: typeof response === 'object' && response && 'status' in response ? (response as any).status : 'created',
+        status: typeof response === 'object' && response && 'status' in response ? (response as { status?: string }).status : 'created',
         user_tier: userTier,
         timestamp: new Date().toISOString()
       }
     });
 
-  } catch {
+  } catch (error) {
     console.error('Workflow API Error:', error);
     
     return NextResponse.json(
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     // Verify JWT token and get _user information
     const authResult = await verifyJWT(request);
@@ -119,8 +119,6 @@ export async function GET() {
     const { searchParams } = new URL(request.url);
     const workflowId = searchParams.get('workflow_id');
 
-    const aiIntegration = new BuffrSignAIIntegration();
-    
     if (workflowId) {
       // Get specific workflow status
       const response = await getWorkflowState(workflowId);
@@ -156,7 +154,7 @@ export async function GET() {
       });
     }
 
-  } catch {
+  } catch (error) {
     console.error('Workflow API Error:', error);
     
     return NextResponse.json(

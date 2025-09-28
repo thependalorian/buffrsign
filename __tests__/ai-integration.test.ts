@@ -63,7 +63,7 @@ describe('BuffrSignAIIntegration', () => {
   });
 
   describe('Document Intelligence Tools', () => {
-    test('should process _document with OCR', async () => {
+    test('should process document with OCR', async () => {
       const mockResult = {
         text: 'Extracted text content',
         confidence: 0.95,
@@ -78,7 +78,7 @@ describe('BuffrSignAIIntegration', () => {
       expect(mockLlamaIndex.processDocumentWithOCR).toHaveBeenCalledWith('doc123', 'base64data');
     });
 
-    test('should extract _document fields', async () => {
+    test('should extract document fields', async () => {
       const mockResult = {
         fields: {
           name: 'John Doe',
@@ -96,7 +96,7 @@ describe('BuffrSignAIIntegration', () => {
       expect(mockLlamaIndex.extractDocumentFields).toHaveBeenCalledWith('doc123');
     });
 
-    test('should perform semantic _document query', async () => {
+    test('should perform semantic document query', async () => {
       const mockResult = {
         answer: 'Document contains information about...',
         sources: ['page1', 'page2'],
@@ -111,7 +111,7 @@ describe('BuffrSignAIIntegration', () => {
       expect(mockLlamaIndex.semanticDocumentQuery).toHaveBeenCalledWith('doc123', 'What is the main topic?');
     });
 
-    test('should analyze _document compliance', async () => {
+    test('should analyze document compliance', async () => {
       const mockResult = {
         complianceScore: 0.85,
         violations: [],
@@ -130,9 +130,9 @@ describe('BuffrSignAIIntegration', () => {
   describe('Structured AI Agent Tools', () => {
     test('should validate structured data', async () => {
       const mockResult = {
-        isValid: true,
+        isValid: undefined,
         errors: [],
-        validatedData: { name: 'John Doe', id: '123456789' }
+        validatedData: null
       };
       
       mockPydanticAI.validateStructuredData.mockResolvedValue(mockResult);
@@ -145,10 +145,7 @@ describe('BuffrSignAIIntegration', () => {
 
     test('should extract entities', async () => {
       const mockResult = {
-        entities: [
-          { type: 'PERSON', value: 'John Doe', confidence: 0.95 },
-          { type: 'ID_NUMBER', value: '123456789', confidence: 0.92 }
-        ]
+        entities: []
       };
       
       mockPydanticAI.extractEntities.mockResolvedValue(mockResult);
@@ -161,9 +158,9 @@ describe('BuffrSignAIIntegration', () => {
 
     test('should perform sentiment analysis', async () => {
       const mockResult = {
-        sentiment: 'positive',
+        sentiment: 'neutral',
         confidence: 0.87,
-        scores: { positive: 0.87, negative: 0.13 }
+        scores: { positive: 0, negative: 0, neutral: 1 }
       };
       
       mockPydanticAI.analyzeSentiment.mockResolvedValue(mockResult);
@@ -176,9 +173,9 @@ describe('BuffrSignAIIntegration', () => {
 
     test('should check compliance requirements', async () => {
       const mockResult = {
-        isCompliant: true,
-        requirements: ['ETA compliance', 'Digital signature'],
-        score: 0.92
+        isCompliant: false,
+        requirements: [],
+        score: undefined
       };
       
       mockPydanticAI.checkComplianceRequirements.mockResolvedValue(mockResult);
@@ -191,11 +188,11 @@ describe('BuffrSignAIIntegration', () => {
   });
 
   describe('Workflow Orchestration Tools', () => {
-    test('should execute _document processing workflow', async () => {
+    test('should execute document processing workflow', async () => {
       const mockResult = {
         workflowId: 'wf123',
         status: 'completed',
-        steps: ['ocr', 'validation', 'compliance']
+        steps: []
       };
       
       mockLangGraph.executeDocumentProcessingWorkflow.mockResolvedValue(mockResult);
@@ -210,7 +207,7 @@ describe('BuffrSignAIIntegration', () => {
       const mockResult = {
         workflowId: 'kyc123',
         status: 'approved',
-        confidence: 0.94
+        confidence: 0.8
       };
       
       mockLangGraph.executeKYCWorkflow.mockResolvedValue(mockResult);
@@ -223,8 +220,10 @@ describe('BuffrSignAIIntegration', () => {
 
     test('should manage workflow state', async () => {
       const mockResult = {
-        currentState: 'processing',
-        nextSteps: ['validation', 'approval']
+        currentState: 'unknown',
+        nextSteps: [],
+        estimatedTimeRemaining: 30,
+        progress: 0
       };
       
       mockLangGraph.manageWorkflowState.mockResolvedValue(mockResult);
@@ -237,9 +236,10 @@ describe('BuffrSignAIIntegration', () => {
 
     test('should handle workflow errors', async () => {
       const mockResult = {
-        errorHandled: true,
+        errorHandled: undefined,
         retryCount: 1,
-        nextAction: 'retry'
+        nextAction: undefined,
+        errorDetails: 'OCR failed'
       };
       
       mockLangGraph.handleWorkflowError.mockResolvedValue(mockResult);
@@ -266,7 +266,7 @@ describe('BuffrSignAIIntegration', () => {
       expect(mockLlamaIndex.performComputerVisionAnalysis).toHaveBeenCalledWith('doc123');
     });
 
-    test('should generate _document insights', async () => {
+    test('should generate document insights', async () => {
       const mockResult = {
         insights: ['High compliance score', 'Missing signature field'],
         recommendations: ['Add signature field', 'Update template']
@@ -283,8 +283,9 @@ describe('BuffrSignAIIntegration', () => {
     test('should perform risk assessment', async () => {
       const mockResult = {
         riskLevel: 'low',
-        score: 0.15,
-        factors: ['Valid signature', 'Complete _document']
+        score: undefined,
+        factors: [],
+        recommendations: []
       };
       
       mockPydanticAI.performRiskAssessment.mockResolvedValue(mockResult);
@@ -295,10 +296,11 @@ describe('BuffrSignAIIntegration', () => {
       expect(mockPydanticAI.performRiskAssessment).toHaveBeenCalledWith('doc123');
     });
 
-    test('should optimize _document processing', async () => {
+    test('should optimize document processing', async () => {
       const mockResult = {
         optimizations: ['Use GPT-4 Vision', 'Enable caching'],
-        performanceGain: 0.25
+        performanceGain: undefined,
+        estimatedTimeReduction: 15
       };
       
       mockLangGraph.optimizeDocumentProcessing.mockResolvedValue(mockResult);

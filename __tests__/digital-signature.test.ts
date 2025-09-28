@@ -6,10 +6,11 @@
  * Features: Comprehensive testing of signature lifecycle with TypeScript
  */
 
-import { 
-  Signature, 
-  SignatureData, 
-  SignatureType, 
+import * as fs from 'fs'; // Import fs module
+import {
+  Signature,
+  SignatureData,
+  SignatureType,
   SignatureVerificationStatus,
   DigitalCertificate,
   BiometricData,
@@ -21,64 +22,36 @@ import {
   FieldLocation,
   AuditEvent
 } from '../lib/types';
+import { IDatabase, ICrypto } from '../lib/interfaces';
+import { InMemoryDatabase } from '../lib/database';
+import { Crypto } from '../lib/crypto';
+import { SignatureImageGenerator } from '../lib/signature-image-generator';
 
-// Mock crypto functions for testing
-const mockCrypto = {
-  generateKeyPair: jest.fn(),
-  sign: jest.fn(),
-  verify: jest.fn(),
-  hash: jest.fn(),
-  generateRandomBytes: jest.fn()
-};
 
-// Mock database operations
-const mockDatabase = {
-  signatures: new Map<string, Signature>(),
-  documents: new Map<string, Document>(),
-  auditEvents: new Map<string, AuditEvent[]>(),
-  
-  saveSignature: jest.fn((signature: Signature) => {
-    mockDatabase.signatures.set(signature.id, signature);
-    return Promise.resolve(signature);
-  }),
-  
-  getSignature: jest.fn((id: string) => {
-    return Promise.resolve(mockDatabase.signatures.get(id));
-  }),
-  
-  saveDocument: jest.fn((_document: Document) => {
-    mockDatabase.documents.set(_document.id, _document);
-    return Promise.resolve(_document);
-  }),
-  
-  getDocument: jest.fn((id: string) => {
-    return Promise.resolve(mockDatabase.documents.get(id));
-  }),
-  
-  saveAuditEvent: jest.fn((event: AuditEvent) => {
-    const events = mockDatabase.auditEvents.get(event.resource_id) || [];
-    events.push(event);
-    mockDatabase.auditEvents.set(event.resource_id, events);
-    return Promise.resolve(event);
-  })
-};
 
 // Digital Signature Service for testing
 class DigitalSignatureService {
-  private db = mockDatabase;
-  private crypto = mockCrypto;
+  private db: IDatabase;
+  private crypto: ICrypto;
+  private signatureImageGenerator: SignatureImageGenerator;
+
+  constructor(db: IDatabase, crypto: ICrypto, signatureImageGenerator: SignatureImageGenerator) {
+    this.db = db;
+    this.crypto = crypto;
+    this.signatureImageGenerator = signatureImageGenerator;
+  }
 
   async createSignature(
     documentId: string,
     signerId: string,
-    signatureData: SignatureData,
+    initialSignatureData: SignatureData, // Renamed to avoid confusion
     signatureType: SignatureType,
     ipAddress: string,
     userAgent: string
   ): Promise<Signature> {
     try {
       // Validate inputs
-      if (!documentId || !signerId || !signatureData) {
+      if (!documentId || !signerId || !initialSignatureData) {
         throw new Error('Missing required signature parameters');
       }
 
@@ -92,16 +65,35 @@ class DigitalSignatureService {
       const signatureId = this.generateId();
 
       // Create digital certificate if needed
-      const certificate = signatureType === SignatureType.DIGITAL 
-        ? await this.generateDigitalCertificate(signerId)
-        : undefined;
+      let certificate: DigitalCertificate | undefined;
+      if (signatureType === SignatureType.DIGITAL) {
+        certificate = await this.generateDigitalCertificate(signerId);
+      }
 
-      // Generate verification hash
+      let finalSignatureData: SignatureData = { ...initialSignatureData }; // Create a mutable copy
+
+      let dataToSignForCrypto: string;
+      let digitalSignatureValue: string | undefined;
+
+      // Generate dataToSignForCrypto before potentially modifying finalSignatureData
+      dataToSignForCrypto = `${documentId}:${signerId}:${JSON.stringify(initialSignatureData)}`;
+
+      if (signatureType === SignatureType.DIGITAL && certificate) {
+        console.log('Data being signed in createSignature:', dataToSignForCrypto);
+        digitalSignatureValue = await this.crypto.sign(dataToSignForCrypto, certificate.private_key);
+        console.log('Generated digitalSignatureValue:', digitalSignatureValue); // Added log
+        finalSignatureData.digital_signature = digitalSignatureValue; // Update with the actual digital signature
+      }
+
+      // Generate verification hash (this will use the initialSignatureData, not finalSignatureData with digital_signature)
       const verificationHash = await this.generateVerificationHash(
-        documentId, 
-        signerId, 
-        signatureData
+        documentId,
+        signerId,
+        initialSignatureData // Use initialSignatureData here
       );
+
+      // Update finalSignatureData with verification_hash
+      finalSignatureData.verification_hash = verificationHash;
 
       // Create signature object
       const signature: Signature = {
@@ -110,8 +102,7 @@ class DigitalSignatureService {
         signer_id: signerId,
         field_name: 'signature_field',
         signature_data: {
-          ...signatureData,
-          verification_hash: verificationHash
+          ...finalSignatureData // finalSignatureData now contains digital_signature and verification_hash
         },
         signature_type: signatureType,
         timestamp: new Date().toISOString(),
@@ -119,9 +110,11 @@ class DigitalSignatureService {
         user_agent: userAgent,
         verification_status: SignatureVerificationStatus.PENDING,
         certificate_info: certificate,
+        signed_data_string: dataToSignForCrypto, // Store the exact string that was signed by crypto
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
+      console.log('Signature object before saving:', JSON.stringify(signature, null, 2)); // Added log
 
       // Save signature
       await this.db.saveSignature(signature);
@@ -200,18 +193,21 @@ class DigitalSignatureService {
   }
 
   async getSignatureAuditTrail(signatureId: string): Promise<AuditEvent[]> {
-    const events = mockDatabase.auditEvents.get(signatureId) || [];
-    return events.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    const events = await this.db.getSignatureAuditTrail(signatureId);
+    return events;
   }
 
   private async generateDigitalCertificate(signerId: string): Promise<DigitalCertificate> {
-    // Mock certificate generation
+    const { publicKey, privateKey } = await this.crypto.generateKeyPair();
+    console.log('Generated Certificate Public Key:', publicKey.substring(0, 50));
+    console.log('Generated Certificate Private Key:', privateKey.substring(0, 50));
     return {
       issuer: 'BuffrSign Certificate Authority',
       serial_number: this.generateId(),
       valid_from: new Date().toISOString(),
       valid_until: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year
-      public_key: 'mock-public-key',
+      public_key: publicKey,
+      private_key: privateKey, // Added this line
       certificate_chain: ['BuffrSign CA', 'Root CA']
     };
   }
@@ -226,12 +222,24 @@ class DigitalSignatureService {
   }
 
   private async verifySignatureData(signature: Signature, documentId: string): Promise<boolean> {
-    // Mock verification logic
-    const expectedHash = await this.generateVerificationHash(
-      documentId,
-      signature.signer_id,
-      signature.signature_data
-    );
+    // Generate expectedHash using the original signed_data_string
+    const expectedHash = await this.crypto.hash(signature.signed_data_string);
+
+    // Use real crypto verification if digital_signature is present
+    if (signature.signature_type === SignatureType.DIGITAL && signature.signature_data.digital_signature && signature.certificate_info?.public_key) {
+      // Use the stored signed_data_string for verification
+      if (!signature.signed_data_string) {
+        throw new Error('Signed data string not found for verification');
+      }
+      console.log('Verifying signature with:', {
+        signedDataString: signature.signed_data_string,
+        digitalSignature: signature.signature_data.digital_signature,
+        publicKey: signature.certificate_info.public_key
+      });
+      const isVerified = this.crypto.verify(signature.signed_data_string, signature.signature_data.digital_signature, signature.certificate_info.public_key);
+      console.log('Crypto verification result:', isVerified);
+      return isVerified;
+    }
     
     return signature.signature_data.verification_hash === expectedHash;
   }
@@ -274,16 +282,20 @@ describe('Digital Signature Service', () => {
   let signatureService: DigitalSignatureService;
   let testDocument: Document;
   let testSignatureField: SignatureField;
+  let inMemoryDb: InMemoryDatabase;
+  let realCrypto: Crypto;
 
   beforeEach(() => {
-    // Reset mocks
-    jest.clearAllMocks();
-    mockDatabase.signatures.clear();
-    mockDatabase.documents.clear();
-    mockDatabase.auditEvents.clear();
+    // Initialize real dependencies
+    inMemoryDb = new InMemoryDatabase();
+    realCrypto = new Crypto();
+    const signatureImageGenerator = new SignatureImageGenerator(); // Instantiate the image generator
 
-    // Initialize service
-    signatureService = new DigitalSignatureService();
+    // Initialize service with real dependencies
+    signatureService = new DigitalSignatureService(inMemoryDb, realCrypto, signatureImageGenerator);
+
+    // Clear database before each test
+    inMemoryDb.clear();
 
     // Create test document
     testDocument = {
@@ -327,14 +339,20 @@ describe('Digital Signature Service', () => {
     testDocument.signature_fields = [testSignatureField];
 
     // Save test document
-    mockDatabase.saveDocument(testDocument);
+    inMemoryDb.saveDocument(testDocument);
   });
 
   describe('Signature Creation', () => {
     it('should create an electronic signature successfully', async () => {
       // Arrange
+      const signatureText = 'Test Signature';
+      const signatureImagePath = await signatureService.signatureImageGenerator.generateSignatureImage(
+        'test-signature-id', // Use a unique ID for the image file
+        signatureText
+      );
+
       const signatureData: SignatureData = {
-        image_url: 'https://example.com/signature.png',
+        image_url: signatureImagePath,
         verification_hash: ''
       };
 
@@ -359,20 +377,17 @@ describe('Digital Signature Service', () => {
       expect(signature.timestamp).toBeDefined();
       expect(signature.ip_address).toBe('192.168.1.1');
       expect(signature.user_agent).toBe('Mozilla/5.0 (Test Browser)');
+      expect(fs.existsSync(signature.signature_data.image_url as string)).toBe(true); // Assert that the PNG file was created
     });
 
     it('should create a digital signature with certificate', async () => {
       // Arrange
-      const signatureData: SignatureData = {
-        digital_signature: 'base64-encoded-signature',
-        verification_hash: ''
-      };
-
+      const { privateKey } = await realCrypto.generateKeyPair(); // Generate a key pair for signing
       // Act
       const signature = await signatureService.createSignature(
         testDocument.id,
         'test-_user-456',
-        signatureData,
+        { verification_hash: '' }, // Pass initialSignatureData without digital_signature
         SignatureType.DIGITAL,
         '192.168.1.1',
         'Mozilla/5.0 (Test Browser)'
@@ -386,7 +401,15 @@ describe('Digital Signature Service', () => {
       expect(signature.certificate_info?.serial_number).toBeDefined();
       expect(signature.certificate_info?.valid_from).toBeDefined();
       expect(signature.certificate_info?.valid_until).toBeDefined();
-    });
+      // Verify the digital signature using the generated public key
+      const isVerifiedDigital = await realCrypto.verify(
+        signature.signed_data_string, // Use the signed_data_string from the created signature
+        signature.signature_data.digital_signature as string, // Use the digital_signature from the created signature
+        signature.certificate_info?.public_key as string
+      );
+      console.log('isVerifiedDigital (test):', isVerifiedDigital);
+      await expect(isVerifiedDigital).toBe(true);
+    }); // Added missing closing brace
 
     it('should create a biometric signature', async () => {
       // Arrange
@@ -465,20 +488,26 @@ describe('Digital Signature Service', () => {
     let testSignature: Signature;
 
     beforeEach(async () => {
-      // Create a test signature
-      const signatureData: SignatureData = {
-        image_url: 'https://example.com/signature.png',
-        verification_hash: ''
+      // Create a test digital signature for verification tests
+      const { privateKey } = await realCrypto.generateKeyPair();
+      const dataToSign = `${testDocument.id}:test-_user-456:${JSON.stringify({ someData: 'value' })}`;
+      const digitalSignatureValue = await realCrypto.sign(dataToSign, privateKey);
+
+      const initialSignatureData: SignatureData = {
+        digital_signature: digitalSignatureValue,
+        verification_hash: '' // This will be updated by createSignature
       };
 
       testSignature = await signatureService.createSignature(
         testDocument.id,
         'test-_user-456',
-        signatureData,
-        SignatureType.ELECTRONIC,
+        initialSignatureData,
+        SignatureType.DIGITAL,
         '192.168.1.1',
         'Mozilla/5.0 (Test Browser)'
       );
+      // The testSignature now contains the correct verification_hash generated by createSignature
+      testSignature.signature_data.verification_hash = (await realCrypto.hash(testSignature.signed_data_string));
     });
 
     it('should verify a valid signature successfully', async () => {
@@ -504,13 +533,17 @@ describe('Digital Signature Service', () => {
     });
 
     it('should update signature verification status after verification', async () => {
+      // Arrange
+      const initialSignature = await inMemoryDb.getSignature(testSignature.id);
+      const initialUpdatedAt = initialSignature?.updated_at;
+
       // Act
       await signatureService.verifySignature(testSignature.id, testDocument.id);
 
       // Assert
-      const updatedSignature = await mockDatabase.getSignature(testSignature.id);
+      const updatedSignature = await inMemoryDb.getSignature(testSignature.id);
       expect(updatedSignature?.verification_status).toBe(SignatureVerificationStatus.VERIFIED);
-      expect(updatedSignature?.updated_at).not.toBe(testSignature.updated_at);
+      expect(updatedSignature?.updated_at).not.toBe(initialUpdatedAt);
     });
   });
 
@@ -601,8 +634,7 @@ describe('Digital Signature Service', () => {
 
     it('should validate digital signature data', async () => {
       // Arrange
-      const validSignatureData: SignatureData = {
-        digital_signature: 'base64-encoded-signature-data',
+      const initialSignatureData: SignatureData = {
         verification_hash: ''
       };
 
@@ -610,14 +642,15 @@ describe('Digital Signature Service', () => {
       const signature = await signatureService.createSignature(
         testDocument.id,
         'test-_user-456',
-        validSignatureData,
+        initialSignatureData,
         SignatureType.DIGITAL,
         '192.168.1.1',
         'Mozilla/5.0 (Test Browser)'
       );
 
       // Assert
-      expect(signature.signature_data.digital_signature).toBe(validSignatureData.digital_signature);
+      expect(signature.signature_data.digital_signature).toBeDefined();
+      expect(signature.signature_data.digital_signature).not.toBe('');
       expect(signature.certificate_info).toBeDefined();
     });
 
@@ -656,7 +689,7 @@ describe('Digital Signature Service', () => {
   describe('Error Handling', () => {
     it('should handle database errors gracefully', async () => {
       // Arrange
-      mockDatabase.saveSignature.mockRejectedValueOnce(new Error('Database connection failed'));
+      jest.spyOn(inMemoryDb, 'saveSignature').mockRejectedValueOnce(new Error('Database connection failed'));
       
       const signatureData: SignatureData = {
         image_url: 'https://example.com/signature.png',
@@ -692,7 +725,7 @@ describe('Digital Signature Service', () => {
         'Mozilla/5.0 (Test Browser)'
       );
 
-      mockDatabase.getSignature.mockRejectedValueOnce(new Error('Database read error'));
+      jest.spyOn(inMemoryDb, 'getSignature').mockRejectedValueOnce(new Error('Database read error'));
 
       // Act & Assert
       await expect(
@@ -761,14 +794,15 @@ describe('Digital Signature Service', () => {
 describe('Digital Signature Integration Tests', () => {
   let signatureService: DigitalSignatureService;
   let testDocument: Document;
+  let inMemoryDb: InMemoryDatabase;
+  let realCrypto: Crypto;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockDatabase.signatures.clear();
-    mockDatabase.documents.clear();
-    mockDatabase.auditEvents.clear();
-
-    signatureService = new DigitalSignatureService();
+    inMemoryDb = new InMemoryDatabase();
+    realCrypto = new Crypto();
+    signatureService = new DigitalSignatureService(inMemoryDb, realCrypto);
+    inMemoryDb.clear();
 
     testDocument = {
       id: 'integration-test-doc',
@@ -792,7 +826,7 @@ describe('Digital Signature Integration Tests', () => {
       updated_at: new Date().toISOString()
     };
 
-    mockDatabase.saveDocument(testDocument);
+    inMemoryDb.saveDocument(testDocument);
   });
 
   it('should complete full signature lifecycle', async () => {
@@ -812,6 +846,12 @@ describe('Digital Signature Integration Tests', () => {
       'Integration Test Browser'
     );
 
+    // Assert after creation
+    expect(signature).toBeDefined();
+    expect(signature.verification_status).toBe(SignatureVerificationStatus.PENDING);
+    const expectedVerificationHash = await realCrypto.hash(signature.signed_data_string);
+    expect(signature.signature_data.verification_hash).toBe(expectedVerificationHash);
+
     // Act - Verify signature
     const verificationResult = await signatureService.verifySignature(
       signature.id,
@@ -821,10 +861,7 @@ describe('Digital Signature Integration Tests', () => {
     // Act - Get audit trail
     const auditTrail = await signatureService.getSignatureAuditTrail(signature.id);
 
-    // Assert
-    expect(signature).toBeDefined();
-    expect(signature.verification_status).toBe(SignatureVerificationStatus.PENDING);
-    
+    // Assert after verification
     expect(verificationResult.valid).toBe(true);
     expect(verificationResult.verification_status).toBe(SignatureVerificationStatus.VERIFIED);
     

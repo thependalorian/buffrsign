@@ -44,7 +44,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get _user profile
+    // Get user profile
+    const supabase = await getSupabaseClient();
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('id, email, role, permissions')
@@ -60,15 +61,15 @@ export async function POST(request: NextRequest) {
 
     // Create JWT token pair
     const tokenPair = await jwtService.createTokenPair({
-      id: profile.id,
-      email: profile.email,
-      role: profile.role,
-      permissions: profile.permissions || [],
+      id: profile.id as string,
+      email: profile.email as string,
+      role: profile.role as string,
+      permissions: (profile.permissions as string[]) || [],
     });
 
     // Log successful login
     await (await getSupabaseClient()).rpc('log_token_action', {
-      p_user_id: profile.id,
+      p_user_id: profile.id as string,
       p_action: 'login',
       p_token_type: 'access',
       p_success: true,
@@ -81,14 +82,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: tokenPair,
-      _user: {
-        id: profile.id,
-        email: profile.email,
-        role: profile.role,
-        permissions: profile.permissions || [],
+      user: {
+        id: profile.id as string,
+        email: profile.email as string,
+        role: profile.role as string,
+        permissions: (profile.permissions as string[]) || [],
       },
     });
-  } catch {
+  } catch (error) {
     console.error('Token creation error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -131,7 +132,7 @@ export async function PUT(request: NextRequest) {
       success: true,
       data: newTokenPair,
     });
-  } catch {
+  } catch (error) {
     console.error('Token refresh error:', error);
     
     // Log failed refresh attempt
@@ -165,9 +166,9 @@ export async function PUT(request: NextRequest) {
 export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const token = request.token;
-    const _user = request._user;
+    const user = request._user;
 
-    if (!token || !_user) {
+    if (!token || !user) {
       return NextResponse.json(
         { error: 'No token provided' },
         { status: 401 }
@@ -177,17 +178,17 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
     // Blacklist the current token
     await jwtService.blacklistToken(token);
 
-    // Revoke all _user tokens (optional - for security)
+    // Revoke all user tokens (optional - for security)
     const revokeAll = request.nextUrl.searchParams.get('revoke_all') === 'true';
     if (revokeAll) {
-      await jwtService.revokeAllUserTokens(_user.sub);
+      await jwtService.revokeAllUserTokens(user.sub);
     }
 
     // Log successful logout
     await (await getSupabaseClient()).rpc('log_token_action', {
-      p_user_id: _user.sub,
+      p_user_id: user.sub,
       p_action: 'logout',
-      p_token_type: _user.tokenType,
+      p_token_type: user.tokenType,
       p_success: true,
       p_metadata: {
         revoke_all: revokeAll,
@@ -200,7 +201,7 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
       success: true,
       message: 'Token revoked successfully',
     });
-  } catch {
+  } catch (error) {
     console.error('Token revocation error:', error);
     return NextResponse.json(
       { error: 'Failed to revoke token' },
@@ -214,20 +215,20 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
  */
 export const GET = withAuth(async (request: AuthenticatedRequest) => {
   try {
-    const _user = request._user;
+    const user = request._user;
 
-    if (!_user) {
+    if (!user) {
       return NextResponse.json(
-        { error: 'No _user found' },
+        { error: 'No user found' },
         { status: 401 }
       );
     }
 
-    // Get fresh _user profile
+    // Get fresh user profile
     const { data: profile, error: profileError } = await (await getSupabaseClient())
       .from('profiles')
       .select('id, email, role, permissions, first_name, last_name, company_name')
-      .eq('id', _user.sub)
+      .eq('id', user.sub)
       .single();
 
     if (profileError || !profile) {
@@ -240,23 +241,23 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
     return NextResponse.json({
       success: true,
       data: {
-        _user: {
-          id: profile.id,
-          email: profile.email,
-          role: profile.role,
-          permissions: profile.permissions || [],
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          company_name: profile.company_name,
+        user: {
+          id: profile.id as string,
+          email: profile.email as string,
+          role: profile.role as string,
+          permissions: (profile.permissions as string[]) || [],
+          first_name: profile.first_name as string,
+          last_name: profile.last_name as string,
+          company_name: profile.company_name as string,
         },
         token: {
-          type: _user.tokenType,
-          expires_at: new Date(_user.exp * 1000).toISOString(),
-          issued_at: new Date(_user.iat * 1000).toISOString(),
+          type: user.tokenType,
+          expires_at: new Date(user.exp * 1000).toISOString(),
+          issued_at: new Date(user.iat * 1000).toISOString(),
         },
       },
     });
-  } catch {
+  } catch (error) {
     console.error('Token validation error:', error);
     return NextResponse.json(
       { error: 'Token validation failed' },
